@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+    <record id="view_solar_installation_list" model="ir.ui.view">
+        <field name="name">solar.installation.list</field>
+        <field name="model">solar.installation</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="lead_id"/>
+                <field name="installation_manager_id"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_solar_installation_form" model="ir.ui.view">
+        <field name="name">solar.installation.form</field>
+        <field name="model">solar.installation</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_mark_site_survey_done" string="Complete Site Survey" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_mark_boq_bom_done" string="Complete BOQ/BOM Creation" type="object"
+                            class="btn-primary" invisible="state != 'boq_bom'"/>
+                    <button name="action_mark_material_dispatch_done" string="Complete Material Dispatch" type="object"
+                            class="btn-primary" invisible="state != 'material_dispatch'"/>
+                    <button name="action_mark_structure_work_done" string="Complete Structure Work" type="object"
+                            class="btn-primary" invisible="state != 'structure_work'"/>
+                    <button name="action_mark_wiring_work_done" string="Complete Wiring Work" type="object"
+                            class="btn-primary" invisible="state != 'wiring_work'"/>
+                    <button name="action_mark_solar_installation_done" string="Complete Solar Installation" type="object"
+                            class="btn-primary" invisible="state != 'solar_installation'"/>
+                    <button name="action_mark_work_inspection_done" string="Complete Work Inspection" type="object"
+                            class="btn-primary" invisible="state != 'work_inspection'"/>
+                    <button name="action_return_files_to_registration" string="Return Files to Registration Dept" type="object"
+                            class="btn-primary" invisible="state != 'completed' or files_returned_to_registration"/>
+
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_registration" type="object" class="oe_stat_button" icon="fa-file-text-o">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Registration</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="registration_id"/>
+                            <field name="lead_id"/>
+                            <field name="installation_manager_id"/>
+                        </group>
+                        <group>
+                            <field name="files_returned_to_registration" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Progress">
+                            <group>
+                                <group string="Site Survey">
+                                    <field name="site_survey_done" readonly="1"/>
+                                    <field name="site_survey_date" readonly="1"/>
+                                </group>
+                                <group string="BOQ / BOM">
+                                    <field name="boq_bom_done" readonly="1"/>
+                                    <field name="boq_bom_date" readonly="1"/>
+                                    <field name="bom_file" filename="bom_filename"/>
+                                    <field name="bom_filename" invisible="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Material Dispatch">
+                                    <field name="material_dispatch_done" readonly="1"/>
+                                    <field name="material_dispatch_date" readonly="1"/>
+                                </group>
+                                <group string="Structure Work">
+                                    <field name="structure_work_done" readonly="1"/>
+                                    <field name="structure_work_date" readonly="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Wiring Work">
+                                    <field name="wiring_work_done" readonly="1"/>
+                                    <field name="wiring_work_date" readonly="1"/>
+                                </group>
+                                <group string="Solar Installation">
+                                    <field name="solar_installation_done" readonly="1"/>
+                                    <field name="solar_installation_date" readonly="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Work Inspection">
+                                    <field name="work_inspection_done" readonly="1"/>
+                                    <field name="work_inspection_date" readonly="1"/>
+                                    <field name="inspected_by_id"/>
+                                </group>
+                                <group string="Completion Report">
+                                    <field name="completion_report_generated" readonly="1"/>
+                                    <field name="completion_report_date" readonly="1"/>
+                                    <field name="completion_report_file" filename="completion_report_filename"/>
+                                    <field name="completion_report_filename" invisible="1"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    </data>
+</odoo>

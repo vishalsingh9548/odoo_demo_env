@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- Module category, shown in Settings > Users & Companies > Groups -->
+        <record id="module_category_solar" model="ir.module.category">
+            <field name="name">Solar</field>
+            <field name="description">Access rights for the Grando Solar Management module.</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- The group that gates the whole Solar module -->
+        <record id="group_solar_user" model="res.groups">
+            <field name="name">Solar User</field>
+            <field name="category_id" ref="module_category_solar"/>
+            <field name="comment">Users in this group can see the Solar menu, the Solar models (Site Survey, Design, Registration, Installation, DISCOM Activation), and the solar-specific fields added to Leads/Opportunities and Sales Orders.</field>
+        </record>
+
+    </data>
+</odoo>

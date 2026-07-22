@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_solar_survey,access_solar_survey,model_solar_site_survey,group_solar_user,1,1,1,1
+access_solar_design,access_solar_design,model_solar_design,group_solar_user,1,1,1,1
+access_solar_registration,access_solar_registration,model_solar_registration,group_solar_user,1,1,1,1
+access_solar_installation,access_solar_installation,model_solar_installation,group_solar_user,1,1,1,1
+access_solar_discom_activation,access_solar_discom_activation,model_solar_discom_activation,group_solar_user,1,1,1,1

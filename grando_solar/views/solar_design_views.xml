@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_solar_design_list" model="ir.ui.view">
+            <field name="name">solar.design.list</field>
+            <field name="model">solar.design</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="name"/>
+                    <field name="survey_id"/>
+                    <field name="lead_id"/>
+                    <field name="designer_id"/>
+                    <field name="state"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_solar_design_form" model="ir.ui.view">
+            <field name="name">solar.design.form</field>
+            <field name="model">solar.design</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_submit" string="Submit" type="object" invisible="state != 'draft'"/>
+                        <button name="action_approve" string="Approve" type="object" invisible="state != 'review'"/>
+                        <button name="action_reject" string="Reject" type="object" invisible="state != 'review'"/>
+                        <button name="action_create_quotation" string="Generate Quotation" type="object" class="btn-primary" invisible="state != 'approved'"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+
+                            <button name="action_view_quotation" type="object" class="oe_stat_button" icon="fa-file-text" invisible="not sale_order_id">
+
+                                <field name="quotation_count" widget="statinfo" string="Quotation"/>
+
+                            </button>
+
+                        </div>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+
+                        <group>
+                            <field name="survey_id"/>
+                            <field name="lead_id"/>
+                            <field name="designer_id"/>
+                        </group>
+                        <group>
+                            <field name="layout_plan" filename="layout_filename"/>
+                            <field name="layout_filename" invisible="1"/>
+                            <field name="bom_file" filename="bom_filename"/>
+                            <field name="bom_filename" invisible="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>
