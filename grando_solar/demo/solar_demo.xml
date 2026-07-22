@@ -1,0 +1,733 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- =====================================================================
+         ORGANIZATION
+         The Grando Solar EPC team, matching the real department structure:
+         Telecalling -> Sales (Surat/Vapi/Vadodara) -> Design -> Quotation ->
+         Registration -> Installation -> Accounts -> DISCOM Activation.
+         Created first so every pipeline record below can point straight at
+         the right person at creation time (see note further down on why
+         these records can't be back-patched after the fact).
+         ===================================================================== -->
+
+    <!-- == Sales Head == -->
+    <record id="demo_user_vishal_kothari" model="res.users">
+        <field name="name">Vishal Kothari</field>
+        <field name="login">vishal.kothari@grandosolar.example.com</field>
+        <field name="email">vishal.kothari@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- == Telecalling Team (shared lead bucket, distributed by Vishal) == -->
+    <record id="demo_user_kiran_bhatt" model="res.users">
+        <field name="name">Kiran Bhatt</field>
+        <field name="login">kiran.bhatt@grandosolar.example.com</field>
+        <field name="email">kiran.bhatt@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_neha_joshi" model="res.users">
+        <field name="name">Neha Joshi</field>
+        <field name="login">neha.joshi@grandosolar.example.com</field>
+        <field name="email">neha.joshi@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_rohan_mehta" model="res.users">
+        <field name="name">Rohan Mehta</field>
+        <field name="login">rohan.mehta@grandosolar.example.com</field>
+        <field name="email">rohan.mehta@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_anjali_rana" model="res.users">
+        <field name="name">Anjali Rana</field>
+        <field name="login">anjali.rana@grandosolar.example.com</field>
+        <field name="email">anjali.rana@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_vivek_solanki" model="res.users">
+        <field name="name">Vivek Solanki</field>
+        <field name="login">vivek.solanki@grandosolar.example.com</field>
+        <field name="email">vivek.solanki@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_pooja_trivedi" model="res.users">
+        <field name="name">Pooja Trivedi</field>
+        <field name="login">pooja.trivedi@grandosolar.example.com</field>
+        <field name="email">pooja.trivedi@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_sameer_pandya" model="res.users">
+        <field name="name">Sameer Pandya</field>
+        <field name="login">sameer.pandya@grandosolar.example.com</field>
+        <field name="email">sameer.pandya@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_divya_chauhan" model="res.users">
+        <field name="name">Divya Chauhan</field>
+        <field name="login">divya.chauhan@grandosolar.example.com</field>
+        <field name="email">divya.chauhan@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_nikhil_bhavsar" model="res.users">
+        <field name="name">Nikhil Bhavsar</field>
+        <field name="login">nikhil.bhavsar@grandosolar.example.com</field>
+        <field name="email">nikhil.bhavsar@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_sneha_vora" model="res.users">
+        <field name="name">Sneha Vora</field>
+        <field name="login">sneha.vora@grandosolar.example.com</field>
+        <field name="email">sneha.vora@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- == Sales Managers: Surat (4), Vapi (1), Vadodara (1) == -->
+    <record id="demo_user_jignesh_patel" model="res.users">
+        <field name="name">Jignesh Patel</field>
+        <field name="login">jignesh.patel@grandosolar.example.com</field>
+        <field name="email">jignesh.patel@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_kalpesh_desai" model="res.users">
+        <field name="name">Kalpesh Desai</field>
+        <field name="login">kalpesh.desai@grandosolar.example.com</field>
+        <field name="email">kalpesh.desai@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_bhavesh_rana" model="res.users">
+        <field name="name">Bhavesh Rana</field>
+        <field name="login">bhavesh.rana@grandosolar.example.com</field>
+        <field name="email">bhavesh.rana@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_nirav_shah" model="res.users">
+        <field name="name">Nirav Shah</field>
+        <field name="login">nirav.shah@grandosolar.example.com</field>
+        <field name="email">nirav.shah@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_chirag_modi" model="res.users">
+        <field name="name">Chirag Modi</field>
+        <field name="login">chirag.modi@grandosolar.example.com</field>
+        <field name="email">chirag.modi@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_hardik_trivedi" model="res.users">
+        <field name="name">Hardik Trivedi</field>
+        <field name="login">hardik.trivedi@grandosolar.example.com</field>
+        <field name="email">hardik.trivedi@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- == Field Sales Executives (deal owners: survey + client-facing) == -->
+    <record id="demo_user_amit_vaghela" model="res.users">
+        <field name="name">Amit Vaghela</field>
+        <field name="login">amit.vaghela@grandosolar.example.com</field>
+        <field name="email">amit.vaghela@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_foram_shah" model="res.users">
+        <field name="name">Foram Shah</field>
+        <field name="login">foram.shah@grandosolar.example.com</field>
+        <field name="email">foram.shah@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_karan_oza" model="res.users">
+        <field name="name">Karan Oza</field>
+        <field name="login">karan.oza@grandosolar.example.com</field>
+        <field name="email">karan.oza@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_meet_pandit" model="res.users">
+        <field name="name">Meet Pandit</field>
+        <field name="login">meet.pandit@grandosolar.example.com</field>
+        <field name="email">meet.pandit@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- == Design Head & Design Team == -->
+    <record id="demo_user_aryan_jariwala" model="res.users">
+        <field name="name">Aryan Jariwala</field>
+        <field name="login">aryan.jariwala@grandosolar.example.com</field>
+        <field name="email">aryan.jariwala@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_rutvik_sheth" model="res.users">
+        <field name="name">Rutvik Sheth</field>
+        <field name="login">rutvik.sheth@grandosolar.example.com</field>
+        <field name="email">rutvik.sheth@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_payal_dave" model="res.users">
+        <field name="name">Payal Dave</field>
+        <field name="login">payal.dave@grandosolar.example.com</field>
+        <field name="email">payal.dave@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_harsh_gohil" model="res.users">
+        <field name="name">Harsh Gohil</field>
+        <field name="login">harsh.gohil@grandosolar.example.com</field>
+        <field name="email">harsh.gohil@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- == Quotation, Registration, Installation, Accounts == -->
+    <record id="demo_user_satish_shekh" model="res.users">
+        <field name="name">Satish Shekh</field>
+        <field name="login">satish.shekh@grandosolar.example.com</field>
+        <field name="email">satish.shekh@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_kavya_rathod" model="res.users">
+        <field name="name">Kavya Rathod</field>
+        <field name="login">kavya.rathod@grandosolar.example.com</field>
+        <field name="email">kavya.rathod@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_dipak_shekh" model="res.users">
+        <field name="name">Dipak Shekh</field>
+        <field name="login">dipak.shekh@grandosolar.example.com</field>
+        <field name="email">dipak.shekh@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_praful_lakhani" model="res.users">
+        <field name="name">Praful Lakhani</field>
+        <field name="login">praful.lakhani@grandosolar.example.com</field>
+        <field name="email">praful.lakhani@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="demo_user_mitul_patel" model="res.users">
+        <field name="name">Mitul Patel</field>
+        <field name="login">mitul.patel@grandosolar.example.com</field>
+        <field name="email">mitul.patel@grandosolar.example.com</field>
+        <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- == Sales Teams == -->
+    <record id="demo_team_telecalling" model="crm.team">
+        <field name="name">Telecalling Team</field>
+        <field name="user_id" ref="demo_user_vishal_kothari"/>
+    </record>
+    <record id="demo_team_surat" model="crm.team">
+        <field name="name">Surat Sales Team</field>
+        <field name="user_id" ref="demo_user_jignesh_patel"/>
+    </record>
+    <record id="demo_team_vapi" model="crm.team">
+        <field name="name">Vapi Sales Team</field>
+        <field name="user_id" ref="demo_user_chirag_modi"/>
+    </record>
+    <record id="demo_team_vadodara" model="crm.team">
+        <field name="name">Vadodara Sales Team</field>
+        <field name="user_id" ref="demo_user_hardik_trivedi"/>
+    </record>
+
+    <record id="demo_member_tc_1" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_telecalling"/>
+        <field name="user_id" ref="demo_user_kiran_bhatt"/>
+    </record>
+    <record id="demo_member_tc_2" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_telecalling"/>
+        <field name="user_id" ref="demo_user_neha_joshi"/>
+    </record>
+    <record id="demo_member_tc_3" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_telecalling"/>
+        <field name="user_id" ref="demo_user_rohan_mehta"/>
+    </record>
+    <record id="demo_member_tc_4" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_telecalling"/>
+        <field name="user_id" ref="demo_user_anjali_rana"/>
+    </record>
+    <record id="demo_member_tc_5" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_telecalling"/>
+        <field name="user_id" ref="demo_user_vivek_solanki"/>
+    </record>
+    <record id="demo_member_tc_6" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_telecalling"/>
+        <field name="user_id" ref="demo_user_pooja_trivedi"/>
+    </record>
+    <record id="demo_member_tc_7" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_telecalling"/>
+        <field name="user_id" ref="demo_user_sameer_pandya"/>
+    </record>
+    <record id="demo_member_tc_8" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_telecalling"/>
+        <field name="user_id" ref="demo_user_divya_chauhan"/>
+    </record>
+    <record id="demo_member_tc_9" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_telecalling"/>
+        <field name="user_id" ref="demo_user_nikhil_bhavsar"/>
+    </record>
+    <record id="demo_member_tc_10" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_telecalling"/>
+        <field name="user_id" ref="demo_user_sneha_vora"/>
+    </record>
+
+    <record id="demo_member_surat_1" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_surat"/>
+        <field name="user_id" ref="demo_user_kalpesh_desai"/>
+    </record>
+    <record id="demo_member_surat_2" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_surat"/>
+        <field name="user_id" ref="demo_user_bhavesh_rana"/>
+    </record>
+    <record id="demo_member_surat_3" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_surat"/>
+        <field name="user_id" ref="demo_user_nirav_shah"/>
+    </record>
+    <record id="demo_member_surat_4" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_surat"/>
+        <field name="user_id" ref="demo_user_amit_vaghela"/>
+    </record>
+    <record id="demo_member_surat_5" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_surat"/>
+        <field name="user_id" ref="demo_user_foram_shah"/>
+    </record>
+
+    <record id="demo_member_vapi_1" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_vapi"/>
+        <field name="user_id" ref="demo_user_karan_oza"/>
+    </record>
+
+    <record id="demo_member_vadodara_1" model="crm.team.member">
+        <field name="crm_team_id" ref="demo_team_vadodara"/>
+        <field name="user_id" ref="demo_user_meet_pandit"/>
+    </record>
+
+    <!-- ================= Customers ================= -->
+
+    <record id="demo_partner_ravi_kumar" model="res.partner">
+        <field name="name">Ravi Kumar</field>
+        <field name="street">12, Shanti Nagar Society</field>
+        <field name="city">Surat</field>
+        <field name="state_id" ref="base.state_in_gj"/>
+        <field name="country_id" ref="base.in"/>
+        <field name="zip">395003</field>
+        <field name="phone">+91 98765 43210</field>
+        <field name="email">ravi.kumar@example.com</field>
+    </record>
+
+    <record id="demo_partner_priya_shah" model="res.partner">
+        <field name="name">Priya Shah</field>
+        <field name="street">45, Vesu Residency</field>
+        <field name="city">Surat</field>
+        <field name="state_id" ref="base.state_in_gj"/>
+        <field name="country_id" ref="base.in"/>
+        <field name="zip">395007</field>
+        <field name="phone">+91 98250 11223</field>
+        <field name="email">priya.shah@example.com</field>
+    </record>
+
+    <record id="demo_partner_sunrise_textiles" model="res.partner">
+        <field name="name">Sunrise Textiles Pvt. Ltd.</field>
+        <field name="is_company">True</field>
+        <field name="street">Plot 22, GIDC Industrial Estate</field>
+        <field name="city">Vapi</field>
+        <field name="state_id" ref="base.state_in_gj"/>
+        <field name="country_id" ref="base.in"/>
+        <field name="zip">396195</field>
+        <field name="phone">+91 260 264 5678</field>
+        <field name="email">contact@sunrisetextiles.example.com</field>
+    </record>
+
+    <record id="demo_partner_greenfield_industries" model="res.partner">
+        <field name="name">Greenfield Industries Ltd.</field>
+        <field name="is_company">True</field>
+        <field name="street">Plot 8, Makarpura Industrial Area</field>
+        <field name="city">Vadodara</field>
+        <field name="state_id" ref="base.state_in_gj"/>
+        <field name="country_id" ref="base.in"/>
+        <field name="zip">390007</field>
+        <field name="phone">+91 265 234 5678</field>
+        <field name="email">procurement@greenfieldind.example.com</field>
+    </record>
+
+    <!-- ================= Products ================= -->
+
+    <record id="demo_product_solar_panel" model="product.template">
+        <field name="name">Solar Panel 540W Mono PERC</field>
+        <field name="list_price">12000.0</field>
+        <field name="standard_price">9500.0</field>
+    </record>
+
+    <record id="demo_product_solar_inverter" model="product.template">
+        <field name="name">Solar Inverter 5kW On-Grid</field>
+        <field name="list_price">45000.0</field>
+        <field name="standard_price">36000.0</field>
+    </record>
+
+    <record id="demo_product_mounting_structure" model="product.template">
+        <field name="name">GI Mounting Structure (per kW)</field>
+        <field name="list_price">8000.0</field>
+        <field name="standard_price">6000.0</field>
+    </record>
+
+    <record id="demo_product_installation_service" model="product.template">
+        <field name="name">Installation &amp; Commissioning Service</field>
+        <field name="list_price">15000.0</field>
+        <field name="standard_price">10000.0</field>
+    </record>
+
+    <!-- ================= CRM Leads / Opportunities ================= -->
+
+    <!-- Case A: Ravi Kumar (Surat) - full pipeline, completed and activated.
+         Field Sales Executive: Amit Vaghela. -->
+    <record id="demo_lead_ravi" model="crm.lead">
+        <field name="name">Ravi Kumar - 5kW Rooftop Solar</field>
+        <field name="type">opportunity</field>
+        <field name="partner_id" ref="demo_partner_ravi_kumar"/>
+        <field name="team_id" ref="demo_team_surat"/>
+        <field name="user_id" ref="demo_user_amit_vaghela"/>
+        <field name="stage_id" ref="crm.stage_lead4"/>
+        <field name="customer_type">residential</field>
+        <field name="solar_capacity">5.0</field>
+        <field name="monthly_bill">4500.0</field>
+        <field name="roof_type">rcc</field>
+        <field name="phone">+91 98765 43210</field>
+        <field name="email_from">ravi.kumar@example.com</field>
+        <field name="city">Surat</field>
+        <field name="expected_revenue">220000.0</field>
+        <field name="probability">100.0</field>
+        <field name="create_date" eval="datetime.now() - relativedelta(days=70)"/>
+    </record>
+
+    <!-- Case B: Priya Shah (Surat) - approved, installation in progress.
+         Field Sales Executive: Foram Shah. -->
+    <record id="demo_lead_priya" model="crm.lead">
+        <field name="name">Priya Shah - 3kW Residential Solar</field>
+        <field name="type">opportunity</field>
+        <field name="partner_id" ref="demo_partner_priya_shah"/>
+        <field name="team_id" ref="demo_team_surat"/>
+        <field name="user_id" ref="demo_user_foram_shah"/>
+        <field name="stage_id" ref="crm.stage_lead4"/>
+        <field name="customer_type">residential</field>
+        <field name="solar_capacity">3.0</field>
+        <field name="monthly_bill">3000.0</field>
+        <field name="roof_type">sheet</field>
+        <field name="phone">+91 98250 11223</field>
+        <field name="email_from">priya.shah@example.com</field>
+        <field name="city">Surat</field>
+        <field name="expected_revenue">130000.0</field>
+        <field name="probability">100.0</field>
+        <field name="create_date" eval="datetime.now() - relativedelta(days=30)"/>
+    </record>
+
+    <!-- Case C: Sunrise Textiles (Vapi) - design under review, no quotation yet.
+         Field Sales Executive: Karan Oza. -->
+    <record id="demo_lead_sunrise" model="crm.lead">
+        <field name="name">Sunrise Textiles - 50kW Commercial Solar</field>
+        <field name="type">opportunity</field>
+        <field name="partner_id" ref="demo_partner_sunrise_textiles"/>
+        <field name="team_id" ref="demo_team_vapi"/>
+        <field name="user_id" ref="demo_user_karan_oza"/>
+        <field name="stage_id" ref="crm.stage_lead3"/>
+        <field name="customer_type">commercial</field>
+        <field name="solar_capacity">50.0</field>
+        <field name="monthly_bill">85000.0</field>
+        <field name="roof_type">sheet</field>
+        <field name="phone">+91 260 264 5678</field>
+        <field name="email_from">contact@sunrisetextiles.example.com</field>
+        <field name="city">Vapi</field>
+        <field name="expected_revenue">1800000.0</field>
+        <field name="probability">60.0</field>
+        <field name="create_date" eval="datetime.now() - relativedelta(days=12)"/>
+    </record>
+
+    <!-- Case D: Greenfield Industries (Vadodara) - site survey scheduled, not yet done.
+         Field Sales Executive: Meet Pandit. -->
+    <record id="demo_lead_greenfield" model="crm.lead">
+        <field name="name">Greenfield Industries - 100kW Industrial Solar</field>
+        <field name="type">opportunity</field>
+        <field name="partner_id" ref="demo_partner_greenfield_industries"/>
+        <field name="team_id" ref="demo_team_vadodara"/>
+        <field name="user_id" ref="demo_user_meet_pandit"/>
+        <field name="stage_id" ref="crm.stage_lead2"/>
+        <field name="customer_type">industrial</field>
+        <field name="solar_capacity">100.0</field>
+        <field name="monthly_bill">150000.0</field>
+        <field name="roof_type">ground</field>
+        <field name="phone">+91 265 234 5678</field>
+        <field name="email_from">procurement@greenfieldind.example.com</field>
+        <field name="city">Vadodara</field>
+        <field name="expected_revenue">3500000.0</field>
+        <field name="probability">30.0</field>
+        <field name="create_date" eval="datetime.now() - relativedelta(days=5)"/>
+    </record>
+
+    <!-- Case E: Meera Patel (Vadodara) - fresh inbound enquiry, still sitting
+         in the telecalling bucket, not yet handed to a Field Sales Executive. -->
+    <record id="demo_lead_meera" model="crm.lead">
+        <field name="name">Meera Patel - 4kW Solar Enquiry</field>
+        <field name="type">lead</field>
+        <field name="partner_name">Meera Patel</field>
+        <field name="contact_name">Meera Patel</field>
+        <field name="team_id" ref="demo_team_telecalling"/>
+        <field name="user_id" ref="demo_user_sneha_vora"/>
+        <field name="stage_id" ref="crm.stage_lead1"/>
+        <field name="customer_type">residential</field>
+        <field name="solar_capacity">4.0</field>
+        <field name="monthly_bill">3500.0</field>
+        <field name="roof_type">rcc</field>
+        <field name="phone">+91 90000 12345</field>
+        <field name="email_from">meera.patel@example.com</field>
+        <field name="city">Vadodara</field>
+        <field name="expected_revenue">170000.0</field>
+        <field name="probability">10.0</field>
+    </record>
+
+    <!-- ================= Site Surveys =================
+         Conducted by the same Field Sales Executive who owns the deal. -->
+
+    <record id="demo_survey_ravi" model="solar.site.survey">
+        <field name="lead_id" ref="demo_lead_ravi"/>
+        <field name="engineer_id" ref="demo_user_amit_vaghela"/>
+        <field name="survey_date" eval="(datetime.now() - relativedelta(days=65)).strftime('%Y-%m-%d')"/>
+        <field name="roof_area">400.0</field>
+        <field name="roof_type">rcc</field>
+        <field name="monthly_consumption">450.0</field>
+        <field name="shadow_analysis">No significant shadow obstruction observed between 9 AM and 5 PM. Roof is clear of water tanks on the south-facing section.</field>
+        <field name="latitude">21.1959</field>
+        <field name="longitude">72.8302</field>
+        <field name="state">done</field>
+    </record>
+
+    <record id="demo_survey_priya" model="solar.site.survey">
+        <field name="lead_id" ref="demo_lead_priya"/>
+        <field name="engineer_id" ref="demo_user_foram_shah"/>
+        <field name="survey_date" eval="(datetime.now() - relativedelta(days=27)).strftime('%Y-%m-%d')"/>
+        <field name="roof_area">250.0</field>
+        <field name="roof_type">sheet</field>
+        <field name="monthly_consumption">300.0</field>
+        <field name="shadow_analysis">Minor shading from a neighboring water tank in the early morning, negligible impact on daily generation.</field>
+        <field name="latitude">21.1702</field>
+        <field name="longitude">72.8311</field>
+        <field name="state">done</field>
+    </record>
+
+    <record id="demo_survey_sunrise" model="solar.site.survey">
+        <field name="lead_id" ref="demo_lead_sunrise"/>
+        <field name="engineer_id" ref="demo_user_karan_oza"/>
+        <field name="survey_date" eval="(datetime.now() - relativedelta(days=9)).strftime('%Y-%m-%d')"/>
+        <field name="roof_area">5000.0</field>
+        <field name="roof_type">sheet</field>
+        <field name="monthly_consumption">9500.0</field>
+        <field name="shadow_analysis">Large open industrial shed roof, no shadow interference. Structural reinforcement may be required in the northeast corner.</field>
+        <field name="latitude">20.3893</field>
+        <field name="longitude">72.9106</field>
+        <field name="state">done</field>
+    </record>
+
+    <record id="demo_survey_greenfield" model="solar.site.survey">
+        <field name="lead_id" ref="demo_lead_greenfield"/>
+        <field name="engineer_id" ref="demo_user_meet_pandit"/>
+        <field name="survey_date" eval="(datetime.now() + relativedelta(days=3)).strftime('%Y-%m-%d')"/>
+        <field name="roof_type">ground</field>
+        <field name="state">draft</field>
+    </record>
+
+    <!-- ================= Quotations (Sale Orders) =================
+         Created before the designs below so each design can point
+         straight at its resulting quotation without a forward
+         reference (noupdate records can't be back-patched once the
+         module is already installed, i.e. any run after the first).
+         Salesperson: Satish Shekh, who runs the Quotation Process. -->
+
+    <record id="demo_order_ravi" model="sale.order">
+        <field name="partner_id" ref="demo_partner_ravi_kumar"/>
+        <field name="user_id" ref="demo_user_satish_shekh"/>
+        <field name="date_order" eval="datetime.now() - relativedelta(days=55)"/>
+        <field name="state">sale</field>
+        <field name="warranty_type">performance_warranty</field>
+        <field name="delivery_type">within_15_days</field>
+        <field name="freight_type">included</field>
+        <field name="payment_type">cash</field>
+        <field name="cancellation_policy">custom</field>
+        <field name="certifications_type">iec_almm_bis</field>
+        <field name="tolerance_type">positive</field>
+        <field name="advance_payment">50000.0</field>
+        <field name="quotation_stage">shared_with_registration</field>
+        <field name="token_payment_date" eval="(datetime.now() - relativedelta(days=53)).strftime('%Y-%m-%d')"/>
+        <field name="client_documents_collected">True</field>
+    </record>
+
+    <record id="demo_order_line_ravi_1" model="sale.order.line">
+        <field name="order_id" ref="demo_order_ravi"/>
+        <field name="product_id" ref="demo_product_solar_panel"/>
+        <field name="product_uom_qty">10</field>
+        <field name="price_unit">12000.0</field>
+        <field name="display_hsn_code">85414011</field>
+    </record>
+
+    <record id="demo_order_line_ravi_2" model="sale.order.line">
+        <field name="order_id" ref="demo_order_ravi"/>
+        <field name="product_id" ref="demo_product_solar_inverter"/>
+        <field name="product_uom_qty">1</field>
+        <field name="price_unit">45000.0</field>
+        <field name="display_hsn_code">85044090</field>
+    </record>
+
+    <record id="demo_order_line_ravi_3" model="sale.order.line">
+        <field name="order_id" ref="demo_order_ravi"/>
+        <field name="product_id" ref="demo_product_mounting_structure"/>
+        <field name="product_uom_qty">5</field>
+        <field name="price_unit">8000.0</field>
+        <field name="display_hsn_code">73089090</field>
+    </record>
+
+    <record id="demo_order_line_ravi_4" model="sale.order.line">
+        <field name="order_id" ref="demo_order_ravi"/>
+        <field name="product_id" ref="demo_product_installation_service"/>
+        <field name="product_uom_qty">1</field>
+        <field name="price_unit">15000.0</field>
+        <field name="display_hsn_code">998714</field>
+    </record>
+
+    <record id="demo_order_priya" model="sale.order">
+        <field name="partner_id" ref="demo_partner_priya_shah"/>
+        <field name="user_id" ref="demo_user_satish_shekh"/>
+        <field name="date_order" eval="datetime.now() - relativedelta(days=22)"/>
+        <field name="state">sale</field>
+        <field name="warranty_type">performance_warranty</field>
+        <field name="delivery_type">within_7_days</field>
+        <field name="freight_type">included</field>
+        <field name="payment_type">loan</field>
+        <field name="cancellation_policy">custom</field>
+        <field name="certifications_type">iec_almm_bis</field>
+        <field name="tolerance_type">positive</field>
+        <field name="advance_payment">15000.0</field>
+        <field name="quotation_stage">shared_with_registration</field>
+        <field name="token_payment_date" eval="(datetime.now() - relativedelta(days=20)).strftime('%Y-%m-%d')"/>
+        <field name="client_documents_collected">True</field>
+    </record>
+
+    <record id="demo_order_line_priya_1" model="sale.order.line">
+        <field name="order_id" ref="demo_order_priya"/>
+        <field name="product_id" ref="demo_product_solar_panel"/>
+        <field name="product_uom_qty">6</field>
+        <field name="price_unit">12000.0</field>
+        <field name="display_hsn_code">85414011</field>
+    </record>
+
+    <record id="demo_order_line_priya_2" model="sale.order.line">
+        <field name="order_id" ref="demo_order_priya"/>
+        <field name="product_id" ref="demo_product_mounting_structure"/>
+        <field name="product_uom_qty">3</field>
+        <field name="price_unit">8000.0</field>
+        <field name="display_hsn_code">73089090</field>
+    </record>
+
+    <record id="demo_order_line_priya_3" model="sale.order.line">
+        <field name="order_id" ref="demo_order_priya"/>
+        <field name="product_id" ref="demo_product_installation_service"/>
+        <field name="product_uom_qty">1</field>
+        <field name="price_unit">15000.0</field>
+        <field name="display_hsn_code">998714</field>
+    </record>
+
+    <!-- ================= Solar Designs =================
+         Design Head Aryan Jariwala assigns each survey to one of 3 designers. -->
+
+    <record id="demo_design_ravi" model="solar.design">
+        <field name="survey_id" ref="demo_survey_ravi"/>
+        <field name="designer_id" ref="demo_user_rutvik_sheth"/>
+        <field name="state">approved</field>
+        <field name="sale_order_id" ref="demo_order_ravi"/>
+    </record>
+
+    <record id="demo_design_priya" model="solar.design">
+        <field name="survey_id" ref="demo_survey_priya"/>
+        <field name="designer_id" ref="demo_user_payal_dave"/>
+        <field name="state">approved</field>
+        <field name="sale_order_id" ref="demo_order_priya"/>
+    </record>
+
+    <record id="demo_design_sunrise" model="solar.design">
+        <field name="survey_id" ref="demo_survey_sunrise"/>
+        <field name="designer_id" ref="demo_user_harsh_gohil"/>
+        <field name="state">review</field>
+    </record>
+
+    <!-- ================= Registration Department =================
+         Deal shared by Satish Shekh; cash flow handled straight through,
+         loan flow routed to Dipak Shekh; Mitul Patel clears the final
+         payment before DISCOM. -->
+
+    <record id="demo_registration_ravi" model="solar.registration">
+        <field name="design_id" ref="demo_design_ravi"/>
+        <field name="sale_order_id" ref="demo_order_ravi"/>
+        <field name="sales_rep_id" ref="demo_user_satish_shekh"/>
+        <field name="state">approved</field>
+        <field name="payment_mode">cash</field>
+        <field name="cash_feasibility_result">approved</field>
+        <field name="installation_files_received">True</field>
+        <field name="installation_files_received_date" eval="datetime.now() - relativedelta(days=20)"/>
+        <field name="payment_clearance_state">approved</field>
+        <field name="payment_clearance_checked_by_id" ref="demo_user_mitul_patel"/>
+        <field name="payment_clearance_date" eval="datetime.now() - relativedelta(days=15)"/>
+    </record>
+
+    <record id="demo_registration_priya" model="solar.registration">
+        <field name="design_id" ref="demo_design_priya"/>
+        <field name="sale_order_id" ref="demo_order_priya"/>
+        <field name="sales_rep_id" ref="demo_user_satish_shekh"/>
+        <field name="state">approved</field>
+        <field name="payment_mode">loan</field>
+        <field name="loan_dept_user_id" ref="demo_user_dipak_shekh"/>
+        <field name="loan_approval_result">approved</field>
+    </record>
+
+    <!-- ================= Installation Department =================
+         Run by Installation Manager Praful Lakhani. -->
+
+    <record id="demo_installation_ravi" model="solar.installation">
+        <field name="registration_id" ref="demo_registration_ravi"/>
+        <field name="installation_manager_id" ref="demo_user_praful_lakhani"/>
+        <field name="state">completed</field>
+        <field name="site_survey_done">True</field>
+        <field name="site_survey_date" eval="datetime.now() - relativedelta(days=45)"/>
+        <field name="boq_bom_done">True</field>
+        <field name="boq_bom_date" eval="datetime.now() - relativedelta(days=40)"/>
+        <field name="material_dispatch_done">True</field>
+        <field name="material_dispatch_date" eval="datetime.now() - relativedelta(days=35)"/>
+        <field name="structure_work_done">True</field>
+        <field name="structure_work_date" eval="datetime.now() - relativedelta(days=28)"/>
+        <field name="wiring_work_done">True</field>
+        <field name="wiring_work_date" eval="datetime.now() - relativedelta(days=22)"/>
+        <field name="solar_installation_done">True</field>
+        <field name="solar_installation_date" eval="datetime.now() - relativedelta(days=18)"/>
+        <field name="work_inspection_done">True</field>
+        <field name="work_inspection_date" eval="datetime.now() - relativedelta(days=13)"/>
+        <field name="inspected_by_id" ref="demo_user_praful_lakhani"/>
+        <field name="completion_report_generated">True</field>
+        <field name="completion_report_date" eval="datetime.now() - relativedelta(days=13)"/>
+        <field name="files_returned_to_registration">True</field>
+    </record>
+
+    <record id="demo_installation_priya" model="solar.installation">
+        <field name="registration_id" ref="demo_registration_priya"/>
+        <field name="installation_manager_id" ref="demo_user_praful_lakhani"/>
+        <field name="state">wiring_work</field>
+        <field name="site_survey_done">True</field>
+        <field name="site_survey_date" eval="datetime.now() - relativedelta(days=18)"/>
+        <field name="boq_bom_done">True</field>
+        <field name="boq_bom_date" eval="datetime.now() - relativedelta(days=15)"/>
+        <field name="material_dispatch_done">True</field>
+        <field name="material_dispatch_date" eval="datetime.now() - relativedelta(days=11)"/>
+        <field name="structure_work_done">True</field>
+        <field name="structure_work_date" eval="datetime.now() - relativedelta(days=6)"/>
+    </record>
+
+    <!-- ================= DISCOM & Final Activation =================
+         Sales Rep Satish Shekh activates the system and briefs the client. -->
+
+    <record id="demo_discom_ravi" model="solar.discom.activation">
+        <field name="registration_id" ref="demo_registration_ravi"/>
+        <field name="state">completed</field>
+        <field name="submitted_date" eval="datetime.now() - relativedelta(days=14)"/>
+        <field name="meter_installed_date" eval="datetime.now() - relativedelta(days=10)"/>
+        <field name="activated_by_id" ref="demo_user_satish_shekh"/>
+        <field name="activation_date" eval="datetime.now() - relativedelta(days=8)"/>
+        <field name="procedure_explained_date" eval="datetime.now() - relativedelta(days=6)"/>
+        <field name="project_completed_date" eval="datetime.now() - relativedelta(days=4)"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+    <record id="crm_lead_form_survey_button" model="ir.ui.view">
+        <field name="name">crm.lead.form.survey.button</field>
+        <field name="model">crm.lead</field>
+
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+
+        <field name="arch" type="xml">
+
+            <xpath expr="//header" position="inside">
+                <button name="action_create_survey" type="object" string="Create Survey" class="btn-primary"
+                        groups="grando_solar.group_solar_user"/>
+            </xpath>
+
+            <xpath expr="//div[@name='button_box']" position="inside">
+
+                <button name="action_view_surveys" type="object" class="oe_stat_button" icon="fa-map-marker"
+                        groups="grando_solar.group_solar_user">
+
+                    <field name="survey_count" widget="statinfo" string="Surveys"/>
+
+                </button>
+
+            </xpath>
+
+        </field>
+
+    </record>
+
+    </data>
+</odoo>

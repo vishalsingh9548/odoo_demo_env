@@ -1,0 +1,91 @@
+<odoo>
+    <data>
+
+    <menuitem
+        id="menu_solar_root"
+        name="Solar"
+        groups="group_solar_user"/>
+
+    <menuitem
+        id="menu_solar_survey"
+        name="Site Survey"
+        parent="menu_solar_root"
+        groups="group_solar_user"/>
+
+    <record id="action_solar_survey"
+            model="ir.actions.act_window">
+
+        <field name="name">Site Survey</field>
+
+        <field name="res_model">solar.site.survey</field>
+
+        <field name="view_mode">list,form</field>
+
+    </record>
+
+    <menuitem
+        id="menu_solar_survey_action"
+        parent="menu_solar_survey"
+        action="action_solar_survey"
+        groups="group_solar_user"/>
+
+
+        <record id="action_solar_design"
+        model="ir.actions.act_window">
+
+    <field name="name">Designs</field>
+
+    <field name="res_model">solar.design</field>
+
+    <field name="view_mode">list,form</field>
+
+</record>
+
+<menuitem
+    id="menu_solar_design"
+    parent="menu_solar_root"
+    action="action_solar_design"
+    sequence="20"
+    groups="group_solar_user"/>
+
+    <record id="action_solar_registration" model="ir.actions.act_window">
+        <field name="name">Registration</field>
+        <field name="res_model">solar.registration</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+        id="menu_solar_registration"
+        parent="menu_solar_root"
+        action="action_solar_registration"
+        sequence="30"
+        groups="group_solar_user"/>
+
+    <record id="action_solar_installation" model="ir.actions.act_window">
+        <field name="name">Installation</field>
+        <field name="res_model">solar.installation</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+        id="menu_solar_installation"
+        parent="menu_solar_root"
+        action="action_solar_installation"
+        sequence="40"
+        groups="group_solar_user"/>
+
+    <record id="action_solar_discom" model="ir.actions.act_window">
+        <field name="name">DISCOM Activation</field>
+        <field name="res_model">solar.discom.activation</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+        id="menu_solar_discom"
+        parent="menu_solar_root"
+        action="action_solar_discom"
+        sequence="50"
+        groups="group_solar_user"/>
+
+    </data>
+</odoo>

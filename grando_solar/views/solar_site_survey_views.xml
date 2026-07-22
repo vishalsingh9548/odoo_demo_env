@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+    <record id="view_solar_survey_list"
+            model="ir.ui.view">
+
+        <field name="name">solar.site.survey.list</field>
+        <field name="model">solar.site.survey</field>
+
+        <field name="arch" type="xml">
+
+            <list>
+                <field name="name"/>
+                <field name="lead_id"/>
+                <field name="survey_date"/>
+                <field name="engineer_id"/>
+                <field name="state"/>
+            </list>
+
+        </field>
+
+    </record>
+
+    <record id="view_solar_survey_form"
+            model="ir.ui.view">
+
+        <field name="name">solar.site.survey.form</field>
+
+        <field name="model">solar.site.survey</field>
+
+        <field name="arch" type="xml">
+
+            <form>
+
+                <header>
+                    <button name="action_create_design"
+                            string="Create Design"
+                            type="object"
+                            class="btn-primary"/>
+
+                    <field name="state"
+                           widget="statusbar"/>
+
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_designs"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-pencil-square-o">
+                            <field name="design_count"
+                                   widget="statinfo"
+                                   string="Designs"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <group>
+
+                        <field name="lead_id"/>
+                        <field name="survey_date"/>
+                        <field name="engineer_id"/>
+
+                    </group>
+
+                    <group>
+
+                        <field name="roof_area"/>
+                        <field name="roof_type"/>
+                        <field name="monthly_consumption"/>
+
+                    </group>
+
+                    <group>
+
+                        <field name="shadow_analysis"/>
+                        <field name="latitude"/>
+                        <field name="longitude"/>
+
+                    </group>
+
+                </sheet>
+
+            </form>
+
+        </field>
+
+    </record>
+
+    </data>
+</odoo>

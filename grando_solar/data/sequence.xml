@@ -1,0 +1,43 @@
+<odoo>
+    <data>
+
+    <record id="seq_solar_survey" model="ir.sequence">
+        <field name="name">Solar Survey</field>
+        <field name="code">solar.site.survey</field>
+        <field name="prefix">SURV/</field>
+        <field name="padding">4</field>
+    </record>
+
+    <record id="seq_solar_design"
+        model="ir.sequence">
+
+    <field name="name">Solar Design</field>
+    <field name="code">solar.design</field>
+    <field name="prefix">DES/</field>
+    <field name="padding">4</field>
+
+</record>
+
+    <record id="seq_solar_registration" model="ir.sequence">
+        <field name="name">Solar Registration</field>
+        <field name="code">solar.registration</field>
+        <field name="prefix">REG/</field>
+        <field name="padding">4</field>
+    </record>
+
+    <record id="seq_solar_installation" model="ir.sequence">
+        <field name="name">Solar Installation</field>
+        <field name="code">solar.installation</field>
+        <field name="prefix">INST/</field>
+        <field name="padding">4</field>
+    </record>
+
+    <record id="seq_solar_discom" model="ir.sequence">
+        <field name="name">Solar DISCOM Activation</field>
+        <field name="code">solar.discom.activation</field>
+        <field name="prefix">DISCOM/</field>
+        <field name="padding">4</field>
+    </record>
+
+    </data>
+</odoo>

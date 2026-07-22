@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+    <record id="view_solar_discom_list" model="ir.ui.view">
+        <field name="name">solar.discom.activation.list</field>
+        <field name="model">solar.discom.activation</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="lead_id"/>
+                <field name="activated_by_id"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_solar_discom_form" model="ir.ui.view">
+        <field name="name">solar.discom.activation.form</field>
+        <field name="model">solar.discom.activation</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit_to_discom" string="Submit File to DISCOM" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_meter_installed" string="Meter Installation Completed" type="object"
+                            class="btn-primary" invisible="state != 'submitted'"/>
+                    <button name="action_activate_system" string="Activate Solar System" type="object"
+                            class="btn-primary" invisible="state != 'meter_installed'"/>
+                    <button name="action_explain_procedure" string="Explain Procedure to Client" type="object"
+                            class="btn-primary" invisible="state != 'activated'"/>
+                    <button name="action_complete_project" string="Mark Project Successfully Completed" type="object"
+                            class="btn-primary" invisible="state != 'procedure_explained'"/>
+
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="registration_id"/>
+                            <field name="lead_id"/>
+                        </group>
+                        <group>
+                            <field name="activated_by_id"/>
+                        </group>
+                    </group>
+
+                    <group string="Timeline">
+                        <group>
+                            <field name="submitted_date" readonly="1"/>
+                            <field name="meter_installed_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="activation_date" readonly="1"/>
+                            <field name="procedure_explained_date" readonly="1"/>
+                            <field name="project_completed_date" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    </data>
+</odoo>
