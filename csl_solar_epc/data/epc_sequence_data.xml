@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Gives every Site Survey a reference like SS/2026/00001 -->
+        <record id="seq_epc_site_survey" model="ir.sequence">
+            <field name="name">Site Survey Sequence</field>
+            <field name="code">epc.site.survey</field>
+            <field name="prefix">SS/%(range_year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Gives every Feasibility Study a reference like TF/2026/00001 -->
+        <record id="seq_epc_feasibility" model="ir.sequence">
+            <field name="name">Technical Feasibility Sequence</field>
+            <field name="code">epc.feasibility</field>
+            <field name="prefix">TF/%(range_year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Gives every BOQ a reference like BOQ/2026/00001 -->
+        <record id="seq_epc_boq" model="ir.sequence">
+            <field name="name">BOQ Sequence</field>
+            <field name="code">epc.boq</field>
+            <field name="prefix">BOQ/%(range_year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Gives every Material Request a reference like MR/2026/00001 -->
+        <record id="seq_epc_material_request" model="ir.sequence">
+            <field name="name">Material Request Sequence</field>
+            <field name="code">epc.material.request</field>
+            <field name="prefix">MR/%(range_year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Gives every Daily Progress Report a reference like DPR/2026/00001 -->
+        <record id="seq_epc_dpr" model="ir.sequence">
+            <field name="name">Daily Progress Report Sequence</field>
+            <field name="code">epc.dpr</field>
+            <field name="prefix">DPR/%(range_year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Gives every Quality Check a reference like QC/2026/00001 -->
+        <record id="seq_epc_quality_check" model="ir.sequence">
+            <field name="name">Quality Check Sequence</field>
+            <field name="code">epc.quality.check</field>
+            <field name="prefix">QC/%(range_year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Gives every Commissioning record a reference like COM/2026/00001 -->
+        <record id="seq_epc_commissioning" model="ir.sequence">
+            <field name="name">Commissioning Sequence</field>
+            <field name="code">epc.commissioning</field>
+            <field name="prefix">COM/%(range_year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Gives every Handover record a reference like HO/2026/00001 -->
+        <record id="seq_epc_handover" model="ir.sequence">
+            <field name="name">Handover Sequence</field>
+            <field name="code">epc.handover</field>
+            <field name="prefix">HO/%(range_year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Gives every AMC Contract a reference like AMC/2026/00001 -->
+        <record id="seq_epc_amc_contract" model="ir.sequence">
+            <field name="name">AMC Contract Sequence</field>
+            <field name="code">epc.amc.contract</field>
+            <field name="prefix">AMC/%(range_year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

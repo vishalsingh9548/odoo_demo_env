@@ -1,0 +1,245 @@
+// Solar EPC dashboard palette: a solar-panel blue accent plus a clear traffic-light
+// trio (green/red/amber) reserved specifically for Quality Check Pass/Fail/Pending,
+// so quality problems always read the same colour everywhere on the page.
+.o_epc_dashboard {
+    --epc-bg: #f7f8fa;
+    --epc-surface: #ffffff;
+    --epc-surface-2: #f7f8fb;
+    --epc-border: #eaecf1;
+    --epc-text: #33394a;
+    --epc-text-muted: #7c8296;
+    --epc-text-faint: #a6acbd;
+
+    --epc-accent: #2f7fb6;
+    --epc-accent-soft: #e7f1f9;
+    --epc-accent-strong: #1f5c86;
+
+    --epc-pass: #46b980;
+    --epc-pass-soft: #e9f9f0;
+    --epc-fail: #e0684f;
+    --epc-fail-soft: #fbe9e6;
+    --epc-warn: #eba93f;
+    --epc-warn-soft: #fdf3e2;
+    --epc-pending: #b9bccf;
+    --epc-pending-soft: #f3f4f8;
+
+    --epc-shadow: 0 1px 2px rgba(51, 57, 74, 0.04), 0 1px 1px rgba(51, 57, 74, 0.03);
+    --epc-shadow-hover: 0 8px 20px rgba(51, 57, 74, 0.08), 0 2px 6px rgba(51, 57, 74, 0.05);
+    --epc-radius: 10px;
+
+    overflow-y: auto;
+    min-height: 100%;
+    background:
+        radial-gradient(750px circle at 10% 0%, rgba(47, 127, 182, 0.10), transparent 55%),
+        radial-gradient(750px circle at 90% 10%, rgba(235, 169, 63, 0.10), transparent 55%),
+        radial-gradient(900px circle at 50% 100%, rgba(47, 127, 182, 0.09), transparent 60%),
+        var(--epc-bg);
+    color: var(--epc-text);
+    padding: 20px 4px 40px;
+
+    // ------------------------------------------------------------------
+    // KPI tiles
+    // ------------------------------------------------------------------
+    .o_epc_kpi_row {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 16px;
+        margin: 0 8px 28px;
+
+        @media (max-width: 1180px) {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        @media (max-width: 700px) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .o_epc_tile {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        min-width: 0;
+        background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.72));
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: var(--epc-radius);
+        padding: 18px 16px 18px 18px;
+        box-shadow: var(--epc-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        overflow: hidden;
+        --tile-accent: var(--epc-pending);
+        --tile-accent-soft: var(--epc-pending-soft);
+
+        &::before {
+            content: "";
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: var(--tile-accent);
+            z-index: 1;
+        }
+
+        .o_epc_tile_icon {
+            flex: 0 0 auto;
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(150deg, var(--tile-accent-soft), rgba(255, 255, 255, 0.4));
+            color: var(--tile-accent);
+            box-shadow: 0 2px 8px -2px var(--tile-accent);
+            font-size: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .o_epc_tile_body {
+            position: relative;
+            z-index: 1;
+            min-width: 0;
+        }
+
+        .o_epc_tile_label {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--epc-text-muted);
+            line-height: 1.3;
+        }
+        .o_epc_tile_value {
+            font-size: 23px;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-top: 4px;
+            color: var(--epc-text);
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
+    .o_epc_tile_accent { --tile-accent: var(--epc-accent); --tile-accent-soft: var(--epc-accent-soft); }
+    .o_epc_tile_pass { --tile-accent: var(--epc-pass); --tile-accent-soft: var(--epc-pass-soft); }
+    .o_epc_tile_fail { --tile-accent: var(--epc-fail); --tile-accent-soft: var(--epc-fail-soft); }
+    .o_epc_tile_warn { --tile-accent: var(--epc-warn); --tile-accent-soft: var(--epc-warn-soft); }
+
+    .o_epc_clickable {
+        cursor: pointer;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+        &:hover {
+            box-shadow: var(--epc-shadow-hover), 0 6px 18px -6px var(--tile-accent);
+            transform: translateY(-2px);
+        }
+        &:focus-visible {
+            outline: 2px solid var(--epc-accent);
+            outline-offset: 2px;
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Chart / table cards
+    // ------------------------------------------------------------------
+    .o_epc_chart_row {
+        margin: 0 8px 22px;
+    }
+
+    .o_epc_chart_card, .o_epc_table_card {
+        position: relative;
+        min-width: 320px;
+        flex: 1 1 320px;
+        padding: 22px 22px 24px;
+        border-radius: var(--epc-radius);
+        overflow: hidden;
+        background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.72));
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: var(--epc-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        transition: box-shadow 0.25s ease;
+
+        &:hover {
+            box-shadow: var(--epc-shadow-hover), 0 6px 20px -10px var(--epc-accent);
+        }
+
+        h6 {
+            margin: 0 0 18px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--epc-text);
+            display: flex;
+            align-items: center;
+            gap: 9px;
+
+            i.fa {
+                color: var(--epc-accent);
+                font-size: 0.9rem;
+            }
+        }
+    }
+
+    .o_epc_table_card {
+        margin: 0 8px 16px;
+    }
+
+    .o_epc_chart_card_wide {
+        flex: 2 1 480px;
+    }
+
+    .o_epc_chart_wrap {
+        position: relative;
+        height: 340px;
+    }
+
+    // ------------------------------------------------------------------
+    // Tables
+    // ------------------------------------------------------------------
+    table.table {
+        margin-bottom: 0;
+        font-size: 0.9rem;
+
+        thead th {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--epc-text-faint);
+            border-bottom: 2px solid var(--epc-accent-soft);
+            border-top: none;
+            padding-bottom: 12px;
+        }
+        tbody td {
+            border-color: var(--epc-border);
+            color: var(--epc-text);
+            vertical-align: middle;
+            padding-top: 16px;
+            padding-bottom: 16px;
+        }
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+        &.o_epc_pretty_table tbody tr:nth-child(even) td {
+            background: var(--epc-surface-2);
+        }
+    }
+
+    .o_epc_clickable_row {
+        cursor: pointer;
+        transition: background 0.12s ease;
+        &:hover, &:hover td {
+            background: var(--epc-accent-soft) !important;
+        }
+    }
+
+    .o_epc_pct_chip {
+        display: inline-block;
+        padding: 3px 11px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        font-variant-numeric: tabular-nums;
+    }
+    .o_epc_pct_high { background: var(--epc-pass-soft); color: var(--epc-pass); }
+    .o_epc_pct_low { background: var(--epc-fail-soft); color: var(--epc-fail); }
+}

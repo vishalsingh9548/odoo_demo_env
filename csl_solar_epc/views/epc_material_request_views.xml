@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="epc_material_request_view_list" model="ir.ui.view">
+            <field name="name">epc.material.request.list</field>
+            <field name="model">epc.material.request</field>
+            <field name="arch" type="xml">
+                <list string="Material Requests">
+                    <field name="name"/>
+                    <field name="project_id"/>
+                    <field name="requested_by"/>
+                    <field name="request_date"/>
+                    <field name="approval_state" widget="badge"
+                           decoration-success="approval_state == 'approved'"
+                           decoration-danger="approval_state == 'rejected'"
+                           decoration-info="approval_state == 'submitted'"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="epc_material_request_view_form" model="ir.ui.view">
+            <field name="name">epc.material.request.form</field>
+            <field name="model">epc.material.request</field>
+            <field name="arch" type="xml">
+                <form string="Material Request">
+                    <header>
+                        <button name="action_submit" string="Submit for Approval" type="object"
+                                class="oe_highlight" invisible="approval_state != 'to_submit'"/>
+                        <button name="action_approve" string="Approve" type="object"
+                                class="oe_highlight" groups="csl_solar_epc.group_epc_manager"
+                                invisible="approval_state != 'submitted'"/>
+                        <button name="action_reject" string="Reject" type="object"
+                                groups="csl_solar_epc.group_epc_manager"
+                                invisible="approval_state != 'submitted'"/>
+                        <button name="action_reset_to_submit" string="Reset to Draft" type="object"
+                                invisible="approval_state not in ('submitted', 'rejected')"/>
+                        <button name="action_create_purchase_orders" string="Create Purchase Orders" type="object"
+                                class="oe_highlight"
+                                invisible="approval_state != 'approved' or purchase_order_count &gt; 0"/>
+                        <button name="action_issue_to_project" string="Issue to Project" type="object"
+                                invisible="approval_state != 'approved'"/>
+                        <field name="approval_state" widget="statusbar"
+                               statusbar_visible="to_submit,submitted,approved"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_purchase_orders" type="object"
+                                    class="oe_stat_button" icon="fa-shopping-cart"
+                                    invisible="purchase_order_count == 0">
+                                <field name="purchase_order_count" widget="statinfo" string="Purchase Orders"/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+                        <group>
+                            <field name="project_id"/>
+                            <field name="requested_by"/>
+                            <field name="request_date"/>
+                        </group>
+                        <field name="line_ids">
+                            <list editable="bottom">
+                                <field name="product_id"/>
+                                <field name="description"/>
+                                <field name="quantity_required"/>
+                                <field name="uom_id"/>
+                                <field name="quantity_on_hand" readonly="1"/>
+                                <field name="quantity_to_purchase" readonly="1"/>
+                                <field name="vendor_id"/>
+                            </list>
+                        </field>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="epc_material_request_action" model="ir.actions.act_window">
+            <field name="name">Material Requests</field>
+            <field name="res_model">epc.material.request</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Create your first Material Request</p>
+                <p>List what a project needs; whatever isn't already in stock becomes a Purchase Order.</p>
+            </field>
+        </record>
+    </data>
+</odoo>

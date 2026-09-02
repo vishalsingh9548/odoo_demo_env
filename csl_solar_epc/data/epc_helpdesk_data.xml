@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- A dedicated Field Service project that AMC engineer visits are
+             scheduled against (separate from each customer's own installation
+             project, since one O&M team services many completed installations) -->
+        <record id="epc_fsm_project" model="project.project">
+            <field name="name">Solar O&amp;M Field Service</field>
+            <field name="is_fsm" eval="True"/>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- The Helpdesk team that AMC complaint tickets are logged against;
+             Field Service is switched on so tickets can generate engineer visits -->
+        <record id="epc_helpdesk_team" model="helpdesk.team">
+            <field name="name">Solar AMC Support</field>
+            <field name="use_fsm" eval="True"/>
+            <field name="fsm_project_id" ref="epc_fsm_project"/>
+            <field name="use_alias" eval="False"/>
+        </record>
+    </data>
+</odoo>

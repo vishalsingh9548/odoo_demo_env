@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="epc_boq_view_list" model="ir.ui.view">
+            <field name="name">epc.boq.list</field>
+            <field name="model">epc.boq</field>
+            <field name="arch" type="xml">
+                <list string="BOQs">
+                    <field name="name"/>
+                    <field name="lead_id"/>
+                    <field name="partner_id"/>
+                    <field name="capacity_kw"/>
+                    <!-- Hidden for now: these read 0 until BOQ lines have a Unit Cost
+                         entered, which looks like a bug rather than an unfinished BOQ.
+                         See LOG.md for the plan to address this properly. -->
+                    <field name="total_cost" sum="Total Cost" optional="hide"/>
+                    <field name="total_sell_price" sum="Total Sell Price" optional="hide"/>
+                    <field name="approval_state" widget="badge"
+                           decoration-success="approval_state == 'approved'"
+                           decoration-danger="approval_state == 'rejected'"
+                           decoration-info="approval_state == 'submitted'"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="epc_boq_view_form" model="ir.ui.view">
+            <field name="name">epc.boq.form</field>
+            <field name="model">epc.boq</field>
+            <field name="arch" type="xml">
+                <form string="Bill of Quantities">
+                    <header>
+                        <button name="action_submit" string="Submit for Approval" type="object"
+                                class="oe_highlight" invisible="approval_state != 'to_submit'"/>
+                        <button name="action_approve" string="Approve" type="object"
+                                class="oe_highlight" groups="csl_solar_epc.group_epc_manager"
+                                invisible="approval_state != 'submitted'"/>
+                        <button name="action_reject" string="Reject" type="object"
+                                groups="csl_solar_epc.group_epc_manager"
+                                invisible="approval_state != 'submitted'"/>
+                        <button name="action_reset_to_submit" string="Reset to Draft" type="object"
+                                invisible="approval_state not in ('submitted', 'rejected')"/>
+                        <button name="action_create_quotation" string="Create Quotation" type="object"
+                                class="oe_highlight" invisible="approval_state != 'approved' or sale_order_id"/>
+                        <button name="action_view_quotation" string="View Quotation" type="object"
+                                invisible="not sale_order_id"/>
+                        <field name="approval_state" widget="statusbar"
+                               statusbar_visible="to_submit,submitted,approved"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+                        <group>
+                            <group string="Reference">
+                                <field name="feasibility_id"/>
+                                <field name="lead_id"/>
+                                <field name="partner_id"/>
+                                <field name="currency_id" groups="base.group_multi_currency"/>
+                            </group>
+                            <group string="Summary">
+                                <field name="capacity_kw"/>
+                                <!-- Hidden for now: reads 0 until BOQ lines have a Unit
+                                     Cost entered. See LOG.md for the plan to fix this. -->
+                                <field name="total_cost" invisible="1"/>
+                                <field name="margin_percent"/>
+                                <field name="total_sell_price" invisible="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="BOQ Lines" name="lines">
+                                <field name="line_ids">
+                                    <list editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="category"/>
+                                        <field name="product_id"/>
+                                        <field name="description"/>
+                                        <field name="quantity"/>
+                                        <field name="uom_id" optional="hide"/>
+                                        <field name="unit_cost" optional="hide"/>
+                                        <field name="subtotal" sum="Total" optional="hide"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Approval" name="approval">
+                                <group>
+                                    <field name="submitted_by" readonly="1"/>
+                                    <field name="submitted_date" readonly="1"/>
+                                    <field name="approved_by" readonly="1"/>
+                                    <field name="approved_date" readonly="1"/>
+                                    <field name="rejection_reason"
+                                           invisible="approval_state not in ('submitted', 'rejected')"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="epc_boq_action" model="ir.actions.act_window">
+            <field name="name">BOQ &amp; Costing</field>
+            <field name="res_model">epc.boq</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first BOQ
+                </p>
+                <p>
+                    A Bill of Quantities lists every material and cost that makes up
+                    the price quoted to the customer.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

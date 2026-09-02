@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Adds the AMC Contract link to the standard Helpdesk Ticket form, so
+             an O&M agent can see which contract (and its SLA/warranty terms)
+             a complaint was raised under -->
+        <record id="helpdesk_ticket_view_form_epc" model="ir.ui.view">
+            <field name="name">helpdesk.ticket.form.epc</field>
+            <field name="model">helpdesk.ticket</field>
+            <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="amc_contract_id"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
