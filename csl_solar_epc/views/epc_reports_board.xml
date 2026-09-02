@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Stage 18: Analytics & Reports. The live, click-through Solar EPC
+             Dashboard (below) is the interactive screen; everything else here
+             is a printable PDF report that queries live data at the moment
+             it's generated, not a static picture. -->
+
+        <!-- Project Dashboard: every EPC project, grouped by kanban stage.
+             (No menu item points at this — the OWL Dashboard below covers
+             its role — kept only in case it's wanted again later.) -->
+        <record id="epc_report_project_action" model="ir.actions.act_window">
+            <field name="name">Project Dashboard</field>
+            <field name="res_model">project.project</field>
+            <field name="view_mode">kanban,list,form</field>
+            <field name="domain">[('boq_id', '!=', False)]</field>
+        </record>
+
+        <!-- Project Profitability: budgeted cost vs contract revenue, per project -->
+        <record id="epc_report_profitability_pdf_action" model="ir.actions.report">
+            <field name="name">Project Profitability</field>
+            <field name="model">project.project</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">csl_solar_epc.epc_report_profitability_template</field>
+            <field name="report_file">csl_solar_epc.epc_report_profitability_template</field>
+        </record>
+        <template id="epc_report_profitability_template">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Project Profitability Report</h2>
+                        <t t-set="projects" t-value="env['project.project'].search([('boq_id', '!=', False)])"/>
+                        <table class="table table-sm o_table" style="margin-top:16px;">
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Budgeted Cost</th>
+                                    <th>Contract Revenue</th>
+                                    <th>Margin</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="projects" t-as="project">
+                                    <td><span t-esc="project.name"/></td>
+                                    <td><span t-esc="'%.2f' % project.boq_total_cost"/></td>
+                                    <td><span t-esc="'%.2f' % project.boq_total_sell_price"/></td>
+                                    <td><span t-esc="'%.2f' % (project.boq_total_sell_price - project.boq_total_cost)"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <!-- Procurement Report: every Purchase Order raised for a project -->
+        <record id="epc_report_procurement_pdf_action" model="ir.actions.report">
+            <field name="name">Procurement Report</field>
+            <field name="model">purchase.order</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">csl_solar_epc.epc_report_procurement_template</field>
+            <field name="report_file">csl_solar_epc.epc_report_procurement_template</field>
+        </record>
+        <template id="epc_report_procurement_template">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Procurement Report</h2>
+                        <t t-set="orders" t-value="env['purchase.order'].search([('project_id', '!=', False)], order='project_id')"/>
+                        <table class="table table-sm o_table" style="margin-top:16px;">
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>PO Number</th>
+                                    <th>Vendor</th>
+                                    <th>Order Date</th>
+                                    <th>Status</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="orders" t-as="order">
+                                    <td><span t-esc="order.project_id.display_name"/></td>
+                                    <td><span t-esc="order.name"/></td>
+                                    <td><span t-esc="order.partner_id.display_name"/></td>
+                                    <td><span t-esc="order.date_order"/></td>
+                                    <td><span t-esc="order.state"/></td>
+                                    <td><span t-esc="'%.2f' % order.amount_total"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <!-- Inventory Report: every warehouse receipt/transfer linked to a project -->
+        <record id="epc_report_inventory_pdf_action" model="ir.actions.report">
+            <field name="name">Inventory Report</field>
+            <field name="model">stock.picking</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">csl_solar_epc.epc_report_inventory_template</field>
+            <field name="report_file">csl_solar_epc.epc_report_inventory_template</field>
+        </record>
+        <template id="epc_report_inventory_template">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Inventory Report</h2>
+                        <t t-set="pickings" t-value="env['stock.picking'].search([('project_id', '!=', False)], order='project_id, date')"/>
+                        <table class="table table-sm o_table" style="margin-top:16px;">
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Reference</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="pickings" t-as="picking">
+                                    <td><span t-esc="picking.project_id.display_name"/></td>
+                                    <td><span t-esc="picking.name"/></td>
+                                    <td><span t-esc="picking.location_id.display_name"/></td>
+                                    <td><span t-esc="picking.location_dest_id.display_name"/></td>
+                                    <td><span t-esc="picking.state"/></td>
+                                    <td><span t-esc="picking.date"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <!-- DPR Report: every Daily Progress Report, across every project -->
+        <record id="epc_report_dpr_pdf_action" model="ir.actions.report">
+            <field name="name">DPR Report</field>
+            <field name="model">epc.dpr</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">csl_solar_epc.epc_report_dpr_template</field>
+            <field name="report_file">csl_solar_epc.epc_report_dpr_template</field>
+        </record>
+        <template id="epc_report_dpr_template">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Daily Progress Report Summary</h2>
+                        <t t-set="dprs" t-value="env['epc.dpr'].search([], order='project_id, report_date')"/>
+                        <table class="table table-sm o_table" style="margin-top:16px;">
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Reference</th>
+                                    <th>Date</th>
+                                    <th>Weather</th>
+                                    <th>Manpower</th>
+                                    <th>Reported By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="dprs" t-as="dpr">
+                                    <td><span t-esc="dpr.project_id.display_name"/></td>
+                                    <td><span t-esc="dpr.name"/></td>
+                                    <td><span t-esc="dpr.report_date"/></td>
+                                    <td><span t-esc="dpr.weather"/></td>
+                                    <td><span t-esc="dpr.manpower_deployed"/></td>
+                                    <td><span t-esc="dpr.reported_by.name"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <!-- Quality Report: every Quality Check, across every project and category -->
+        <record id="epc_report_qc_pdf_action" model="ir.actions.report">
+            <field name="name">Quality Report</field>
+            <field name="model">epc.quality.check</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">csl_solar_epc.epc_report_qc_template</field>
+            <field name="report_file">csl_solar_epc.epc_report_qc_template</field>
+        </record>
+        <template id="epc_report_qc_template">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Quality Report</h2>
+                        <t t-set="checks" t-value="env['epc.quality.check'].search([], order='project_id, category')"/>
+                        <table class="table table-sm o_table" style="margin-top:16px;">
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Reference</th>
+                                    <th>Category</th>
+                                    <th>Check Date</th>
+                                    <th>Inspector</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="checks" t-as="check">
+                                    <td><span t-esc="check.project_id.display_name"/></td>
+                                    <td><span t-esc="check.name"/></td>
+                                    <td><span t-esc="check.category"/></td>
+                                    <td><span t-esc="check.check_date"/></td>
+                                    <td><span t-esc="check.inspector_id.name"/></td>
+                                    <td><span t-esc="check.overall_result"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <!-- Billing & Collection Report: every customer invoice and its payment status -->
+        <record id="epc_report_billing_pdf_action" model="ir.actions.report">
+            <field name="name">Billing &amp; Collection Report</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">csl_solar_epc.epc_report_billing_template</field>
+            <field name="report_file">csl_solar_epc.epc_report_billing_template</field>
+        </record>
+        <template id="epc_report_billing_template">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Billing &amp; Collection Report</h2>
+                        <t t-set="invoices" t-value="env['account.move'].search([('move_type', '=', 'out_invoice')], order='invoice_date')"/>
+                        <table class="table table-sm o_table" style="margin-top:16px;">
+                            <thead>
+                                <tr>
+                                    <th>Invoice</th>
+                                    <th>Customer</th>
+                                    <th>Invoice Date</th>
+                                    <th>Total</th>
+                                    <th>Payment Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="invoices" t-as="invoice">
+                                    <td><span t-esc="invoice.name"/></td>
+                                    <td><span t-esc="invoice.partner_id.display_name"/></td>
+                                    <td><span t-esc="invoice.invoice_date"/></td>
+                                    <td><span t-esc="'%.2f' % invoice.amount_total"/></td>
+                                    <td><span t-esc="invoice.payment_state"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <!-- O&amp;M / AMC Report: every maintenance contract and its status -->
+        <record id="epc_report_amc_pdf_action" model="ir.actions.report">
+            <field name="name">O&amp;M / AMC Report</field>
+            <field name="model">epc.amc.contract</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">csl_solar_epc.epc_report_amc_template</field>
+            <field name="report_file">csl_solar_epc.epc_report_amc_template</field>
+        </record>
+        <template id="epc_report_amc_template">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>O&amp;M / AMC Report</h2>
+                        <t t-set="contracts" t-value="env['epc.amc.contract'].search([], order='project_id')"/>
+                        <table class="table table-sm o_table" style="margin-top:16px;">
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Contract</th>
+                                    <th>Customer</th>
+                                    <th>Start</th>
+                                    <th>End</th>
+                                    <th>Status</th>
+                                    <th>Next Service</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="contracts" t-as="contract">
+                                    <td><span t-esc="contract.project_id.display_name"/></td>
+                                    <td><span t-esc="contract.name"/></td>
+                                    <td><span t-esc="contract.partner_id.display_name"/></td>
+                                    <td><span t-esc="contract.start_date"/></td>
+                                    <td><span t-esc="contract.end_date"/></td>
+                                    <td><span t-esc="contract.state"/></td>
+                                    <td><span t-esc="contract.next_service_date"/></td>
+                                    <td><span t-esc="'%.2f' % contract.contract_value"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <!-- The main "Solar EPC Dashboard" screen: a live, dynamic KPI dashboard
+             (custom OWL component + AbstractModel backend, see models/epc_dashboard.py
+             and static/src/js/epc_dashboard.js) — not a static picture, and not a
+             manually-authored spreadsheet. Every tile and chart queries real data on
+             every open, and clicking one drills into the exact underlying records. -->
+        <record id="epc_dashboard_action" model="ir.actions.client">
+            <field name="name">Solar EPC Dashboard</field>
+            <field name="tag">epc_dashboard</field>
+            <field name="target">current</field>
+        </record>
+    </data>
+</odoo>

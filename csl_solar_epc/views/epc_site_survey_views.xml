@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="epc_site_survey_view_list" model="ir.ui.view">
+            <field name="name">epc.site.survey.list</field>
+            <field name="model">epc.site.survey</field>
+            <field name="arch" type="xml">
+                <list string="Site Surveys">
+                    <field name="name"/>
+                    <field name="lead_id"/>
+                    <field name="partner_id"/>
+                    <field name="survey_date"/>
+                    <field name="engineer_id"/>
+                    <field name="is_feasible"/>
+                    <field name="approval_state" widget="badge"
+                           decoration-success="approval_state == 'approved'"
+                           decoration-danger="approval_state == 'rejected'"
+                           decoration-info="approval_state == 'submitted'"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="epc_site_survey_view_form" model="ir.ui.view">
+            <field name="name">epc.site.survey.form</field>
+            <field name="model">epc.site.survey</field>
+            <field name="arch" type="xml">
+                <form string="Site Survey">
+                    <header>
+                        <button name="action_submit" string="Submit for Approval" type="object"
+                                class="oe_highlight" invisible="approval_state != 'to_submit'"/>
+                        <button name="action_approve" string="Approve" type="object"
+                                class="oe_highlight" groups="csl_solar_epc.group_epc_manager"
+                                invisible="approval_state != 'submitted'"/>
+                        <button name="action_reject" string="Reject" type="object"
+                                groups="csl_solar_epc.group_epc_manager"
+                                invisible="approval_state != 'submitted'"/>
+                        <button name="action_reset_to_submit" string="Reset to Draft" type="object"
+                                invisible="approval_state not in ('submitted', 'rejected')"/>
+                        <button name="action_create_feasibility" string="Create Feasibility Study" type="object"
+                                class="oe_highlight" invisible="approval_state != 'approved' or feasibility_count != 0"/>
+                        <field name="approval_state" widget="statusbar"
+                               statusbar_visible="to_submit,submitted,approved"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_feasibility" type="object"
+                                    class="oe_stat_button" icon="fa-flask"
+                                    invisible="feasibility_count == 0">
+                                <field name="feasibility_count" widget="statinfo" string="Feasibility Studies"/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+                        <group>
+                            <group string="Reference">
+                                <field name="lead_id"/>
+                                <field name="partner_id"/>
+                                <field name="survey_date"/>
+                                <field name="engineer_id"/>
+                            </group>
+                            <group string="Site Details">
+                                <field name="roof_or_land_type"/>
+                                <field name="available_area_sqft"/>
+                                <field name="sanctioned_load_kw"/>
+                                <field name="has_existing_transformer"/>
+                                <field name="grid_access_available"/>
+                            </group>
+                        </group>
+                        <group string="Location">
+                            <field name="site_address"/>
+                        </group>
+                        <notebook>
+                            <page string="Shadow Analysis &amp; Photos" name="shadow">
+                                <group>
+                                    <field name="shadow_analysis"/>
+                                </group>
+                                <group>
+                                    <field name="site_photo" widget="image"/>
+                                    <field name="site_photo_filename" invisible="1"/>
+                                </group>
+                            </page>
+                            <page string="Survey Report" name="report">
+                                <field name="survey_report"/>
+                                <field name="is_feasible"/>
+                            </page>
+                            <page string="Approval" name="approval">
+                                <group>
+                                    <field name="submitted_by" readonly="1"/>
+                                    <field name="submitted_date" readonly="1"/>
+                                    <field name="approved_by" readonly="1"/>
+                                    <field name="approved_date" readonly="1"/>
+                                    <field name="rejection_reason"
+                                           invisible="approval_state not in ('submitted', 'rejected')"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="epc_site_survey_action" model="ir.actions.act_window">
+            <field name="name">Site Surveys</field>
+            <field name="res_model">epc.site.survey</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first Site Survey
+                </p>
+                <p>
+                    A Site Survey records what an engineer finds during a visit to
+                    the customer's site, before a Feasibility Study and BOQ are prepared.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

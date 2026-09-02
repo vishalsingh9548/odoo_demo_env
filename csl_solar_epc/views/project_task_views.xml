@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Adds the solar installation checkpoint checklist to the standard
+             Task form, used for Site Execution (Stage 10) -->
+        <record id="view_task_form2_epc" model="ir.ui.view">
+            <field name="name">project.task.form.epc</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_form2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page name="epc_site_checklist" string="Solar Site Checklist">
+                        <group>
+                            <group string="Civil &amp; Structure">
+                                <field name="civil_work_done"/>
+                                <field name="civil_work_date" invisible="not civil_work_done"/>
+                                <field name="structure_installation_done"/>
+                                <field name="structure_installation_date" invisible="not structure_installation_done"/>
+                                <field name="module_installation_done"/>
+                                <field name="module_installation_date" invisible="not module_installation_done"/>
+                            </group>
+                            <group string="Electrical">
+                                <field name="dc_cabling_done"/>
+                                <field name="dc_cabling_date" invisible="not dc_cabling_done"/>
+                                <field name="ac_cabling_done"/>
+                                <field name="ac_cabling_date" invisible="not ac_cabling_done"/>
+                                <field name="lt_panel_installation_done"/>
+                                <field name="lt_panel_installation_date" invisible="not lt_panel_installation_done"/>
+                                <field name="earthing_done"/>
+                                <field name="earthing_date" invisible="not earthing_done"/>
+                            </group>
+                        </group>
+                        <group string="Testing">
+                            <field name="testing_precommissioning_done"/>
+                            <field name="testing_precommissioning_date" invisible="not testing_precommissioning_done"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

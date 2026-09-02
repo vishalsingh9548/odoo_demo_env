@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="epc_amc_contract_view_list" model="ir.ui.view">
+            <field name="name">epc.amc.contract.list</field>
+            <field name="model">epc.amc.contract</field>
+            <field name="arch" type="xml">
+                <list string="AMC Contracts">
+                    <field name="name"/>
+                    <field name="project_id"/>
+                    <field name="partner_id"/>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                    <field name="service_frequency"/>
+                    <field name="next_service_date"/>
+                    <field name="state" widget="badge"
+                           decoration-success="state == 'active'"
+                           decoration-muted="state in ('expired', 'terminated')"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="epc_amc_contract_view_form" model="ir.ui.view">
+            <field name="name">epc.amc.contract.form</field>
+            <field name="model">epc.amc.contract</field>
+            <field name="arch" type="xml">
+                <form string="AMC Contract">
+                    <header>
+                        <button name="action_activate" string="Activate" type="object"
+                                class="oe_highlight" invisible="state != 'draft'"/>
+                        <button name="action_terminate" string="Terminate" type="object"
+                                invisible="state != 'active'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,active"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_tickets" type="object"
+                                    class="oe_stat_button" icon="fa-headphones"
+                                    invisible="ticket_count == 0">
+                                <field name="ticket_count" widget="statinfo" string="Complaint Tickets"/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="project_id"/>
+                                <field name="partner_id"/>
+                                <field name="helpdesk_team_id"/>
+                            </group>
+                            <group>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                                <field name="contract_value"/>
+                                <field name="warranty_end_date"/>
+                            </group>
+                        </group>
+                        <group string="Preventive Maintenance">
+                            <field name="service_frequency"/>
+                            <field name="next_service_date"/>
+                            <field name="sla_response_hours"/>
+                        </group>
+                        <notebook>
+                            <page string="Maintenance Plan" name="plan">
+                                <field name="preventive_maintenance_plan"/>
+                            </page>
+                        </notebook>
+                        <div class="mt16">
+                            <button name="action_log_complaint" string="Log Complaint Ticket" type="object"
+                                    class="btn-secondary" invisible="not helpdesk_team_id"/>
+                        </div>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="epc_amc_contract_action" model="ir.actions.act_window">
+            <field name="name">AMC Contracts</field>
+            <field name="res_model">epc.amc.contract</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Create your first AMC Contract</p>
+                <p>Set up the maintenance agreement; complaints raised against it flow through Helpdesk and Field Service.</p>
+            </field>
+        </record>
+    </data>
+</odoo>

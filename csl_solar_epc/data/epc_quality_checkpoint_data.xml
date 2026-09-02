@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Starter checkpoints, matching what the process diagram calls out for
+         each QC category. noupdate="1" so these are only the STARTING point —
+         edited or deleted freely afterward from Configuration > QC Checkpoints
+         without an upgrade ever putting them back. -->
+    <data noupdate="1">
+        <record id="epc_checkpoint_final_system_testing" model="epc.quality.checkpoint">
+            <field name="name">System Testing</field>
+            <field name="category">final</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="epc_checkpoint_final_precommissioning" model="epc.quality.checkpoint">
+            <field name="name">Pre-Commissioning QC</field>
+            <field name="category">final</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- Generic checks that apply to every incoming delivery regardless of
+             which product it contains — these appear alongside the per-product
+             lines that get added automatically once a receipt is picked -->
+        <record id="epc_checkpoint_incoming_packaging" model="epc.quality.checkpoint">
+            <field name="name">Packaging Condition</field>
+            <field name="category">incoming_material</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="epc_checkpoint_incoming_challan" model="epc.quality.checkpoint">
+            <field name="name">Delivery Challan Matches Purchase Order</field>
+            <field name="category">incoming_material</field>
+            <field name="sequence">20</field>
+        </record>
+    </data>
+</odoo>

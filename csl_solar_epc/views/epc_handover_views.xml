@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="epc_handover_view_list" model="ir.ui.view">
+            <field name="name">epc.handover.list</field>
+            <field name="model">epc.handover</field>
+            <field name="arch" type="xml">
+                <list string="Handover &amp; Closure">
+                    <field name="name"/>
+                    <field name="project_id"/>
+                    <field name="partner_id"/>
+                    <field name="closure_date"/>
+                    <field name="customer_training_done"/>
+                    <field name="approval_state" widget="badge"
+                           decoration-success="approval_state == 'approved'"
+                           decoration-danger="approval_state == 'rejected'"
+                           decoration-info="approval_state == 'submitted'"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="epc_handover_view_form" model="ir.ui.view">
+            <field name="name">epc.handover.form</field>
+            <field name="model">epc.handover</field>
+            <field name="arch" type="xml">
+                <form string="Handover &amp; Project Closure">
+                    <header>
+                        <button name="action_submit" string="Submit for Approval" type="object"
+                                class="oe_highlight" invisible="approval_state != 'to_submit'"/>
+                        <button name="action_approve" string="Approve" type="object"
+                                class="oe_highlight" groups="csl_solar_epc.group_epc_manager"
+                                invisible="approval_state != 'submitted'"/>
+                        <button name="action_reject" string="Reject" type="object"
+                                groups="csl_solar_epc.group_epc_manager"
+                                invisible="approval_state != 'submitted'"/>
+                        <button name="action_reset_to_submit" string="Reset to Draft" type="object"
+                                invisible="approval_state not in ('submitted', 'rejected')"/>
+                        <field name="approval_state" widget="statusbar"
+                               statusbar_visible="to_submit,submitted,approved"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="project_id"/>
+                                <field name="partner_id"/>
+                                <field name="closure_date"/>
+                            </group>
+                            <group>
+                                <field name="customer_training_done"/>
+                                <field name="customer_training_date"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Documents" name="documents">
+                                <group>
+                                    <field name="as_built_drawing" filename="as_built_drawing_filename"/>
+                                    <field name="as_built_drawing_filename" invisible="1"/>
+                                    <field name="test_reports" filename="test_reports_filename"/>
+                                    <field name="test_reports_filename" invisible="1"/>
+                                    <field name="om_manual" filename="om_manual_filename"/>
+                                    <field name="om_manual_filename" invisible="1"/>
+                                    <field name="warranty_certificate" filename="warranty_certificate_filename"/>
+                                    <field name="warranty_certificate_filename" invisible="1"/>
+                                </group>
+                            </page>
+                            <page string="Closure Report" name="closure">
+                                <field name="project_closure_report"/>
+                            </page>
+                            <page string="Approval" name="approval">
+                                <group>
+                                    <field name="submitted_by" readonly="1"/>
+                                    <field name="submitted_date" readonly="1"/>
+                                    <field name="approved_by" readonly="1"/>
+                                    <field name="approved_date" readonly="1"/>
+                                    <field name="rejection_reason"
+                                           invisible="approval_state not in ('submitted', 'rejected')"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="epc_handover_action" model="ir.actions.act_window">
+            <field name="name">Handover &amp; Closure</field>
+            <field name="res_model">epc.handover</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Create your first Handover record</p>
+                <p>Hand documents to the customer and formally close the project.</p>
+            </field>
+        </record>
+    </data>
+</odoo>

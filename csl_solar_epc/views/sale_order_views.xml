@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Adds the EPC Project smart button and a "Solar EPC Terms" tab to
+             the standard Quotation/Sales Order form -->
+        <record id="sale_order_view_form_epc" model="ir.ui.view">
+            <field name="name">sale.order.form.epc</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_epc_project" type="object"
+                            class="oe_stat_button" icon="fa-building-o"
+                            invisible="epc_project_count == 0">
+                        <field name="epc_project_count" widget="statinfo" string="EPC Project"/>
+                    </button>
+                </xpath>
+                <xpath expr="//notebook" position="inside">
+                    <page name="epc_terms" string="Solar EPC Terms">
+                        <field name="boq_id" readonly="1"/>
+                        <group>
+                            <group string="Commercial Terms">
+                                <field name="warranty_type"/>
+                                <field name="delivery_type"/>
+                                <field name="freight_type"/>
+                                <field name="payment_terms_type"/>
+                            </group>
+                            <group string="Compliance">
+                                <field name="cancellation_policy"/>
+                                <field name="certification_type"/>
+                                <field name="tolerance_type"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

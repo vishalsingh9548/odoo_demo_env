@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- The printable action: turns an approved Commissioning record into a
+             downloadable PDF certificate, instead of only accepting an
+             externally-made file upload -->
+        <record id="epc_commissioning_report_action" model="ir.actions.report">
+            <field name="name">Commissioning Certificate</field>
+            <field name="model">epc.commissioning</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">csl_solar_epc.epc_commissioning_certificate_template</field>
+            <field name="report_file">csl_solar_epc.epc_commissioning_certificate_template</field>
+            <field name="print_report_name">'Commissioning Certificate - %s' % (object.name)</field>
+            <field name="binding_model_id" ref="model_epc_commissioning"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <!-- The certificate's actual layout: project/customer details, the
+             test results, and signature lines for the engineer and customer -->
+        <template id="epc_commissioning_certificate_template">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <h2 class="text-center">Solar Commissioning Certificate</h2>
+                            <table class="table table-sm o_table" style="margin-top: 24px;">
+                                <tr>
+                                    <td style="width: 40%;"><strong>Certificate No.</strong></td>
+                                    <td><span t-field="doc.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Project</strong></td>
+                                    <td><span t-field="doc.project_id.display_name"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Customer</strong></td>
+                                    <td><span t-field="doc.partner_id.display_name"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>System Capacity</strong></td>
+                                    <td>
+                                        <span t-field="doc.project_id.capacity_kw"/> kW
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Commissioning Date</strong></td>
+                                    <td><span t-field="doc.commissioning_date"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Verified Generation</strong></td>
+                                    <td>
+                                        <span t-field="doc.generation_verification_kwh"/> kWh
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <h4 style="margin-top: 24px;">Commissioning Checklist</h4>
+                            <div t-field="doc.commissioning_checklist"/>
+
+                            <table class="table table-sm o_table" style="margin-top: 16px;">
+                                <tr>
+                                    <td style="width: 60%;">System Testing Completed</td>
+                                    <td>
+                                        <span t-if="doc.system_testing_done">Yes</span>
+                                        <span t-else="">No</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Customer Walkthrough Completed</td>
+                                    <td>
+                                        <span t-if="doc.customer_walkthrough_done">Yes</span>
+                                        <span t-else="">No</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Customer Approved</td>
+                                    <td>
+                                        <span t-if="doc.customer_approved">Yes</span>
+                                        <span t-else="">No</span>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="margin-top: 40px;">
+                                This certifies that the above solar power system has been installed,
+                                tested and commissioned, and is formally accepted for operation.
+                            </p>
+
+                            <div class="row" style="margin-top: 70px;">
+                                <div class="col-6">
+                                    <p>_____________________________<br/>Commissioning Engineer</p>
+                                </div>
+                                <div class="col-6">
+                                    <p>_____________________________<br/>Customer Signature</p>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

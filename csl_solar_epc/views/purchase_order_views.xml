@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Shows which Material Request (if any) generated this Purchase Order,
+             for traceability from BOQ shortage all the way to the RFQ -->
+        <record id="purchase_order_view_form_epc" model="ir.ui.view">
+            <field name="name">purchase.order.form.epc</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="material_request_id" readonly="1" invisible="not material_request_id"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

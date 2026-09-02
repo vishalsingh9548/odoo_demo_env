@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Adds solar qualification fields, a "Schedule Site Survey" button, and
+             smart buttons for Site Survey/Feasibility/BOQ counts onto the standard
+             CRM Lead/Opportunity form -->
+        <record id="crm_lead_view_form_epc" model="ir.ui.view">
+            <field name="name">crm.lead.form.epc</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_site_surveys" type="object"
+                            class="oe_stat_button" icon="fa-map-marker"
+                            invisible="site_survey_count == 0">
+                        <field name="site_survey_count" widget="statinfo" string="Surveys"/>
+                    </button>
+                </xpath>
+                <xpath expr="//header" position="inside">
+                    <button name="action_create_site_survey" string="Schedule Site Survey"
+                            type="object" class="oe_highlight" groups="csl_solar_epc.group_epc_user"
+                            invisible="type == 'lead'"/>
+                </xpath>
+                <xpath expr="//notebook" position="inside">
+                    <page name="epc_solar_details" string="Solar Details">
+                        <group>
+                            <group string="Requirement">
+                                <field name="customer_segment"/>
+                                <field name="proposed_capacity_kw"/>
+                                <field name="monthly_electricity_bill"/>
+                                <field name="roof_or_land_type"/>
+                                <field name="expected_closure_date"/>
+                            </group>
+                            <group string="Site">
+                                <field name="site_address"/>
+                                <field name="site_latitude"/>
+                                <field name="site_longitude"/>
+                                <field name="sanctioned_load_kw"/>
+                                <field name="has_existing_transformer"/>
+                                <field name="grid_access_available"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

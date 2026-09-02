@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    <t t-name="csl_solar_epc.EpcDashboard">
+        <div class="o_epc_dashboard">
+
+            <div t-if="state.loading" class="text-center p-5">
+                <i class="fa fa-spin fa-spinner fa-2x"/>
+            </div>
+
+            <t t-if="!state.loading and state.data">
+
+                <div class="o_epc_kpi_row">
+                    <div class="o_epc_tile o_epc_tile_accent o_epc_clickable" tabindex="0"
+                         t-on-click="() => this.openList(state.data.kpis.active_projects.domain, 'Active Projects', 'project.project')">
+                        <div class="o_epc_tile_icon"><i class="fa fa-sun-o"/></div>
+                        <div class="o_epc_tile_body">
+                            <div class="o_epc_tile_label">Active Projects</div>
+                            <div class="o_epc_tile_value" t-esc="state.data.kpis.active_projects.count"/>
+                        </div>
+                    </div>
+                    <div class="o_epc_tile o_epc_tile_pass">
+                        <div class="o_epc_tile_icon"><i class="fa fa-money"/></div>
+                        <div class="o_epc_tile_body">
+                            <div class="o_epc_tile_label">Contract Value</div>
+                            <div class="o_epc_tile_value" t-esc="formatMoney(state.data.kpis.contract_value.value)"/>
+                        </div>
+                    </div>
+                    <div class="o_epc_tile o_epc_tile_pass o_epc_clickable" tabindex="0"
+                         t-on-click="() => this.openList(state.data.kpis.completed_projects.domain, 'Completed Projects', 'project.project')">
+                        <div class="o_epc_tile_icon"><i class="fa fa-flag-checkered"/></div>
+                        <div class="o_epc_tile_body">
+                            <div class="o_epc_tile_label">Completed Projects</div>
+                            <div class="o_epc_tile_value" t-esc="state.data.kpis.completed_projects.count"/>
+                        </div>
+                    </div>
+                    <div class="o_epc_tile o_epc_tile_warn o_epc_clickable" tabindex="0"
+                         t-on-click="() => this.openList(state.data.kpis.pending_material_requests.domain, 'Pending Material Requests', 'epc.material.request')">
+                        <div class="o_epc_tile_icon"><i class="fa fa-truck"/></div>
+                        <div class="o_epc_tile_body">
+                            <div class="o_epc_tile_label">Pending Material Requests</div>
+                            <div class="o_epc_tile_value" t-esc="state.data.kpis.pending_material_requests.count"/>
+                        </div>
+                    </div>
+                    <div class="o_epc_tile o_epc_tile_fail o_epc_clickable" tabindex="0"
+                         t-on-click="() => this.openList(state.data.kpis.pending_quality_checks.domain, 'Pending / Failed Quality Checks', 'epc.quality.check')">
+                        <div class="o_epc_tile_icon"><i class="fa fa-check-square-o"/></div>
+                        <div class="o_epc_tile_body">
+                            <div class="o_epc_tile_label">QC Needing Attention</div>
+                            <div class="o_epc_tile_value" t-esc="state.data.kpis.pending_quality_checks.count"/>
+                        </div>
+                    </div>
+                    <div class="o_epc_tile o_epc_tile_accent o_epc_clickable" tabindex="0"
+                         t-on-click="() => this.openList(state.data.kpis.active_amc_contracts.domain, 'Active AMC Contracts', 'epc.amc.contract')">
+                        <div class="o_epc_tile_icon"><i class="fa fa-wrench"/></div>
+                        <div class="o_epc_tile_body">
+                            <div class="o_epc_tile_label">Active AMC Contracts</div>
+                            <div class="o_epc_tile_value" t-esc="state.data.kpis.active_amc_contracts.count"/>
+                        </div>
+                    </div>
+                    <div class="o_epc_tile o_epc_tile_warn o_epc_clickable" tabindex="0"
+                         t-on-click="() => this.openList(state.data.kpis.open_tickets.domain, 'Open Complaint Tickets', 'helpdesk.ticket')">
+                        <div class="o_epc_tile_icon"><i class="fa fa-headphones"/></div>
+                        <div class="o_epc_tile_body">
+                            <div class="o_epc_tile_label">Open Complaint Tickets</div>
+                            <div class="o_epc_tile_value" t-esc="state.data.kpis.open_tickets.count"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="o_epc_chart_row d-flex flex-wrap gap-3 p-2">
+                    <div class="o_epc_chart_card">
+                        <h6><i class="fa fa-pie-chart"/>Portfolio by Phase</h6>
+                        <div class="o_epc_chart_wrap"><canvas t-ref="portfolioPhaseChart"/></div>
+                    </div>
+                    <div class="o_epc_chart_card">
+                        <h6><i class="fa fa-tasks"/>Pipeline Activity</h6>
+                        <div class="o_epc_chart_wrap"><canvas t-ref="pipelineActivityChart"/></div>
+                    </div>
+                    <div class="o_epc_chart_card">
+                        <h6><i class="fa fa-wrench"/>AMC Contract Health</h6>
+                        <div class="o_epc_chart_wrap"><canvas t-ref="amcHealthChart"/></div>
+                    </div>
+                    <div class="o_epc_chart_card o_epc_chart_card_wide">
+                        <h6><i class="fa fa-shopping-cart"/>Procurement Status</h6>
+                        <div class="o_epc_chart_wrap"><canvas t-ref="procurementStatusChart"/></div>
+                    </div>
+                </div>
+
+                <div class="o_epc_table_card">
+                    <h6><i class="fa fa-calendar-check-o"/>Upcoming AMC Preventive Services</h6>
+                    <table class="table table-sm o_epc_pretty_table">
+                        <thead><tr><th>Contract</th><th>Project</th><th>Due Date</th><th class="text-end">Days Until</th></tr></thead>
+                        <tbody>
+                            <tr t-foreach="state.data.upcoming_amc_services" t-as="svc" t-key="svc.id"
+                                class="o_epc_clickable_row" t-on-click="() => this.openRecord('epc.amc.contract', svc.id)">
+                                <td><t t-esc="svc.name"/></td>
+                                <td class="text-muted"><t t-esc="svc.project"/></td>
+                                <td><t t-esc="svc.next_service_date"/></td>
+                                <td class="text-end">
+                                    <span t-attf-class="o_epc_pct_chip {{ svc.days_until &lt;= 7 ? 'o_epc_pct_low' : 'o_epc_pct_high' }}"
+                                          t-esc="svc.days_until"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p t-if="!state.data.upcoming_amc_services.length" class="text-muted mb-0">
+                        No preventive service visits due yet.
+                    </p>
+                </div>
+            </t>
+        </div>
+    </t>
+
+</templates>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Adds the Solar EPC context fields (where this project came from, its
+             capacity, site address and scope) to the standard Project form -->
+        <record id="project_view_form_epc" model="ir.ui.view">
+            <field name="name">project.project.form.epc</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.edit_project"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_open_share_project_wizard']" position="after">
+                    <button name="action_create_material_request" string="New Material Request" type="object"
+                            class="oe_highlight" invisible="not boq_id or material_request_count != 0"/>
+                    <button name="action_create_dpr" string="New Daily Progress Report" type="object"
+                            invisible="dpr_count != 0"/>
+                </xpath>
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_epc_sale_order" type="object"
+                            class="oe_stat_button" icon="fa-file-text-o"
+                            invisible="not epc_sale_order_id">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Sales Order</span>
+                        </div>
+                    </button>
+                    <button name="action_view_material_requests" type="object"
+                            class="oe_stat_button" icon="fa-truck"
+                            invisible="material_request_count == 0">
+                        <field name="material_request_count" widget="statinfo" string="Material Requests"/>
+                    </button>
+                    <button name="action_view_dprs" type="object"
+                            class="oe_stat_button" icon="fa-clipboard"
+                            invisible="dpr_count == 0">
+                        <field name="dpr_count" widget="statinfo" string="Daily Progress Reports"/>
+                    </button>
+                    <button name="action_view_quality_checks" type="object"
+                            class="oe_stat_button" icon="fa-check-square-o"
+                            invisible="quality_check_count == 0">
+                        <field name="quality_check_count" widget="statinfo" string="Quality Checks"/>
+                    </button>
+                </xpath>
+                <xpath expr="//field[@name='partner_id'][1]/.." position="after">
+                    <group string="Solar EPC">
+                        <field name="lead_id"/>
+                        <field name="boq_id"/>
+                        <field name="epc_sale_order_id"/>
+                        <field name="capacity_kw"/>
+                        <!-- Hidden for now: these mirror the BOQ's Total Cost/Sell Price,
+                             which read 0 until BOQ lines have a Unit Cost entered. See
+                             LOG.md for the plan to fix this. -->
+                        <field name="boq_total_cost" invisible="1"/>
+                        <field name="boq_total_sell_price" invisible="1"/>
+                    </group>
+                </xpath>
+                <xpath expr="//sheet" position="inside">
+                    <group string="Site &amp; Scope" invisible="not site_address and not scope_of_work">
+                        <field name="site_address"/>
+                        <field name="scope_of_work"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

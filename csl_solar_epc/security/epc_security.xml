@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Groups this app together under one heading in Settings > Users > Groups,
+             instead of scattering its permissions across unrelated categories -->
+        <record id="module_category_epc" model="ir.module.category">
+            <field name="name">Solar EPC</field>
+            <field name="description">Access levels for the Solar EPC (Engineering, Procurement, Construction) app.</field>
+            <field name="sequence">25</field>
+        </record>
+
+        <!-- Everyday users: site engineers, surveyors, sales reps who create and
+             work on their own surveys, BOQs, DPRs, quality checks, etc. -->
+        <record id="group_epc_user" model="res.groups">
+            <field name="name">Field User</field>
+            <field name="category_id" ref="module_category_epc"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">Can create and edit their own Solar EPC records (site surveys, BOQs, DPRs, quality checks) but cannot approve them or manage company-wide settings.</field>
+        </record>
+
+        <!-- Project managers: approve surveys/feasibility/BOQ/commissioning/handover
+             and oversee the whole project pipeline -->
+        <record id="group_epc_manager" model="res.groups">
+            <field name="name">Project Manager</field>
+            <field name="category_id" ref="module_category_epc"/>
+            <field name="implied_ids" eval="[(4, ref('group_epc_user'))]"/>
+            <field name="comment">Can approve or reject Solar EPC documents (surveys, feasibility studies, BOQs, commissioning, handover) and see every project, not just their own.</field>
+        </record>
+
+        <!-- Top-level administrators: full control, including AMC contract setup
+             and anything else that should not be open to regular managers -->
+        <record id="group_epc_admin" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="category_id" ref="module_category_epc"/>
+            <field name="implied_ids" eval="[(4, ref('group_epc_manager'))]"/>
+            <field name="comment">Full control of the Solar EPC app, including AMC contract setup and configuration.</field>
+        </record>
+
+        <!-- Whoever installs the app gets full access immediately, the same way
+             installing Sales or Purchase makes the admin a manager of that app
+             straight away — without this, the very first person to open the
+             app would be locked out of their own installation until someone
+             manually assigned them a group in Settings. A <function> call
+             (rather than a <record> update) is used here because it reliably
+             writes to an existing record owned by another module (base). -->
+        <function model="res.users" name="write">
+            <value model="res.users" eval="[ref('base.user_admin')]"/>
+            <value eval="{'groups_id': [(4, ref('group_epc_admin'))]}"/>
+        </function>
+    </data>
+</odoo>

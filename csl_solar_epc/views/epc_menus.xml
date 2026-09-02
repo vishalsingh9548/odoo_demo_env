@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Top-level app menu ("Solar EPC" in the main app switcher). Sub-menus
+             for each pipeline stage are added here as their screens are built. -->
+        <menuitem id="menu_epc_root"
+                  name="Solar EPC"
+                  sequence="45"
+                  groups="group_epc_user"
+                  web_icon="csl_solar_epc,static/description/icon.png"/>
+
+        <!-- The dashboard is the first thing anyone sees on opening the app -->
+        <menuitem id="menu_epc_dashboard_top"
+                  name="Dashboard"
+                  parent="menu_epc_root"
+                  action="epc_dashboard_action"
+                  sequence="5"/>
+
+        <!-- Pipeline stages 2-4: Site Survey -> Feasibility -> BOQ, in that order -->
+        <menuitem id="menu_epc_site_survey"
+                  name="Site Surveys"
+                  parent="menu_epc_root"
+                  action="epc_site_survey_action"
+                  sequence="10"/>
+        <menuitem id="menu_epc_feasibility"
+                  name="Feasibility Studies"
+                  parent="menu_epc_root"
+                  action="epc_feasibility_action"
+                  sequence="20"/>
+        <menuitem id="menu_epc_boq"
+                  name="BOQ &amp; Costing"
+                  parent="menu_epc_root"
+                  action="epc_boq_action"
+                  sequence="30"/>
+
+        <!-- Stage 8A: Procurement -->
+        <menuitem id="menu_epc_material_request"
+                  name="Material Requests"
+                  parent="menu_epc_root"
+                  action="epc_material_request_action"
+                  sequence="40"/>
+
+        <!-- Stage 12: Quality Checks -->
+        <menuitem id="menu_epc_quality_check"
+                  name="Quality Checks"
+                  parent="menu_epc_root"
+                  action="epc_quality_check_action"
+                  sequence="60"/>
+
+        <!-- Stage 13: Commissioning -->
+        <menuitem id="menu_epc_commissioning"
+                  name="Commissioning"
+                  parent="menu_epc_root"
+                  action="epc_commissioning_action"
+                  sequence="70"/>
+
+        <!-- Stage 14: Handover & Closure -->
+        <menuitem id="menu_epc_handover"
+                  name="Handover &amp; Closure"
+                  parent="menu_epc_root"
+                  action="epc_handover_action"
+                  sequence="80"/>
+
+        <!-- Stage 17: O&amp;M / AMC -->
+        <menuitem id="menu_epc_amc_contract"
+                  name="AMC Contracts"
+                  parent="menu_epc_root"
+                  action="epc_amc_contract_action"
+                  groups="csl_solar_epc.group_epc_manager"
+                  sequence="90"/>
+
+        <!-- Stage 18: Analytics & Reports -->
+        <menuitem id="menu_epc_reporting"
+                  name="Reporting"
+                  parent="menu_epc_root"
+                  sequence="100"/>
+        <menuitem id="menu_epc_report_profitability"
+                  name="Project Profitability"
+                  parent="menu_epc_reporting"
+                  action="epc_report_profitability_pdf_action"
+                  sequence="20"/>
+        <menuitem id="menu_epc_report_procurement"
+                  name="Procurement Report"
+                  parent="menu_epc_reporting"
+                  action="epc_report_procurement_pdf_action"
+                  sequence="30"/>
+        <menuitem id="menu_epc_report_inventory"
+                  name="Inventory Report"
+                  parent="menu_epc_reporting"
+                  action="epc_report_inventory_pdf_action"
+                  sequence="40"/>
+        <menuitem id="menu_epc_report_dpr"
+                  name="DPR Report"
+                  parent="menu_epc_reporting"
+                  action="epc_report_dpr_pdf_action"
+                  sequence="50"/>
+        <menuitem id="menu_epc_report_qc"
+                  name="Quality Report"
+                  parent="menu_epc_reporting"
+                  action="epc_report_qc_pdf_action"
+                  sequence="60"/>
+        <menuitem id="menu_epc_report_billing"
+                  name="Billing &amp; Collection Report"
+                  parent="menu_epc_reporting"
+                  action="epc_report_billing_pdf_action"
+                  sequence="70"/>
+        <menuitem id="menu_epc_report_amc"
+                  name="O&amp;M / AMC Report"
+                  parent="menu_epc_reporting"
+                  action="epc_report_amc_pdf_action"
+                  sequence="80"/>
+
+        <!-- Configuration -->
+        <menuitem id="menu_epc_configuration"
+                  name="Configuration"
+                  parent="menu_epc_root"
+                  groups="csl_solar_epc.group_epc_admin"
+                  sequence="110"/>
+        <menuitem id="menu_epc_config_helpdesk_team"
+                  name="AMC Support Teams"
+                  parent="menu_epc_configuration"
+                  action="helpdesk.helpdesk_team_action"
+                  sequence="10"/>
+        <menuitem id="menu_epc_config_quality_checkpoint"
+                  name="QC Checkpoints"
+                  parent="menu_epc_configuration"
+                  action="epc_quality_checkpoint_action"
+                  sequence="20"/>
+    </data>
+</odoo>

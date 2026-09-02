@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+            Demo Story: "Suryoday Textiles Pvt Ltd" — a 500 kW commercial rooftop
+            solar project walked all the way from first enquiry to an active AMC
+            contract with an open service ticket. Every stage from the process
+            diagram is represented by at least one real record here, so the app
+            can be explored end-to-end without having to create everything by hand.
+
+            Records are created in dependency order (parent before child), and
+            approval-stage documents have their approval fields set directly to
+            'approved' rather than simulated through button clicks, since demo
+            data should describe a finished state, not replay a user session.
+        -->
+
+        <record id="epc_demo_product_module" model="product.product">
+            <field name="name">Solar Module 540W Mono-PERC</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+            <field name="standard_price">9000</field>
+        </record>
+        <record id="epc_demo_product_inverter" model="product.product">
+            <field name="name">String Inverter 100kW</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+            <field name="standard_price">450000</field>
+        </record>
+
+        <record id="epc_demo_partner" model="res.partner">
+            <field name="name">Suryoday Textiles Pvt Ltd</field>
+            <field name="is_company" eval="True"/>
+            <field name="city">Surat</field>
+            <field name="email">facilities@suryodaytextiles.example</field>
+            <field name="phone">+91 98765 43210</field>
+        </record>
+
+        <record id="epc_demo_lead" model="crm.lead">
+            <field name="name">Suryoday Textiles - 500 kW Rooftop Solar</field>
+            <field name="type">opportunity</field>
+            <field name="partner_id" ref="epc_demo_partner"/>
+            <field name="customer_segment">commercial</field>
+            <field name="proposed_capacity_kw">500</field>
+            <field name="monthly_electricity_bill">450000</field>
+            <field name="roof_or_land_type">rcc_roof</field>
+            <field name="site_address">Plot 14, GIDC Industrial Estate, Surat, Gujarat</field>
+            <field name="sanctioned_load_kw">550</field>
+            <field name="grid_access_available" eval="True"/>
+        </record>
+
+        <record id="epc_demo_survey" model="epc.site.survey">
+            <field name="lead_id" ref="epc_demo_lead"/>
+            <field name="survey_date" eval="(DateTime.today() - timedelta(days=45)).strftime('%Y-%m-%d')"/>
+            <field name="engineer_id" ref="base.user_admin"/>
+            <field name="roof_or_land_type">rcc_roof</field>
+            <field name="available_area_sqft">25000</field>
+            <field name="sanctioned_load_kw">550</field>
+            <field name="has_existing_transformer" eval="True"/>
+            <field name="grid_access_available" eval="True"/>
+            <field name="shadow_analysis">Minor shading from a water tank on the north edge in the early morning; no impact on the main array.</field>
+            <field name="survey_report">&lt;p&gt;Roof is structurally sound RCC, flat, with good access for material lifting. Recommended array split across two roof sections.&lt;/p&gt;</field>
+            <field name="is_feasible">yes</field>
+            <field name="approval_state">approved</field>
+        </record>
+
+        <record id="epc_demo_feasibility" model="epc.feasibility">
+            <field name="site_survey_id" ref="epc_demo_survey"/>
+            <field name="lead_id" ref="epc_demo_lead"/>
+            <field name="proposed_capacity_kw">500</field>
+            <field name="system_type">rooftop</field>
+            <field name="module_tilt_angle">15</field>
+            <field name="module_orientation">south</field>
+            <field name="annual_generation_estimate_kwh">730000</field>
+            <field name="performance_ratio">80</field>
+            <field name="financial_benefits">&lt;p&gt;At current tariffs, the system is expected to pay back its investment in under 4 years, with over 25 years of useful life remaining after that.&lt;/p&gt;</field>
+            <field name="feasibility_report">&lt;p&gt;Site is technically feasible for a 500 kW rooftop system split across two roof sections with a central inverter room.&lt;/p&gt;</field>
+            <field name="feasibility_result">yes</field>
+            <field name="approval_state">approved</field>
+        </record>
+
+        <record id="epc_demo_boq" model="epc.boq">
+            <field name="feasibility_id" ref="epc_demo_feasibility"/>
+            <field name="lead_id" ref="epc_demo_lead"/>
+            <field name="margin_percent">15</field>
+            <field name="approval_state">approved</field>
+        </record>
+        <record id="epc_demo_boq_line_modules" model="epc.boq.line">
+            <field name="boq_id" ref="epc_demo_boq"/>
+            <field name="sequence">10</field>
+            <field name="category">solar_module</field>
+            <field name="product_id" ref="epc_demo_product_module"/>
+            <field name="description">540W Mono-PERC Solar Modules</field>
+            <field name="quantity">926</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="unit_cost">9000</field>
+        </record>
+        <record id="epc_demo_boq_line_inverter" model="epc.boq.line">
+            <field name="boq_id" ref="epc_demo_boq"/>
+            <field name="sequence">20</field>
+            <field name="category">inverter</field>
+            <field name="product_id" ref="epc_demo_product_inverter"/>
+            <field name="description">100kW String Inverters</field>
+            <field name="quantity">5</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="unit_cost">450000</field>
+        </record>
+        <record id="epc_demo_boq_line_structure" model="epc.boq.line">
+            <field name="boq_id" ref="epc_demo_boq"/>
+            <field name="sequence">30</field>
+            <field name="category">mounting_structure</field>
+            <field name="description">Galvanised Mounting Structure (per kW)</field>
+            <field name="quantity">500</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="unit_cost">3500</field>
+        </record>
+        <record id="epc_demo_boq_line_dc_cable" model="epc.boq.line">
+            <field name="boq_id" ref="epc_demo_boq"/>
+            <field name="sequence">40</field>
+            <field name="category">dc_cable</field>
+            <field name="description">DC Solar Cable</field>
+            <field name="quantity">1200</field>
+            <field name="uom_id" ref="uom.product_uom_meter"/>
+            <field name="unit_cost">45</field>
+        </record>
+        <record id="epc_demo_boq_line_ac_cable" model="epc.boq.line">
+            <field name="boq_id" ref="epc_demo_boq"/>
+            <field name="sequence">50</field>
+            <field name="category">ac_cable</field>
+            <field name="description">AC Armoured Cable</field>
+            <field name="quantity">300</field>
+            <field name="uom_id" ref="uom.product_uom_meter"/>
+            <field name="unit_cost">60</field>
+        </record>
+        <record id="epc_demo_boq_line_civil" model="epc.boq.line">
+            <field name="boq_id" ref="epc_demo_boq"/>
+            <field name="sequence">60</field>
+            <field name="category">civil_work</field>
+            <field name="description">Civil work &amp; foundation for structure</field>
+            <field name="quantity">1</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="unit_cost">280000</field>
+        </record>
+        <record id="epc_demo_boq_line_manpower" model="epc.boq.line">
+            <field name="boq_id" ref="epc_demo_boq"/>
+            <field name="sequence">70</field>
+            <field name="category">manpower</field>
+            <field name="description">Installation &amp; commissioning labour</field>
+            <field name="quantity">1</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="unit_cost">350000</field>
+        </record>
+
+        <record id="epc_demo_project" model="project.project">
+            <field name="name">Suryoday Textiles - Solar EPC (Demo)</field>
+            <field name="partner_id" ref="epc_demo_partner"/>
+            <field name="lead_id" ref="epc_demo_lead"/>
+            <field name="boq_id" ref="epc_demo_boq"/>
+            <field name="capacity_kw">500</field>
+            <field name="scope_of_work">&lt;p&gt;Supply, installation, testing and commissioning of a 500 kW rooftop solar system, including a 1-year AMC.&lt;/p&gt;</field>
+        </record>
+
+        <record id="epc_demo_quotation" model="sale.order">
+            <field name="partner_id" ref="epc_demo_partner"/>
+            <field name="boq_id" ref="epc_demo_boq"/>
+            <field name="opportunity_id" ref="epc_demo_lead"/>
+            <field name="epc_project_id" ref="epc_demo_project"/>
+            <field name="state">sale</field>
+            <field name="warranty_type">both</field>
+            <field name="delivery_type">scheduled</field>
+            <field name="freight_type">included</field>
+            <field name="payment_terms_type">milestone</field>
+            <field name="cancellation_policy">deduction</field>
+            <field name="certification_type">both</field>
+            <field name="tolerance_type">positive</field>
+        </record>
+        <record id="epc_demo_quotation_line_modules" model="sale.order.line">
+            <field name="order_id" ref="epc_demo_quotation"/>
+            <field name="product_id" ref="epc_demo_product_module"/>
+            <field name="name">540W Mono-PERC Solar Modules</field>
+            <field name="product_uom_qty">926</field>
+            <field name="price_unit">10350</field>
+        </record>
+        <record id="epc_demo_quotation_line_inverter" model="sale.order.line">
+            <field name="order_id" ref="epc_demo_quotation"/>
+            <field name="product_id" ref="epc_demo_product_inverter"/>
+            <field name="name">100kW String Inverters</field>
+            <field name="product_uom_qty">5</field>
+            <field name="price_unit">517500</field>
+        </record>
+        <record id="epc_demo_quotation_line_service" model="sale.order.line">
+            <field name="order_id" ref="epc_demo_quotation"/>
+            <field name="name">Balance of System: structure, cabling, civil work, installation &amp; commissioning</field>
+            <field name="product_uom_qty">1</field>
+            <field name="price_unit">1289000</field>
+        </record>
+
+        <function model="epc.boq" name="write">
+            <value model="epc.boq" eval="[ref('epc_demo_boq')]"/>
+            <value eval="{'sale_order_id': ref('epc_demo_quotation')}"/>
+        </function>
+        <function model="project.project" name="_epc_seed_default_milestones">
+            <value model="project.project" eval="[ref('epc_demo_project')]"/>
+        </function>
+
+        <record id="epc_demo_material_request" model="epc.material.request">
+            <field name="project_id" ref="epc_demo_project"/>
+            <field name="requested_by" ref="base.user_admin"/>
+            <field name="approval_state">approved</field>
+        </record>
+        <record id="epc_demo_material_request_line_1" model="epc.material.request.line">
+            <field name="request_id" ref="epc_demo_material_request"/>
+            <field name="product_id" ref="epc_demo_product_module"/>
+            <field name="description">540W Mono-PERC Solar Modules</field>
+            <field name="quantity_required">926</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+        </record>
+        <record id="epc_demo_material_request_line_2" model="epc.material.request.line">
+            <field name="request_id" ref="epc_demo_material_request"/>
+            <field name="product_id" ref="epc_demo_product_inverter"/>
+            <field name="description">100kW String Inverters</field>
+            <field name="quantity_required">5</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+        </record>
+
+        <record id="epc_demo_dpr_1" model="epc.dpr">
+            <field name="project_id" ref="epc_demo_project"/>
+            <field name="report_date" eval="(DateTime.today() - timedelta(days=10)).strftime('%Y-%m-%d')"/>
+            <field name="reported_by" ref="base.user_admin"/>
+            <field name="weather">sunny</field>
+            <field name="manpower_deployed">12</field>
+            <field name="work_progress_summary">&lt;p&gt;Mounting structure installation completed on Section A of the roof.&lt;/p&gt;</field>
+            <field name="material_received">50 bundles of mounting structure delivered.</field>
+            <field name="material_consumed">Structure for Section A fully consumed.</field>
+            <field name="equipment_deployed">Welding machines, drilling equipment, scaffolding.</field>
+            <field name="tomorrow_plan">Begin module installation on Section A.</field>
+        </record>
+        <record id="epc_demo_dpr_2" model="epc.dpr">
+            <field name="project_id" ref="epc_demo_project"/>
+            <field name="report_date" eval="(DateTime.today() - timedelta(days=9)).strftime('%Y-%m-%d')"/>
+            <field name="reported_by" ref="base.user_admin"/>
+            <field name="weather">cloudy</field>
+            <field name="manpower_deployed">14</field>
+            <field name="work_progress_summary">&lt;p&gt;450 of 926 modules installed on Section A. DC cabling started.&lt;/p&gt;</field>
+            <field name="material_consumed">450 modules, 200m DC cable.</field>
+            <field name="issues_risks">Overcast weather slowed roof work slightly; no impact on schedule.</field>
+            <field name="tomorrow_plan">Complete remaining module installation and continue DC cabling.</field>
+        </record>
+
+        <record id="epc_demo_qc_incoming" model="epc.quality.check">
+            <field name="project_id" ref="epc_demo_project"/>
+            <field name="category">incoming_material</field>
+            <field name="inspector_id" ref="base.user_admin"/>
+        </record>
+        <record id="epc_demo_qc_incoming_line_1" model="epc.quality.check.line">
+            <field name="check_id" ref="epc_demo_qc_incoming"/>
+            <field name="name">Modules</field>
+            <field name="result">pass</field>
+        </record>
+        <record id="epc_demo_qc_incoming_line_2" model="epc.quality.check.line">
+            <field name="check_id" ref="epc_demo_qc_incoming"/>
+            <field name="name">Inverters</field>
+            <field name="result">pass</field>
+        </record>
+
+        <record id="epc_demo_commissioning" model="epc.commissioning">
+            <field name="project_id" ref="epc_demo_project"/>
+            <field name="commissioning_date" eval="(DateTime.today() - timedelta(days=2)).strftime('%Y-%m-%d')"/>
+            <field name="commissioning_checklist">&lt;p&gt;All 926 modules installed and tested; inverters commissioned; grid synchronisation verified.&lt;/p&gt;</field>
+            <field name="system_testing_done" eval="True"/>
+            <field name="generation_verification_kwh">2100</field>
+            <field name="customer_walkthrough_done" eval="True"/>
+            <field name="customer_approved" eval="True"/>
+            <field name="approval_state">approved</field>
+        </record>
+
+        <record id="epc_demo_handover" model="epc.handover">
+            <field name="project_id" ref="epc_demo_project"/>
+            <field name="closure_date" eval="DateTime.today().strftime('%Y-%m-%d')"/>
+            <field name="customer_training_done" eval="True"/>
+            <field name="customer_training_date" eval="DateTime.today().strftime('%Y-%m-%d')"/>
+            <field name="project_closure_report">&lt;p&gt;Project completed on schedule. All documents, certificates and the O&amp;M manual handed over to the customer.&lt;/p&gt;</field>
+            <field name="approval_state">approved</field>
+        </record>
+
+        <record id="epc_demo_amc" model="epc.amc.contract">
+            <field name="project_id" ref="epc_demo_project"/>
+            <field name="start_date" eval="DateTime.today().strftime('%Y-%m-%d')"/>
+            <field name="end_date" eval="(DateTime.today() + timedelta(days=365)).strftime('%Y-%m-%d')"/>
+            <field name="contract_value">75000</field>
+            <field name="service_frequency">quarterly</field>
+            <field name="next_service_date" eval="(DateTime.today() + timedelta(days=90)).strftime('%Y-%m-%d')"/>
+            <field name="sla_response_hours">24</field>
+            <field name="preventive_maintenance_plan">&lt;p&gt;Module cleaning, torque check on structure bolts, inverter firmware check, thermal imaging scan of DC connectors.&lt;/p&gt;</field>
+            <field name="helpdesk_team_id" ref="epc_helpdesk_team"/>
+            <field name="state">active</field>
+        </record>
+
+        <record id="epc_demo_ticket" model="helpdesk.ticket">
+            <field name="name">Inverter showing fault code E04</field>
+            <field name="team_id" ref="epc_helpdesk_team"/>
+            <field name="partner_id" ref="epc_demo_partner"/>
+            <field name="amc_contract_id" ref="epc_demo_amc"/>
+            <field name="description">&lt;p&gt;Customer reports Inverter 3 display is showing fault code E04 and has stopped generating power.&lt;/p&gt;</field>
+        </record>
+    </data>
+</odoo>
