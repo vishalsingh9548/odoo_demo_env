@@ -16,79 +16,174 @@
             <field name="domain">[('boq_id', '!=', False)]</field>
         </record>
 
-        <!-- Project Profitability: budgeted cost vs contract revenue, per project -->
-        <record id="epc_report_profitability_pdf_action" model="ir.actions.report">
-            <field name="name">Project Profitability</field>
-            <field name="model">project.project</field>
-            <field name="report_type">qweb-pdf</field>
-            <field name="report_name">csl_solar_epc.epc_report_profitability_template</field>
-            <field name="report_file">csl_solar_epc.epc_report_profitability_template</field>
-        </record>
-        <template id="epc_report_profitability_template">
-            <t t-call="web.html_container">
-                <t t-call="web.external_layout">
-                    <div class="page">
-                        <h2>Project Profitability Report</h2>
-                        <t t-set="projects" t-value="env['project.project'].search([('boq_id', '!=', False)])"/>
-                        <table class="table table-sm o_table" style="margin-top:16px;">
-                            <thead>
-                                <tr>
-                                    <th>Project</th>
-                                    <th>Budgeted Cost</th>
-                                    <th>Contract Revenue</th>
-                                    <th>Margin</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr t-foreach="projects" t-as="project">
-                                    <td><span t-esc="project.name"/></td>
-                                    <td><span t-esc="'%.2f' % project.boq_total_cost"/></td>
-                                    <td><span t-esc="'%.2f' % project.boq_total_sell_price"/></td>
-                                    <td><span t-esc="'%.2f' % (project.boq_total_sell_price - project.boq_total_cost)"/></td>
-                                </tr>
-                            </tbody>
-                        </table>
+        <!-- ================================================================
+             Shared "Solar Bold Brand" report design — one gradient-banner
+             header (company logo/name/address + report title), one shared
+             CSS block, one contact-info footer, and one small badge system
+             for status columns. Every report below t-calls these three so
+             all of them look and feel like one consistent family instead of
+             each hand-rolling its own header/footer/table styling. Picked
+             from 5 design options shown in an artifact first; applied here
+             to every report exactly as approved for the O&amp;M/AMC Report. -->
+        <template id="epc_report_style">
+            <style>
+                .o_epc_report { font-family: inherit; color: #1f2733; }
+                .o_epc_report .o_epc_report_banner {
+                    background: linear-gradient(120deg, #1f5c86 0%, #2f7fb6 45%, #eba93f 130%);
+                    color: #ffffff; border-radius: 10px; padding: 20px 26px 26px; margin-bottom: 22px;
+                }
+                .o_epc_report .o_epc_report_brand_row { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+                .o_epc_report .o_epc_report_logo {
+                    flex: 0 0 auto; width: 42px; height: 42px; border-radius: 9px; background: rgba(255, 255, 255, 0.92);
+                    display: flex; align-items: center; justify-content: center; overflow: hidden;
+                    font-weight: 700; color: #1f5c86; font-size: 1rem;
+                }
+                .o_epc_report .o_epc_report_logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
+                .o_epc_report .o_epc_report_co_name { font-weight: 700; font-size: 0.92rem; }
+                .o_epc_report .o_epc_report_co_addr { font-size: 0.72rem; opacity: 0.85; line-height: 1.5; margin-top: 1px; }
+                .o_epc_report .o_epc_report_banner_title { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; }
+                .o_epc_report .o_epc_report_banner_sub { font-size: 0.85rem; opacity: 0.9; margin-top: 4px; }
+                .o_epc_report .o_epc_report_kpi_strip { display: flex; gap: 12px; margin: -34px 4px 20px; flex-wrap: wrap; }
+                .o_epc_report .o_epc_report_kpi {
+                    flex: 1 1 140px; background: #ffffff; border-radius: 10px; padding: 12px 14px;
+                    box-shadow: 0 8px 18px -12px rgba(31, 92, 134, 0.45); border: 1px solid #eef1f6;
+                }
+                .o_epc_report .o_epc_report_kpi .l {
+                    font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.05em;
+                    font-weight: 700; color: #8a8fa3;
+                }
+                .o_epc_report .o_epc_report_kpi .v { font-size: 1.15rem; font-weight: 700; color: #1f2733; margin-top: 2px; }
+                .o_epc_report table.o_epc_report_table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+                .o_epc_report table.o_epc_report_table thead th {
+                    text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em;
+                    color: #8a8fa3; font-weight: 700; padding: 10px 12px; border-bottom: 2px solid #eef1f6;
+                }
+                .o_epc_report table.o_epc_report_table thead th.o_epc_num { text-align: right; }
+                .o_epc_report table.o_epc_report_table tbody td {
+                    padding: 11px 12px; font-size: 0.85rem; border-bottom: 1px solid #eef1f6;
+                }
+                .o_epc_report table.o_epc_report_table tbody td.o_epc_num {
+                    text-align: right; font-weight: 600; font-variant-numeric: tabular-nums;
+                }
+                .o_epc_report .o_epc_badge {
+                    display: inline-block; padding: 3px 11px; border-radius: 999px;
+                    font-size: 0.71rem; font-weight: 700; color: #ffffff; white-space: nowrap;
+                }
+                .o_epc_report .o_epc_badge_pass { background: #46b980; }
+                .o_epc_report .o_epc_badge_info { background: #2f7fb6; }
+                .o_epc_report .o_epc_badge_warn { background: #eba93f; }
+                .o_epc_report .o_epc_badge_fail { background: #e0684f; }
+                .o_epc_report .o_epc_badge_neutral { background: #8a8fa3; }
+                .o_epc_report .o_epc_report_footer {
+                    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+                    margin-top: 22px; padding-top: 14px; border-top: 1px solid #eef1f6;
+                    font-size: 0.72rem; color: #8a8fa3;
+                }
+                .o_epc_report h4 { font-size: 1rem; font-weight: 700; margin: 22px 0 4px; }
+                .o_epc_report h4:first-of-type { margin-top: 0; }
+            </style>
+        </template>
+
+        <!-- The gradient title banner: company logo (or a 2-letter fallback
+             mark if none is set), name and address, then this report's own
+             title/subtitle — set `title`/`subtitle` with t-set just before
+             calling this. All company fields come straight from res.company,
+             nothing invented. -->
+        <template id="epc_report_header">
+            <div class="o_epc_report_banner">
+                <div class="o_epc_report_brand_row">
+                    <div class="o_epc_report_logo">
+                        <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo"/>
+                        <t t-else="else" t-esc="(company.name or 'SE')[:2].upper()"/>
                     </div>
-                </t>
-            </t>
+                    <div>
+                        <div class="o_epc_report_co_name" t-esc="company.name"/>
+                        <div class="o_epc_report_co_addr">
+                            <t t-esc="company.street"/><t t-if="company.street2">, <t t-esc="company.street2"/></t><br/>
+                            <t t-esc="company.city"/><t t-if="company.state_id"> <t t-esc="company.state_id.code or company.state_id.name"/></t><t t-if="company.zip"> <t t-esc="company.zip"/></t><br/>
+                            <t t-esc="company.country_id.name"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="o_epc_report_banner_title" t-esc="title"/>
+                <div class="o_epc_report_banner_sub" t-esc="subtitle"/>
+            </div>
+        </template>
+
+        <!-- The contact-info footer strip: phone/email on the left, website
+             on the right, straight from res.company. -->
+        <template id="epc_report_footer">
+            <div class="o_epc_report_footer">
+                <span>
+                    <t t-esc="company.phone"/>
+                    <t t-if="company.phone and company.email"> · </t>
+                    <t t-esc="company.email"/>
+                </span>
+                <span t-esc="company.website"/>
+            </div>
         </template>
 
         <!-- Procurement Report: every Purchase Order raised for a project -->
         <record id="epc_report_procurement_pdf_action" model="ir.actions.report">
             <field name="name">Procurement Report</field>
             <field name="model">purchase.order</field>
-            <field name="report_type">qweb-pdf</field>
+            <!-- qweb-html (not qweb-pdf) so clicking this menu item opens a
+                 preview of the report first, with a Print button that then
+                 generates the actual PDF; Odoo's own native preview-before-
+                 print behaviour, not custom code. -->
+            <field name="report_type">qweb-html</field>
             <field name="report_name">csl_solar_epc.epc_report_procurement_template</field>
             <field name="report_file">csl_solar_epc.epc_report_procurement_template</field>
         </record>
         <template id="epc_report_procurement_template">
             <t t-call="web.html_container">
-                <t t-call="web.external_layout">
+                <t t-call="web.basic_layout">
+                    <t t-set="company" t-value="env.company"/>
                     <div class="page">
-                        <h2>Procurement Report</h2>
-                        <t t-set="orders" t-value="env['purchase.order'].search([('project_id', '!=', False)], order='project_id')"/>
-                        <table class="table table-sm o_table" style="margin-top:16px;">
-                            <thead>
-                                <tr>
-                                    <th>Project</th>
-                                    <th>PO Number</th>
-                                    <th>Vendor</th>
-                                    <th>Order Date</th>
-                                    <th>Status</th>
-                                    <th>Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr t-foreach="orders" t-as="order">
-                                    <td><span t-esc="order.project_id.display_name"/></td>
-                                    <td><span t-esc="order.name"/></td>
-                                    <td><span t-esc="order.partner_id.display_name"/></td>
-                                    <td><span t-esc="order.date_order"/></td>
-                                    <td><span t-esc="order.state"/></td>
-                                    <td><span t-esc="'%.2f' % order.amount_total"/></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="o_epc_report">
+                            <t t-call="csl_solar_epc.epc_report_style"/>
+                            <t t-set="title">Procurement Report</t>
+                            <t t-set="subtitle">Purchase orders raised across every project</t>
+                            <t t-call="csl_solar_epc.epc_report_header"/>
+
+                            <t t-set="orders" t-value="env['purchase.order'].search([('project_id', '!=', False)], order='project_id')"/>
+                            <t t-set="badge_map" t-value="{'draft': 'neutral', 'sent': 'info', 'to approve': 'warn', 'purchase': 'info', 'done': 'pass', 'cancel': 'fail'}"/>
+
+                            <div class="o_epc_report_kpi_strip">
+                                <div class="o_epc_report_kpi"><div class="l">Total Orders</div><div class="v"><t t-esc="len(orders)"/></div></div>
+                                <div class="o_epc_report_kpi"><div class="l">Confirmed</div><div class="v"><t t-esc="len(orders.filtered(lambda o: o.state in ('purchase', 'done')))"/></div></div>
+                                <div class="o_epc_report_kpi"><div class="l">Pending Approval</div><div class="v"><t t-esc="len(orders.filtered(lambda o: o.state in ('sent', 'to approve')))"/></div></div>
+                                <div class="o_epc_report_kpi"><div class="l">Total Amount</div><div class="v"><t t-esc="'%.2f' % sum(orders.mapped('amount_total'))"/></div></div>
+                            </div>
+
+                            <table class="o_epc_report_table">
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>PO Number</th>
+                                        <th>Vendor</th>
+                                        <th>Order Date</th>
+                                        <th>Status</th>
+                                        <th class="o_epc_num">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="orders" t-as="order">
+                                        <td><span t-esc="order.project_id.display_name"/></td>
+                                        <td><span t-esc="order.name"/></td>
+                                        <td><span t-esc="order.partner_id.display_name"/></td>
+                                        <td><span t-esc="order.date_order"/></td>
+                                        <td>
+                                            <span t-attf-class="o_epc_badge o_epc_badge_{{badge_map.get(order.state, 'neutral')}}"
+                                                  t-esc="order.state.replace('_', ' ').capitalize()"/>
+                                        </td>
+                                        <td class="o_epc_num"><span t-esc="'%.2f' % order.amount_total"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <t t-call="csl_solar_epc.epc_report_footer"/>
+                        </div>
                     </div>
                 </t>
             </t>
@@ -98,79 +193,189 @@
         <record id="epc_report_inventory_pdf_action" model="ir.actions.report">
             <field name="name">Inventory Report</field>
             <field name="model">stock.picking</field>
-            <field name="report_type">qweb-pdf</field>
+            <!-- qweb-html (not qweb-pdf) so clicking this menu item opens a
+                 preview of the report first, with a Print button that then
+                 generates the actual PDF; Odoo's own native preview-before-
+                 print behaviour, not custom code. -->
+            <field name="report_type">qweb-html</field>
             <field name="report_name">csl_solar_epc.epc_report_inventory_template</field>
             <field name="report_file">csl_solar_epc.epc_report_inventory_template</field>
         </record>
         <template id="epc_report_inventory_template">
             <t t-call="web.html_container">
-                <t t-call="web.external_layout">
+                <t t-call="web.basic_layout">
+                    <t t-set="company" t-value="env.company"/>
                     <div class="page">
-                        <h2>Inventory Report</h2>
-                        <t t-set="pickings" t-value="env['stock.picking'].search([('project_id', '!=', False)], order='project_id, date')"/>
-                        <table class="table table-sm o_table" style="margin-top:16px;">
-                            <thead>
-                                <tr>
-                                    <th>Project</th>
-                                    <th>Reference</th>
-                                    <th>From</th>
-                                    <th>To</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr t-foreach="pickings" t-as="picking">
-                                    <td><span t-esc="picking.project_id.display_name"/></td>
-                                    <td><span t-esc="picking.name"/></td>
-                                    <td><span t-esc="picking.location_id.display_name"/></td>
-                                    <td><span t-esc="picking.location_dest_id.display_name"/></td>
-                                    <td><span t-esc="picking.state"/></td>
-                                    <td><span t-esc="picking.date"/></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="o_epc_report">
+                            <t t-call="csl_solar_epc.epc_report_style"/>
+                            <t t-set="title">Inventory Report</t>
+                            <t t-set="subtitle">Warehouse receipts and transfers linked to a project</t>
+                            <t t-call="csl_solar_epc.epc_report_header"/>
+
+                            <t t-set="pickings" t-value="env['stock.picking'].search([('project_id', '!=', False)], order='project_id, date')"/>
+                            <t t-set="badge_map" t-value="{'draft': 'neutral', 'waiting': 'warn', 'confirmed': 'warn', 'assigned': 'info', 'done': 'pass', 'cancel': 'fail'}"/>
+
+                            <div class="o_epc_report_kpi_strip">
+                                <div class="o_epc_report_kpi"><div class="l">Total Transfers</div><div class="v"><t t-esc="len(pickings)"/></div></div>
+                                <div class="o_epc_report_kpi"><div class="l">Done</div><div class="v"><t t-esc="len(pickings.filtered(lambda p: p.state == 'done'))"/></div></div>
+                                <div class="o_epc_report_kpi"><div class="l">In Progress</div><div class="v"><t t-esc="len(pickings.filtered(lambda p: p.state not in ('done', 'cancel')))"/></div></div>
+                                <div class="o_epc_report_kpi"><div class="l">Projects Covered</div><div class="v"><t t-esc="len(pickings.mapped('project_id'))"/></div></div>
+                            </div>
+
+                            <table class="o_epc_report_table">
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Reference</th>
+                                        <th>From</th>
+                                        <th>To</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="pickings" t-as="picking">
+                                        <td><span t-esc="picking.project_id.display_name"/></td>
+                                        <td><span t-esc="picking.name"/></td>
+                                        <td><span t-esc="picking.location_id.display_name"/></td>
+                                        <td><span t-esc="picking.location_dest_id.display_name"/></td>
+                                        <td>
+                                            <span t-attf-class="o_epc_badge o_epc_badge_{{badge_map.get(picking.state, 'neutral')}}"
+                                                  t-esc="picking.state.replace('_', ' ').capitalize()"/>
+                                        </td>
+                                        <td><span t-esc="picking.date"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <t t-call="csl_solar_epc.epc_report_footer"/>
+                        </div>
                     </div>
                 </t>
             </t>
         </template>
 
-        <!-- DPR Report: every Daily Progress Report, across every project -->
+        <!-- DPR Report: which projects had real work logged today, and by whom -->
         <record id="epc_report_dpr_pdf_action" model="ir.actions.report">
             <field name="name">DPR Report</field>
-            <field name="model">epc.dpr</field>
-            <field name="report_type">qweb-pdf</field>
+            <field name="model">project.project</field>
+            <!-- qweb-html (not qweb-pdf) so clicking this menu item opens a
+                 preview of the report first, with a Print button that then
+                 generates the actual PDF; Odoo's own native preview-before-
+                 print behaviour, not custom code. -->
+            <field name="report_type">qweb-html</field>
             <field name="report_name">csl_solar_epc.epc_report_dpr_template</field>
             <field name="report_file">csl_solar_epc.epc_report_dpr_template</field>
         </record>
+        <!-- Reusable block: one project's worth of timesheet work on one given
+             date — just a heading plus the Employee/Task/Work Description/Hours
+             table, no DPR-specific summary columns. Shared by the main "DPR
+             Report" listing below AND the project form's instant "Download
+             Today's Report" button, so both always look identical. -->
+        <template id="epc_report_dpr_project_block">
+            <h4><span t-esc="project.display_name"/> — <span t-esc="date"/></h4>
+            <!-- Who actually worked on this project on this exact date, how
+                 many hours and on what — pulled live from the project's real
+                 Timesheets (Odoo's own hr_timesheet entries), not a separate
+                 log, so this always matches what Timesheets itself shows. -->
+            <t t-set="timesheet_lines"
+               t-value="env['account.analytic.line'].search([('project_id', '=', project.id), ('date', '=', date)])"/>
+            <table class="o_epc_report_table" t-if="timesheet_lines">
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Task</th>
+                        <th>Work Description</th>
+                        <th class="o_epc_num">Hours</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="timesheet_lines" t-as="ts">
+                        <td><span t-esc="ts.employee_id.name"/></td>
+                        <td><span t-esc="ts.task_id.name"/></td>
+                        <td><span t-esc="ts.name"/></td>
+                        <td class="o_epc_num"><span t-esc="'%.2f' % ts.unit_amount"/></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p t-if="not timesheet_lines" class="text-muted mb-0">
+                <em>No timesheet entries logged against this project for this date.</em>
+            </p>
+        </template>
+
         <template id="epc_report_dpr_template">
             <t t-call="web.html_container">
-                <t t-call="web.external_layout">
+                <t t-call="web.basic_layout">
+                    <t t-set="company" t-value="env.company"/>
                     <div class="page">
-                        <h2>Daily Progress Report Summary</h2>
-                        <t t-set="dprs" t-value="env['epc.dpr'].search([], order='project_id, report_date')"/>
-                        <table class="table table-sm o_table" style="margin-top:16px;">
-                            <thead>
-                                <tr>
-                                    <th>Project</th>
-                                    <th>Reference</th>
-                                    <th>Date</th>
-                                    <th>Weather</th>
-                                    <th>Manpower</th>
-                                    <th>Reported By</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr t-foreach="dprs" t-as="dpr">
-                                    <td><span t-esc="dpr.project_id.display_name"/></td>
-                                    <td><span t-esc="dpr.name"/></td>
-                                    <td><span t-esc="dpr.report_date"/></td>
-                                    <td><span t-esc="dpr.weather"/></td>
-                                    <td><span t-esc="dpr.manpower_deployed"/></td>
-                                    <td><span t-esc="dpr.reported_by.name"/></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="o_epc_report">
+                            <t t-call="csl_solar_epc.epc_report_style"/>
+                            <t t-set="title">Daily Progress Report Summary</t>
+                            <t t-set="subtitle">Who worked on what, today, across every project</t>
+                            <t t-call="csl_solar_epc.epc_report_header"/>
+
+                            <t t-set="today" t-value="datetime.date.today()"/>
+                            <!-- Which projects actually had work logged today, straight
+                                 from real Timesheets — not the historic epc.dpr records,
+                                 so this always matches "today", never a stale old date. -->
+                            <t t-set="today_lines"
+                               t-value="env['account.analytic.line'].search([('date', '=', today), ('project_id', '!=', False)])"/>
+                            <t t-set="projects_today" t-value="today_lines.mapped('project_id')"/>
+
+                            <div class="o_epc_report_kpi_strip">
+                                <div class="o_epc_report_kpi"><div class="l">Projects Active Today</div><div class="v"><t t-esc="len(projects_today)"/></div></div>
+                                <div class="o_epc_report_kpi"><div class="l">Timesheet Entries</div><div class="v"><t t-esc="len(today_lines)"/></div></div>
+                                <div class="o_epc_report_kpi"><div class="l">Total Hours Logged</div><div class="v"><t t-esc="'%.2f' % sum(today_lines.mapped('unit_amount'))"/></div></div>
+                            </div>
+
+                            <t t-foreach="projects_today" t-as="proj">
+                                <t t-call="csl_solar_epc.epc_report_dpr_project_block">
+                                    <t t-set="project" t-value="proj"/>
+                                    <t t-set="date" t-value="today"/>
+                                </t>
+                            </t>
+                            <p t-if="not projects_today" class="text-muted">
+                                <em>No project has any timesheet entries logged today.</em>
+                            </p>
+
+                            <t t-call="csl_solar_epc.epc_report_footer"/>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <!-- "Download Today's Report" — printed directly from the Project form,
+             no DPR record created or needed: today's date, this one project,
+             same block as above. -->
+        <record id="epc_report_dpr_today_pdf_action" model="ir.actions.report">
+            <field name="name">Today's Progress Report</field>
+            <field name="model">project.project</field>
+            <field name="report_type">qweb-html</field>
+            <field name="report_name">csl_solar_epc.epc_report_dpr_today_template</field>
+            <field name="report_file">csl_solar_epc.epc_report_dpr_today_template</field>
+        </record>
+        <template id="epc_report_dpr_today_template">
+            <t t-call="web.html_container">
+                <t t-call="web.basic_layout">
+                    <t t-set="company" t-value="env.company"/>
+                    <div class="page">
+                        <div class="o_epc_report">
+                            <t t-call="csl_solar_epc.epc_report_style"/>
+                            <t t-set="title">Today's Progress Report</t>
+                            <t t-set="subtitle">Instant, single-project printout — nothing saved</t>
+                            <t t-call="csl_solar_epc.epc_report_header"/>
+
+                            <t t-set="today" t-value="datetime.date.today()"/>
+                            <t t-foreach="docs" t-as="proj">
+                                <t t-call="csl_solar_epc.epc_report_dpr_project_block">
+                                    <t t-set="project" t-value="proj"/>
+                                    <t t-set="date" t-value="today"/>
+                                </t>
+                            </t>
+
+                            <t t-call="csl_solar_epc.epc_report_footer"/>
+                        </div>
                     </div>
                 </t>
             </t>
@@ -180,38 +385,63 @@
         <record id="epc_report_qc_pdf_action" model="ir.actions.report">
             <field name="name">Quality Report</field>
             <field name="model">epc.quality.check</field>
-            <field name="report_type">qweb-pdf</field>
+            <!-- qweb-html (not qweb-pdf) so clicking this menu item opens a
+                 preview of the report first, with a Print button that then
+                 generates the actual PDF; Odoo's own native preview-before-
+                 print behaviour, not custom code. -->
+            <field name="report_type">qweb-html</field>
             <field name="report_name">csl_solar_epc.epc_report_qc_template</field>
             <field name="report_file">csl_solar_epc.epc_report_qc_template</field>
         </record>
         <template id="epc_report_qc_template">
             <t t-call="web.html_container">
-                <t t-call="web.external_layout">
+                <t t-call="web.basic_layout">
+                    <t t-set="company" t-value="env.company"/>
                     <div class="page">
-                        <h2>Quality Report</h2>
-                        <t t-set="checks" t-value="env['epc.quality.check'].search([], order='project_id, category')"/>
-                        <table class="table table-sm o_table" style="margin-top:16px;">
-                            <thead>
-                                <tr>
-                                    <th>Project</th>
-                                    <th>Reference</th>
-                                    <th>Category</th>
-                                    <th>Check Date</th>
-                                    <th>Inspector</th>
-                                    <th>Result</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr t-foreach="checks" t-as="check">
-                                    <td><span t-esc="check.project_id.display_name"/></td>
-                                    <td><span t-esc="check.name"/></td>
-                                    <td><span t-esc="check.category"/></td>
-                                    <td><span t-esc="check.check_date"/></td>
-                                    <td><span t-esc="check.inspector_id.name"/></td>
-                                    <td><span t-esc="check.overall_result"/></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="o_epc_report">
+                            <t t-call="csl_solar_epc.epc_report_style"/>
+                            <t t-set="title">Quality Report</t>
+                            <t t-set="subtitle">Every Quality Check, across every project and category</t>
+                            <t t-call="csl_solar_epc.epc_report_header"/>
+
+                            <t t-set="checks" t-value="env['epc.quality.check'].search([], order='project_id, category')"/>
+                            <t t-set="badge_map" t-value="{'pass': 'pass', 'fail': 'fail', 'pending': 'warn'}"/>
+
+                            <div class="o_epc_report_kpi_strip">
+                                <div class="o_epc_report_kpi"><div class="l">Total Checks</div><div class="v"><t t-esc="len(checks)"/></div></div>
+                                <div class="o_epc_report_kpi"><div class="l">Passed</div><div class="v"><t t-esc="len(checks.filtered(lambda c: c.overall_result == 'pass'))"/></div></div>
+                                <div class="o_epc_report_kpi"><div class="l">Failed</div><div class="v"><t t-esc="len(checks.filtered(lambda c: c.overall_result == 'fail'))"/></div></div>
+                                <div class="o_epc_report_kpi"><div class="l">Pending</div><div class="v"><t t-esc="len(checks.filtered(lambda c: c.overall_result == 'pending'))"/></div></div>
+                            </div>
+
+                            <table class="o_epc_report_table">
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Reference</th>
+                                        <th>Category</th>
+                                        <th>Check Date</th>
+                                        <th>Inspector</th>
+                                        <th>Result</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="checks" t-as="check">
+                                        <td><span t-esc="check.project_id.display_name"/></td>
+                                        <td><span t-esc="check.name"/></td>
+                                        <td><span t-esc="check.category.replace('_', ' ').capitalize()"/></td>
+                                        <td><span t-esc="check.check_date"/></td>
+                                        <td><span t-esc="check.inspector_id.name"/></td>
+                                        <td>
+                                            <span t-attf-class="o_epc_badge o_epc_badge_{{badge_map.get(check.overall_result, 'neutral')}}"
+                                                  t-esc="check.overall_result.capitalize()"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <t t-call="csl_solar_epc.epc_report_footer"/>
+                        </div>
                     </div>
                 </t>
             </t>
@@ -221,36 +451,61 @@
         <record id="epc_report_billing_pdf_action" model="ir.actions.report">
             <field name="name">Billing &amp; Collection Report</field>
             <field name="model">account.move</field>
-            <field name="report_type">qweb-pdf</field>
+            <!-- qweb-html (not qweb-pdf) so clicking this menu item opens a
+                 preview of the report first, with a Print button that then
+                 generates the actual PDF; Odoo's own native preview-before-
+                 print behaviour, not custom code. -->
+            <field name="report_type">qweb-html</field>
             <field name="report_name">csl_solar_epc.epc_report_billing_template</field>
             <field name="report_file">csl_solar_epc.epc_report_billing_template</field>
         </record>
         <template id="epc_report_billing_template">
             <t t-call="web.html_container">
-                <t t-call="web.external_layout">
+                <t t-call="web.basic_layout">
+                    <t t-set="company" t-value="env.company"/>
                     <div class="page">
-                        <h2>Billing &amp; Collection Report</h2>
-                        <t t-set="invoices" t-value="env['account.move'].search([('move_type', '=', 'out_invoice')], order='invoice_date')"/>
-                        <table class="table table-sm o_table" style="margin-top:16px;">
-                            <thead>
-                                <tr>
-                                    <th>Invoice</th>
-                                    <th>Customer</th>
-                                    <th>Invoice Date</th>
-                                    <th>Total</th>
-                                    <th>Payment Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr t-foreach="invoices" t-as="invoice">
-                                    <td><span t-esc="invoice.name"/></td>
-                                    <td><span t-esc="invoice.partner_id.display_name"/></td>
-                                    <td><span t-esc="invoice.invoice_date"/></td>
-                                    <td><span t-esc="'%.2f' % invoice.amount_total"/></td>
-                                    <td><span t-esc="invoice.payment_state"/></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="o_epc_report">
+                            <t t-call="csl_solar_epc.epc_report_style"/>
+                            <t t-set="title">Billing &amp; Collection Report</t>
+                            <t t-set="subtitle">Every customer invoice and its payment status</t>
+                            <t t-call="csl_solar_epc.epc_report_header"/>
+
+                            <t t-set="invoices" t-value="env['account.move'].search([('move_type', '=', 'out_invoice')], order='invoice_date')"/>
+                            <t t-set="badge_map" t-value="{'paid': 'pass', 'in_payment': 'warn', 'partial': 'warn', 'not_paid': 'fail', 'reversed': 'neutral', 'invoicing_legacy': 'neutral'}"/>
+
+                            <div class="o_epc_report_kpi_strip">
+                                <div class="o_epc_report_kpi"><div class="l">Total Invoices</div><div class="v"><t t-esc="len(invoices)"/></div></div>
+                                <div class="o_epc_report_kpi"><div class="l">Total Billed</div><div class="v"><t t-esc="'%.2f' % sum(invoices.mapped('amount_total'))"/></div></div>
+                                <div class="o_epc_report_kpi"><div class="l">Collected</div><div class="v"><t t-esc="'%.2f' % sum(invoices.filtered(lambda i: i.payment_state == 'paid').mapped('amount_total'))"/></div></div>
+                                <div class="o_epc_report_kpi"><div class="l">Outstanding</div><div class="v"><t t-esc="'%.2f' % sum(invoices.filtered(lambda i: i.payment_state in ('not_paid', 'partial')).mapped('amount_residual'))"/></div></div>
+                            </div>
+
+                            <table class="o_epc_report_table">
+                                <thead>
+                                    <tr>
+                                        <th>Invoice</th>
+                                        <th>Customer</th>
+                                        <th>Invoice Date</th>
+                                        <th class="o_epc_num">Total</th>
+                                        <th>Payment Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="invoices" t-as="invoice">
+                                        <td><span t-esc="invoice.name"/></td>
+                                        <td><span t-esc="invoice.partner_id.display_name"/></td>
+                                        <td><span t-esc="invoice.invoice_date"/></td>
+                                        <td class="o_epc_num"><span t-esc="'%.2f' % invoice.amount_total"/></td>
+                                        <td>
+                                            <span t-attf-class="o_epc_badge o_epc_badge_{{badge_map.get(invoice.payment_state, 'neutral')}}"
+                                                  t-esc="invoice.payment_state.replace('_', ' ').capitalize()"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <t t-call="csl_solar_epc.epc_report_footer"/>
+                        </div>
                     </div>
                 </t>
             </t>
@@ -260,42 +515,91 @@
         <record id="epc_report_amc_pdf_action" model="ir.actions.report">
             <field name="name">O&amp;M / AMC Report</field>
             <field name="model">epc.amc.contract</field>
-            <field name="report_type">qweb-pdf</field>
+            <!-- qweb-html (not qweb-pdf) so clicking this menu item opens a
+                 preview of the report first, with a Print button that then
+                 generates the actual PDF; Odoo's own native preview-before-
+                 print behaviour, not custom code. -->
+            <field name="report_type">qweb-html</field>
             <field name="report_name">csl_solar_epc.epc_report_amc_template</field>
             <field name="report_file">csl_solar_epc.epc_report_amc_template</field>
         </record>
         <template id="epc_report_amc_template">
             <t t-call="web.html_container">
-                <t t-call="web.external_layout">
+                <!-- basic_layout (not external_layout) on purpose: external_layout
+                     always draws Odoo's own plain default logo/address header and
+                     contact footer, which would sit above/below this report looking
+                     disconnected from its styling. epc_report_header/epc_report_footer
+                     draw this report's own, from the same res.company fields
+                     external_layout would have used, styled to match. -->
+                <t t-call="web.basic_layout">
+                    <t t-set="company" t-value="env.company"/>
                     <div class="page">
-                        <h2>O&amp;M / AMC Report</h2>
-                        <t t-set="contracts" t-value="env['epc.amc.contract'].search([], order='project_id')"/>
-                        <table class="table table-sm o_table" style="margin-top:16px;">
-                            <thead>
-                                <tr>
-                                    <th>Project</th>
-                                    <th>Contract</th>
-                                    <th>Customer</th>
-                                    <th>Start</th>
-                                    <th>End</th>
-                                    <th>Status</th>
-                                    <th>Next Service</th>
-                                    <th>Value</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr t-foreach="contracts" t-as="contract">
-                                    <td><span t-esc="contract.project_id.display_name"/></td>
-                                    <td><span t-esc="contract.name"/></td>
-                                    <td><span t-esc="contract.partner_id.display_name"/></td>
-                                    <td><span t-esc="contract.start_date"/></td>
-                                    <td><span t-esc="contract.end_date"/></td>
-                                    <td><span t-esc="contract.state"/></td>
-                                    <td><span t-esc="contract.next_service_date"/></td>
-                                    <td><span t-esc="'%.2f' % contract.contract_value"/></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <!-- Same underlying data/columns as before (Project, Contract,
+                             Customer, Start, End, Status, Next Service, Value) — this is
+                             purely a visual restyle ("Solar Bold Brand" design, picked
+                             from 5 options), scoped to this one report so it can't leak
+                             into any other report's styling. -->
+                        <div class="o_epc_report">
+                            <t t-call="csl_solar_epc.epc_report_style"/>
+                            <t t-set="title">O&amp;M / AMC Report</t>
+                            <t t-set="subtitle">Preventive maintenance &amp; contract health</t>
+                            <t t-call="csl_solar_epc.epc_report_header"/>
+
+                            <t t-set="contracts" t-value="env['epc.amc.contract'].search([], order='project_id')"/>
+                            <t t-set="upcoming_dates" t-value="[c.next_service_date for c in contracts if c.next_service_date]"/>
+                            <t t-set="badge_map" t-value="{'active': 'pass', 'draft': 'neutral', 'expired': 'warn', 'terminated': 'fail'}"/>
+
+                            <div class="o_epc_report_kpi_strip">
+                                <div class="o_epc_report_kpi">
+                                    <div class="l">Total Contracts</div>
+                                    <div class="v"><t t-esc="len(contracts)"/></div>
+                                </div>
+                                <div class="o_epc_report_kpi">
+                                    <div class="l">Active</div>
+                                    <div class="v"><t t-esc="len(contracts.filtered(lambda c: c.state == 'active'))"/></div>
+                                </div>
+                                <div class="o_epc_report_kpi">
+                                    <div class="l">Contract Value</div>
+                                    <div class="v"><t t-esc="'%.2f' % sum(contracts.mapped('contract_value'))"/></div>
+                                </div>
+                                <div class="o_epc_report_kpi">
+                                    <div class="l">Next Service Due</div>
+                                    <div class="v"><t t-esc="min(upcoming_dates) if upcoming_dates else '—'"/></div>
+                                </div>
+                            </div>
+
+                            <table class="o_epc_report_table">
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Contract</th>
+                                        <th>Customer</th>
+                                        <th>Start</th>
+                                        <th>End</th>
+                                        <th>Status</th>
+                                        <th>Next Service</th>
+                                        <th class="o_epc_num">Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="contracts" t-as="contract">
+                                        <td><span t-esc="contract.project_id.display_name"/></td>
+                                        <td><span t-esc="contract.name"/></td>
+                                        <td><span t-esc="contract.partner_id.display_name"/></td>
+                                        <td><span t-esc="contract.start_date"/></td>
+                                        <td><span t-esc="contract.end_date"/></td>
+                                        <td>
+                                            <span t-attf-class="o_epc_badge o_epc_badge_{{badge_map.get(contract.state, 'neutral')}}"
+                                                  t-esc="contract.state.capitalize()"/>
+                                        </td>
+                                        <td><span t-esc="contract.next_service_date"/></td>
+                                        <td class="o_epc_num"><span t-esc="'%.2f' % contract.contract_value"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <t t-call="csl_solar_epc.epc_report_footer"/>
+                        </div>
                     </div>
                 </t>
             </t>

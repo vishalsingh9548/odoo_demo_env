@@ -11,8 +11,9 @@
                 <xpath expr="//button[@name='action_open_share_project_wizard']" position="after">
                     <button name="action_create_material_request" string="New Material Request" type="object"
                             class="oe_highlight" invisible="not boq_id or material_request_count != 0"/>
-                    <button name="action_create_dpr" string="New Daily Progress Report" type="object"
-                            invisible="dpr_count != 0"/>
+                    <button name="action_print_today_dpr" string="Download Today's Report" type="object"/>
+                    <button name="action_create_commissioning" string="Proceed to Commissioning" type="object"
+                            class="oe_highlight" invisible="not epc_all_tasks_done or commissioning_count != 0"/>
                 </xpath>
                 <xpath expr="//div[@name='button_box']" position="inside">
                     <button name="action_view_epc_sale_order" type="object"

@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <!-- A tighter page format for the certificate: the default company
+             paperformat reserves ~52mm at the top for a logo header, which
+             this certificate no longer renders (see below), so with the
+             default format the certificate box would float in a large
+             empty gap at the top of the page. -->
+        <record id="epc_commissioning_certificate_paperformat" model="report.paperformat">
+            <field name="name">Commissioning Certificate</field>
+            <field name="format">Letter</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">15</field>
+            <field name="margin_bottom">15</field>
+            <field name="margin_left">10</field>
+            <field name="margin_right">10</field>
+            <field name="header_spacing">0</field>
+            <field name="dpi">90</field>
+        </record>
+
         <!-- The printable action: turns an approved Commissioning record into a
              downloadable PDF certificate, instead of only accepting an
              externally-made file upload -->
@@ -13,85 +30,101 @@
             <field name="print_report_name">'Commissioning Certificate - %s' % (object.name)</field>
             <field name="binding_model_id" ref="model_epc_commissioning"/>
             <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="epc_commissioning_certificate_paperformat"/>
         </record>
 
         <!-- The certificate's actual layout: project/customer details, the
-             test results, and signature lines for the engineer and customer -->
+             test results, and signature lines for the engineer and customer.
+             "Premium Seal" design (picked from 5 options shown in an
+             artifact) — a formal cream-and-gold certificate, deliberately
+             standalone with no company letterhead (real diplomas/
+             certificates don't carry one either), so web.basic_layout is
+             used instead of web.external_layout. Kept to conservative,
+             widely-supported CSS (solid colours, no gradients/flexbox) since
+             this report renders through this machine's unpatched wkhtmltopdf
+             build, not a browser. -->
         <template id="epc_commissioning_certificate_template">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="doc">
-                    <t t-call="web.external_layout">
+                    <t t-call="web.basic_layout">
                         <div class="page">
-                            <h2 class="text-center">Solar Commissioning Certificate</h2>
-                            <table class="table table-sm o_table" style="margin-top: 24px;">
-                                <tr>
-                                    <td style="width: 40%;"><strong>Certificate No.</strong></td>
-                                    <td><span t-field="doc.name"/></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Project</strong></td>
-                                    <td><span t-field="doc.project_id.display_name"/></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Customer</strong></td>
-                                    <td><span t-field="doc.partner_id.display_name"/></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>System Capacity</strong></td>
-                                    <td>
-                                        <span t-field="doc.project_id.capacity_kw"/> kW
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Commissioning Date</strong></td>
-                                    <td><span t-field="doc.commissioning_date"/></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Verified Generation</strong></td>
-                                    <td>
-                                        <span t-field="doc.generation_verification_kwh"/> kWh
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <h4 style="margin-top: 24px;">Commissioning Checklist</h4>
-                            <div t-field="doc.commissioning_checklist"/>
-
-                            <table class="table table-sm o_table" style="margin-top: 16px;">
-                                <tr>
-                                    <td style="width: 60%;">System Testing Completed</td>
-                                    <td>
-                                        <span t-if="doc.system_testing_done">Yes</span>
-                                        <span t-else="">No</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Customer Walkthrough Completed</td>
-                                    <td>
-                                        <span t-if="doc.customer_walkthrough_done">Yes</span>
-                                        <span t-else="">No</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Customer Approved</td>
-                                    <td>
-                                        <span t-if="doc.customer_approved">Yes</span>
-                                        <span t-else="">No</span>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <p style="margin-top: 40px;">
-                                This certifies that the above solar power system has been installed,
-                                tested and commissioned, and is formally accepted for operation.
-                            </p>
-
-                            <div class="row" style="margin-top: 70px;">
-                                <div class="col-6">
-                                    <p>_____________________________<br/>Commissioning Engineer</p>
+                            <div style="font-family: Georgia, 'Times New Roman', serif; background: #fbf3e3;
+                                        border: 3px double #9b7a2f; padding: 26px 34px 34px;">
+                                <div style="text-align: center; margin-bottom: 6px;">
+                                    <div style="width: 60px; height: 60px; margin: 0 auto; border-radius: 50%;
+                                                background: #c9a227; box-shadow: inset 0 0 0 3px rgba(255,255,255,0.45);
+                                                line-height: 60px; font-size: 1.3rem; color: #3a2c05;">☀</div>
                                 </div>
-                                <div class="col-6">
-                                    <p>_____________________________<br/>Customer Signature</p>
+                                <div style="text-align: center; font-size: 0.7rem; letter-spacing: 0.18em;
+                                            text-transform: uppercase; color: #9b7a2f;">Certificate of Commissioning</div>
+                                <h2 style="text-align: center; font-size: 1.6rem; font-weight: 700; color: #2c2410; margin: 6px 0 16px;">
+                                    Solar Commissioning Certificate
+                                </h2>
+                                <p style="text-align: center; font-size: 0.9rem; line-height: 1.7; color: #4a3f22;
+                                          max-width: 90%; margin: 0 auto 18px;">
+                                    This certifies that the solar power system installed for
+                                    <strong><span t-field="doc.partner_id.display_name"/></strong>
+                                    has been installed, tested and commissioned, and is formally accepted for operation.
+                                </p>
+
+                                <table style="width: 88%; margin: 0 auto; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="padding: 6px 4px; font-size: 0.82rem; font-weight: 700; color: #9b7a2f; width: 46%; border-bottom: 1px solid #e3d3a8;">Certificate No.</td>
+                                        <td style="padding: 6px 4px; font-size: 0.82rem; border-bottom: 1px solid #e3d3a8;"><span t-field="doc.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 6px 4px; font-size: 0.82rem; font-weight: 700; color: #9b7a2f; border-bottom: 1px solid #e3d3a8;">Project</td>
+                                        <td style="padding: 6px 4px; font-size: 0.82rem; border-bottom: 1px solid #e3d3a8;"><span t-field="doc.project_id.display_name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 6px 4px; font-size: 0.82rem; font-weight: 700; color: #9b7a2f; border-bottom: 1px solid #e3d3a8;">System Capacity</td>
+                                        <td style="padding: 6px 4px; font-size: 0.82rem; border-bottom: 1px solid #e3d3a8;"><span t-field="doc.project_id.capacity_kw"/> kW</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 6px 4px; font-size: 0.82rem; font-weight: 700; color: #9b7a2f; border-bottom: 1px solid #e3d3a8;">Commissioning Date</td>
+                                        <td style="padding: 6px 4px; font-size: 0.82rem; border-bottom: 1px solid #e3d3a8;"><span t-field="doc.commissioning_date"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 6px 4px; font-size: 0.82rem; font-weight: 700; color: #9b7a2f;">Verified Generation</td>
+                                        <td style="padding: 6px 4px; font-size: 0.82rem;"><span t-field="doc.generation_verification_kwh"/> kWh</td>
+                                    </tr>
+                                </table>
+
+                                <table style="width: 100%; margin-top: 18px;">
+                                    <tr>
+                                        <td style="text-align: center; width: 33%; font-size: 0.78rem; color: #4a3f22;">
+                                            <span t-if="doc.system_testing_done" style="color: #5c7d43; font-weight: 700;">✓</span>
+                                            <span t-else="" style="color: #a15c3c; font-weight: 700;">✗</span>
+                                            System Testing
+                                        </td>
+                                        <td style="text-align: center; width: 33%; font-size: 0.78rem; color: #4a3f22;">
+                                            <span t-if="doc.customer_walkthrough_done" style="color: #5c7d43; font-weight: 700;">✓</span>
+                                            <span t-else="" style="color: #a15c3c; font-weight: 700;">✗</span>
+                                            Customer Walkthrough
+                                        </td>
+                                        <td style="text-align: center; width: 33%; font-size: 0.78rem; color: #4a3f22;">
+                                            <span t-if="doc.customer_approved" style="color: #5c7d43; font-weight: 700;">✓</span>
+                                            <span t-else="" style="color: #a15c3c; font-weight: 700;">✗</span>
+                                            Customer Approved
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <div t-if="not is_html_empty(doc.commissioning_checklist)" style="margin-top: 18px;">
+                                    <div style="font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+                                                color: #9b7a2f; font-weight: 700; margin-bottom: 4px;">Checklist Notes</div>
+                                    <div style="font-size: 0.8rem; color: #4a3f22;" t-field="doc.commissioning_checklist"/>
+                                </div>
+
+                                <div class="row" style="margin-top: 40px; width: 88%; margin-left: auto; margin-right: auto;">
+                                    <div class="col-6" style="text-align: center; font-size: 0.76rem; color: #5c4f2f;">
+                                        <div style="border-top: 1px solid #9b7a2f; height: 30px; margin-bottom: 5px;"></div>
+                                        Commissioning Engineer
+                                    </div>
+                                    <div class="col-6" style="text-align: center; font-size: 0.76rem; color: #5c4f2f;">
+                                        <div style="border-top: 1px solid #9b7a2f; height: 30px; margin-bottom: 5px;"></div>
+                                        Customer Signature
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -27,8 +27,13 @@
     --epc-shadow-hover: 0 8px 20px rgba(51, 57, 74, 0.08), 0 2px 6px rgba(51, 57, 74, 0.05);
     --epc-radius: 10px;
 
-    overflow-y: auto;
+    // Scrolls both ways on its own, regardless of how tall/wide the actual
+    // content ends up being — so nothing gets clipped by the surrounding
+    // Odoo action frame on a small laptop screen or a narrow/zoomed window.
+    height: 100%;
     min-height: 100%;
+    overflow: auto;
+    box-sizing: border-box;
     background:
         radial-gradient(750px circle at 10% 0%, rgba(47, 127, 182, 0.10), transparent 55%),
         radial-gradient(750px circle at 90% 10%, rgba(235, 169, 63, 0.10), transparent 55%),
@@ -51,6 +56,12 @@
         }
         @media (max-width: 700px) {
             grid-template-columns: repeat(2, 1fr);
+        }
+        // Phone-width screens: one tile per row reads far better than two
+        // squeezed-in ones — this is what actually makes the dashboard
+        // usable on a phone rather than just technically not clipped.
+        @media (max-width: 420px) {
+            grid-template-columns: 1fr;
         }
     }
 
@@ -149,7 +160,16 @@
         position: relative;
         min-width: 320px;
         flex: 1 1 320px;
+        max-width: 100%;
         padding: 22px 22px 24px;
+
+        // Below 360px, a fixed 320px min-width can end up wider than the
+        // viewport itself (padding + card border eats into it) — letting
+        // the card shrink to fill the row avoids a needless sideways
+        // scrollbar on the very smallest phones.
+        @media (max-width: 360px) {
+            min-width: 100%;
+        }
         border-radius: var(--epc-radius);
         overflow: hidden;
         background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.72));
@@ -195,6 +215,13 @@
     // ------------------------------------------------------------------
     // Tables
     // ------------------------------------------------------------------
+    // Lets a wide table (more columns than a narrow screen can show without
+    // squashing) scroll sideways inside its own card instead of forcing the
+    // whole page to scroll horizontally or truncating a column unreadably.
+    .o_epc_table_scroll {
+        overflow-x: auto;
+    }
+
     table.table {
         margin-bottom: 0;
         font-size: 0.9rem;

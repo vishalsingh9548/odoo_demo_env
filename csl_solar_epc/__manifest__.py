@@ -20,6 +20,7 @@ Commissioning, Handover, Billing & Payments, O&M/AMC Management and Analytics.
     # Other Odoo apps this module builds on top of, instead of reinventing them
     'depends': [
         'mail',
+        'hr_timesheet',
         'crm',
         'sale_management',
         'sale_project',
@@ -63,6 +64,7 @@ Commissioning, Handover, Billing & Payments, O&M/AMC Management and Analytics.
         'views/project_project_views.xml',
         'views/project_task_views.xml',
         'views/purchase_order_views.xml',
+        'views/stock_picking_views.xml',
         'views/helpdesk_ticket_views.xml',
         'views/epc_reports_board.xml',
         'views/epc_menus.xml',

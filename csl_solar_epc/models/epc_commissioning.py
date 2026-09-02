@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 
 class EpcCommissioning(models.Model):
@@ -56,6 +57,28 @@ class EpcCommissioning(models.Model):
     commissioning_certificate_filename = fields.Char(
         string='Commissioning Certificate Filename', help="Original filename of the uploaded certificate.",
     )
+    epc_needs_final_qc = fields.Boolean(
+        string='Needs Final QC', compute='_compute_epc_needs_final_qc',
+        help="True while this project still has no passed Final Quality Check "
+             "logged against it — drives the 'Log Quality Check' button, and "
+             "blocks Submit for Approval until it's resolved. A system "
+             "shouldn't be commissioned before its Final QC has actually passed.",
+    )
+    epc_can_consume_site_stock = fields.Boolean(
+        string='Can Consume Site Stock', compute='_compute_epc_can_consume_site_stock',
+        help="True once this project has a passed Final QC and still has "
+             "material sitting at its site location — drives the 'Consume "
+             "Site Stock' button, so it can be done from here instead of "
+             "having to go find the Final QC record itself.",
+    )
+    epc_needs_handover = fields.Boolean(
+        string='Needs Handover', compute='_compute_epc_needs_handover',
+        help="True once this commissioning has been approved and its project "
+             "still has no Handover & Closure record yet — drives the "
+             "'Proceed to Handover' button, so the last pipeline step is one "
+             "click away instead of having to go find the Handover menu and "
+             "fill in the project by hand.",
+    )
 
     # Fills in the sequence-based reference number the first time a record is saved
     @api.model_create_multi
@@ -64,3 +87,102 @@ class EpcCommissioning(models.Model):
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('epc.commissioning') or 'New'
         return super().create(vals_list)
+
+    # Works out whether this commissioning's project is still missing a
+    # passed Final Quality Check, so the "Log Quality Check" button only
+    # shows up exactly when it's actually needed
+    @api.depends('project_id')
+    def _compute_epc_needs_final_qc(self):
+        for commissioning in self:
+            passed_final_qc = self.env['epc.quality.check'].search_count([
+                ('project_id', '=', commissioning.project_id.id),
+                ('category', '=', 'final'),
+                ('overall_result', '=', 'pass'),
+            ]) if commissioning.project_id else 0
+            commissioning.epc_needs_final_qc = not passed_final_qc
+
+    # Works out whether there's still material sitting at this project's site
+    # that a passed Final QC could consume, so the "Consume Site Stock"
+    # button only shows up exactly when it would actually do something
+    @api.depends('project_id')
+    def _compute_epc_can_consume_site_stock(self):
+        for commissioning in self:
+            site_location = commissioning.project_id.site_location_id
+            commissioning.epc_can_consume_site_stock = bool(site_location) and bool(
+                self.env['stock.quant'].search_count([
+                    ('location_id', '=', site_location.id),
+                    ('quantity', '>', 0),
+                ])
+            )
+
+    # Works out whether this commissioning's project still needs a Handover
+    # & Closure record, so the "Proceed to Handover" button only shows up
+    # exactly when it would actually do something
+    @api.depends('approval_state', 'project_id')
+    def _compute_epc_needs_handover(self):
+        for commissioning in self:
+            has_handover = bool(commissioning.project_id) and self.env['epc.handover'].search_count([
+                ('project_id', '=', commissioning.project_id.id),
+            ])
+            commissioning.epc_needs_handover = commissioning.approval_state == 'approved' and not has_handover
+
+    # Opens a new, blank Handover & Closure record pre-filled with this
+    # commissioning's project, so Stage 14 can be started directly from here
+    # the moment commissioning is approved — called from the "Proceed to
+    # Handover" header button
+    def action_create_handover(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'epc.handover',
+            'view_mode': 'form',
+            'context': {'default_project_id': self.project_id.id},
+            'target': 'current',
+        }
+
+    # Finds this project's passed Final QC and consumes whatever material is
+    # still sitting at its site location through it — called from the
+    # "Consume Site Stock" header button, so this can be done directly from
+    # Commissioning instead of having to go find the Final QC record itself
+    def action_consume_site_stock(self):
+        self.ensure_one()
+        final_qc = self.env['epc.quality.check'].search([
+            ('project_id', '=', self.project_id.id),
+            ('category', '=', 'final'),
+            ('overall_result', '=', 'pass'),
+        ], order='id desc', limit=1)
+        if not final_qc:
+            raise UserError(
+                "This project has no passed Final Quality Check to consume site stock against."
+            )
+        return final_qc.action_consume_site_stock()
+
+    # Opens a blank, pre-filled Final Quality Check form as a wizard-style
+    # dialog right on top of this commissioning record (target 'new', not a
+    # page navigation) — called from the "Log Quality Check" header button,
+    # the same pattern used for a project's incoming receipts
+    def action_log_quality_check(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'epc.quality.check',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_project_id': self.project_id.id,
+                'default_category': 'final',
+            },
+        }
+
+    # Blocks Submit for Approval until the project has actually passed its
+    # Final Quality Check — a system shouldn't move toward commissioning
+    # sign-off on the strength of an on-screen checkbox alone
+    def action_submit(self):
+        for commissioning in self:
+            if commissioning.epc_needs_final_qc:
+                raise UserError(
+                    "This project has not passed its Final Quality Check yet. "
+                    "Log one (category Final QC) and pass it before submitting "
+                    "this commissioning for approval."
+                )
+        return super().action_submit()

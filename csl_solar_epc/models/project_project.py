@@ -58,6 +58,17 @@ class ProjectProject(models.Model):
         string='Material Request Count', compute='_compute_epc_related_counts',
         help="How many Material Requests have been raised for this project.",
     )
+    commissioning_count = fields.Integer(
+        string='Commissioning Count', compute='_compute_epc_related_counts',
+        help="How many Commissioning records exist for this project.",
+    )
+    epc_all_tasks_done = fields.Boolean(
+        string='All Tasks Done', compute='_compute_epc_all_tasks_done',
+        help="True once this project has at least one task and every one of "
+             "them is closed (done or cancelled) — drives the 'Proceed to "
+             "Commissioning' button, so Commissioning only gets suggested "
+             "once site execution is actually finished.",
+    )
     site_location_id = fields.Many2one(
         'stock.location', string='Project Site Location', readonly=True, copy=False,
         help="The warehouse location representing this project's physical site. "
@@ -79,8 +90,9 @@ class ProjectProject(models.Model):
             'target': 'current',
         }
 
-    # Counts DPRs, Quality Checks and Material Requests linked to this project,
-    # for the smart buttons on the project form
+    # Counts DPRs, Quality Checks, Material Requests and Commissioning
+    # records linked to this project, for the smart buttons on the project
+    # form (and to gate the "Proceed to Commissioning" button below)
     def _compute_epc_related_counts(self):
         for project in self:
             project.dpr_count = self.env['epc.dpr'].search_count([('project_id', '=', project.id)])
@@ -88,19 +100,27 @@ class ProjectProject(models.Model):
                 [('project_id', '=', project.id)])
             project.material_request_count = self.env['epc.material.request'].search_count(
                 [('project_id', '=', project.id)])
+            project.commissioning_count = self.env['epc.commissioning'].search_count(
+                [('project_id', '=', project.id)])
 
-    # Opens a new, blank Daily Progress Report pre-filled with this project,
-    # so Stage 11 can be started directly from the project screen — the only
-    # way in now that Daily Progress Reports has no top-level menu of its own
-    def action_create_dpr(self):
+    # Works out whether every task on this project has actually been
+    # finished (or cancelled) — a project with no tasks at all doesn't count
+    # as "done", it just hasn't started. Deliberately searches project.task
+    # directly rather than using the project's own task_ids field: that
+    # field's own domain excludes closed tasks, so it goes empty the moment
+    # everything is actually done — exactly the case this needs to detect.
+    def _compute_epc_all_tasks_done(self):
+        for project in self:
+            tasks = self.env['project.task'].search([('project_id', '=', project.id)])
+            project.epc_all_tasks_done = bool(tasks) and all(tasks.mapped('is_closed'))
+
+    # Instantly downloads today's progress report for this project — who
+    # worked on it today, on what tasks, for how many hours — pulled live
+    # from Timesheets. No form to fill in and nothing is saved; it's a
+    # straight print, so it can be run again any day.
+    def action_print_today_dpr(self):
         self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'epc.dpr',
-            'view_mode': 'form',
-            'context': {'default_project_id': self.id},
-            'target': 'current',
-        }
+        return self.env.ref('csl_solar_epc.epc_report_dpr_today_pdf_action').report_action(self)
 
     # Opens the Daily Progress Reports for this project, called from the smart button
     def action_view_dprs(self):
@@ -150,6 +170,20 @@ class ProjectProject(models.Model):
             'res_model': 'epc.material.request',
             'view_mode': 'form',
             'res_id': request.id,
+            'target': 'current',
+        }
+
+    # Opens a new, blank Commissioning record pre-filled with this project,
+    # so Stage 13 can be started directly from the project screen the moment
+    # site execution actually finishes — called from the "Proceed to
+    # Commissioning" header button, which only shows once every task is done
+    def action_create_commissioning(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'epc.commissioning',
+            'view_mode': 'form',
+            'context': {'default_project_id': self.id},
             'target': 'current',
         }
 
