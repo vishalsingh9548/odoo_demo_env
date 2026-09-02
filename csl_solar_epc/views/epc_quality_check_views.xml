@@ -25,9 +25,12 @@
             <field name="arch" type="xml">
                 <form string="Quality Check">
                     <header>
-                        <button name="action_consume_site_stock" string="Consume Site Stock" type="object"
-                                class="oe_highlight"
-                                invisible="category != 'final' or overall_result != 'pass'"/>
+                        <!-- No "Consume Site Stock" button here: it lives only on the
+                             Commissioning form now (beside Log Quality Check / Submit for
+                             Approval), so it doesn't also show up a second time whenever
+                             this form is opened as a wizard from there. The action itself
+                             (action_consume_site_stock, below) is unchanged and is what
+                             Commissioning's own button calls into. -->
                         <field name="overall_result" widget="statusbar" statusbar_visible="pending,pass,fail"/>
                     </header>
                     <sheet>

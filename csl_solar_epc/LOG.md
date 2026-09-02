@@ -978,3 +978,644 @@ decide how Unit Cost should actually get entered in practice (manually
 on each BOQ line, or defaulted from the product's cost price) so these
 figures are meaningful by default instead of needing to be remembered.
 Applied with a module upgrade (zero errors) and a live server restart.
+
+---
+
+## Step 29 — Dashboard KPI: "Budgeted Cost" tile replaced with "Completed Projects"
+
+**What:** Replaced the dashboard's "Budgeted Cost" KPI tile with a
+"Completed Projects" tile. `models/epc_dashboard.py`'s `_get_kpis()` now
+reuses the same handed-over-project-ids set it already computed for
+excluding finished projects from "Active Projects", and reports its count
+as a new `completed_projects` KPI (dropping the old `budgeted_cost` KPI
+entirely, since it was redundant with the BOQ/Project total-cost figures
+elsewhere). The tile is clickable, same as Active Projects, opening the
+exact list of handed-over projects.
+
+**Why:** Asked for directly — a plain cost figure at the top of the
+dashboard wasn't as useful a headline number as knowing how many projects
+have actually been finished.
+
+**Impact:** Verified via `get_dashboard_data()` that `completed_projects`
+returns the correct count and domain (matches projects with an approved
+Handover). Applied with a module upgrade (zero errors) and a live server
+restart.
+
+---
+
+## Step 30 — Four fixes: AMC funnel chart, report preview, DPR timesheet detail, QC gate button
+
+**What:** Four separate, unrelated changes made together in one pass:
+
+1. **AMC Contract Health chart** (`static/src/js/epc_dashboard.js`) —
+   changed from a doughnut to a funnel-style chart. Chart.js has no native
+   funnel type, so this uses a well-known plugin-free technique: a
+   horizontal bar chart where each status's bar is a "floating"
+   `[-count/2, +count/2]` segment centred on the same vertical axis,
+   which reads as a symmetric funnel narrowing down the page (Draft →
+   Active → Expired → Terminated) instead of a plain bar list. A custom
+   legend was added by hand (one dataset can't drive Chart.js's default
+   per-slice legend the way a doughnut's can).
+2. **Print preview for all 7 PDF reports** (`views/epc_reports_board.xml`)
+   — every report action's `report_type` changed from `qweb-pdf` to
+   `qweb-html`. This is Odoo's own native behaviour, not custom code:
+   `qweb-html` opens the report in an iframe with a "Print" button,
+   instead of `qweb-pdf`'s immediate forced download with no preview
+   step. Same templates, same data, just a different render/print path.
+3. **DPR Report now shows who worked, on what, and for how many hours**
+   (`views/epc_reports_board.xml`, DPR template) — for each Daily
+   Progress Report row, a nested sub-table lists that project's real
+   Timesheet entries (`account.analytic.line`, Odoo's own `hr_timesheet`
+   data — the same data the Project app's own Timesheets tab shows) for
+   that exact date: Employee, Task, Work Description, Hours. Not a new
+   parallel data-entry table — it reads whatever timesheets are already
+   logged against the project. `hr_timesheet` added to `__manifest__.py`
+   depends (it was already installed transitively, but the module now
+   directly relies on it, so it should be declared).
+4. **Quality Check gate now has a working button, not just a message**
+   (`models/stock_picking.py`) — the two existing block messages (no
+   Incoming QC logged / logged but not passed) are now raised as
+   `RedirectWarning` instead of plain `UserError`, with the exact same
+   message text as before. `RedirectWarning` is Odoo's built-in mechanism
+   for exactly this: the popup keeps blocking the receipt, but also shows
+   a "Log Quality Check" button that jumps straight to a pre-filled
+   Quality Check form (project + delivery/receipt + category already
+   set), instead of only telling the user where to go find it themselves.
+   A new dedicated action, `epc_quality_check_action_new_incoming`
+   (`views/epc_quality_check_views.xml`, `view_mode="form"` only, so it
+   always opens straight to a blank form, never a list), is what the
+   button redirects to.
+
+**Why:** All four asked for directly.
+
+**Impact:** Verified all four end to end, not just "installs cleanly":
+`get_dashboard_data()` still returns a correct `amc_contract_health`
+breakdown; all 7 report actions confirmed as `report_type = qweb-html` in
+the database; the DPR report template was rendered
+(`_render_qweb_html`) and produced real HTML with no errors; a fresh test
+receipt was created and `button_validate()` was called on it to confirm
+`RedirectWarning` actually fires with the right message, the right
+action id, the right button label, and the right project/picking
+context — then rolled back (test data only, nothing left behind).
+Applied with a module upgrade (zero errors) and a live server restart.
+
+---
+
+## Step 31 — Corrected Step 30: real funnel sorting, QC button moved out of the popup into a wizard, DPR report proven with real timesheet data
+
+**What:** Direct user testing found Step 30's four changes needed real
+fixes, not just polish:
+
+1. **Funnel chart was never actually tapering.** The bug: AMC states were
+   always drawn in a fixed order (Draft, Active, Expired, Terminated)
+   regardless of their counts, so with real data like 1/3/0/1 the bars went
+   up-then-down-then-up — not a funnel shape at all, and the small
+   Terminated bar read as "missing" rather than just being small.
+   `_renderAmcHealthChart()` now sorts the 4 stages by count, largest
+   first, before charting, so it always narrows top-to-bottom like an
+   actual funnel — labels, colours and click-domains all reordered
+   together so nothing gets mismatched.
+2. **"Log Quality Check" moved out of the warning popup entirely.** Per
+   explicit correction, the button no longer lives inside the blocking
+   message (`button_validate()` is back to a plain `UserError`, same
+   wording as originally written). Instead, `stock.picking` gets a new
+   computed field `epc_needs_incoming_qc` and a permanent header button —
+   `views/stock_picking_views.xml` inserts it between the native
+   "Validate" and "Print" buttons, visible only while a passed Incoming
+   QC is genuinely still missing.
+3. **Opens as a wizard, not a page navigation.** `action_log_quality_check()`
+   returns its act_window with `target: 'new'`, so clicking the button
+   opens the pre-filled Quality Check form as a dialog directly on top of
+   the receipt screen, instead of navigating away and losing the
+   picking's breadcrumb.
+4. **DPR report's timesheet section proven to actually work.** The report
+   looked unchanged in testing because the demo data has zero real
+   Timesheet entries logged on any DPR's date — the code was correct but
+   had nothing to show, and silently showed nothing. Two fixes: (a) added
+   an explicit "No timesheet entries logged against this project for this
+   date" line so the section is always visibly present, empty or not,
+   instead of looking like nothing happened; (b) actually created a real
+   timesheet entry against a test project/task/date and re-rendered the
+   report to confirm the employee, task, work description and hours all
+   print correctly when data exists (then rolled the test data back).
+
+**Why:** All four were genuine gaps in Step 30, caught by direct
+inspection of the running app rather than a second guess — the funnel
+was a real sorting bug, the popup-button placement was an explicit
+correction, and the DPR report needed proof with real data, not just a
+correct-looking template.
+
+**Impact:** Verified via `odoo shell`: `epc_needs_incoming_qc` computes
+`True`/`False` correctly, `action_log_quality_check()` returns
+`target: 'new'` with the right context, `button_validate()` now raises a
+plain `UserError` again (confirmed no `RedirectWarning` button leaks
+into the popup), and the DPR report's HTML was rendered twice — once
+showing the "no entries" fallback, once showing a real logged timesheet
+row with correct employee/task/description/hours — both passing. Applied
+with a module upgrade (zero errors) and a live server restart.
+
+---
+
+## Step 32 — Funnel chart drops empty stages; found why the DPR report looked empty for real timesheet data
+
+**What:** Two follow-ups from live testing:
+
+1. **Funnel chart no longer shows empty stages.** With Expired at 0
+   contracts, the funnel still listed "Expired (0)" as a zero-width row in
+   both the bars and the legend — a stage nothing can be "filled into"
+   shouldn't take up a slot at all. `_renderAmcHealthChart()` now filters
+   out any status with a count of 0 before sorting/drawing, so the funnel
+   only ever shows stages that actually have contracts in them.
+2. **Root-caused why the DPR report showed "No timesheet entries" even
+   after real timesheet hours were logged** (project "Abigail Peterson -
+   Solar EPC (S00047)", task "task to install": John Doe / Anita Oliver,
+   15 hours total, all dated 2026-08-31). Not a bug: that project had **no
+   Daily Progress Report at all**, and the report only ever prints rows
+   for DPRs that exist — a project with real timesheets but no DPR simply
+   never appears in it. Created `DPR/2026/00005` for that exact project
+   and date so the report now shows this real data end-to-end, live, as
+   proof rather than a synthetic example.
+
+**Why:** Both asked for directly after seeing the dashboard/report not
+match expectations.
+
+**Impact:** Verified via `get_dashboard_data()` that Expired (0) is still
+correctly computed on the backend (nothing removed from the KPI data
+itself) but is now filtered out only at chart-render time on the
+frontend. Confirmed `DPR/2026/00005` persists and is linked to project 26
+with the matching real timesheet lines already on that project/date, so
+the printed DPR report will show the real Employee/Task/Description/Hours
+breakdown for it. Applied with a live server restart (JS-only change,
+no model/view/data changes this round).
+
+---
+
+## Step 33 — Commissioning now gated on Final QC, same pattern as the receiving gate
+
+**What:** Commissioning could be Submitted for Approval regardless of
+whether its project's Final Quality Check had actually passed — the
+"System Testing Done" field was just a checkbox anyone could tick, with
+nothing verifying a real Final QC record backed it up. Added the exact
+same gate pattern already built for incoming receipts (Step 31):
+
+- `epc.commissioning` gets a new computed field `epc_needs_final_qc` —
+  True while the project has no passed Final QC (`epc.quality.check`,
+  `category='final'`, `overall_result='pass'`) logged against it.
+- `action_submit()` is overridden to block with a `UserError` if that's
+  still true, so the check holds even if Submit is somehow triggered
+  another way, not just via the button.
+- On the form (`views/epc_commissioning_views.xml`), "Submit for
+  Approval" and a new "Log Quality Check" button now show/hide as a pair
+  — Submit is only visible once Final QC has actually passed; otherwise
+  "Log Quality Check" takes its place.
+- `action_log_quality_check()` opens a blank Quality Check form as a
+  wizard dialog (`target: 'new'`) with Project and Category ("Final QC")
+  already filled in — same UX as the incoming-receipt version, not a
+  page navigation away from the commissioning record.
+
+**Why:** Asked for directly — commissioning a system that hasn't actually
+passed its final quality check shouldn't be possible just because a
+checkbox was ticked.
+
+**Impact:** Verified via `odoo shell`: a commissioning on a project with
+no passed Final QC has `epc_needs_final_qc = True` and `action_submit()`
+correctly raises; the same wizard action returns `target: 'new'` with the
+right project/category context; a commissioning on a project that *has*
+passed Final QC has `epc_needs_final_qc = False` and `action_submit()`
+succeeds normally. Applied with a module upgrade (zero errors) and a live
+server restart.
+
+---
+
+## Step 34 — "Consume Site Stock" button added to Commissioning, beside Submit for Approval
+
+**What:** Added a "Consume Site Stock" button to the Commissioning form's
+header, next to "Submit for Approval" — so the final stock-consumption
+step (previously only reachable from the Final QC record itself) can be
+done directly from Commissioning. New computed field
+`epc_can_consume_site_stock` (True once the project has a passed Final QC
+and still has material sitting at its site location) controls its
+visibility. `action_consume_site_stock()` on `epc.commissioning` finds
+that project's passed Final QC record and delegates to its own
+`action_consume_site_stock()` — no duplicated stock logic, just a second
+entry point to the same action.
+
+**Why:** Asked for directly.
+
+**Impact:** A mistake on my end during this step: I ran the module
+upgrade against the database but forgot to restart the already-running
+dev server afterward, so the live browser session was still serving the
+old view definition and threw an `EvalError` (`epc_can_consume_site_stock`
+undefined) the moment the page tried to evaluate the new button's
+`invisible` condition. Restarting the server fixed it immediately — not a
+code bug, just a missed step in the usual apply/restart routine.
+Re-verified afterward with `get_view()` that the form's arch now loads
+cleanly and includes the new field. Also verified via `odoo shell`: a
+commissioning on a project with a passed Final QC and real stock still at
+site shows `epc_can_consume_site_stock = True`, and calling the button's
+action actually consumes that stock (site quants confirmed empty
+afterward) — while a project with nothing left at site (or no passed
+Final QC yet) correctly keeps the button hidden.
+
+---
+
+## Step 35 — Removed the Project Profitability report
+
+**What:** Removed the "Project Profitability" entry from the Reporting
+menu entirely — its menu item, `ir.actions.report`, and QWeb template
+(`epc_report_profitability_pdf_action` / `epc_report_profitability_template`)
+are all deleted from `views/epc_menus.xml` / `views/epc_reports_board.xml`.
+
+**Why:** Asked for directly — not needed.
+
+**Impact:** Confirmed via the upgrade log that Odoo cleanly deleted the
+now-orphaned menu, report action and view records on upgrade (no manual
+cleanup needed). The other 6 Reporting entries (Procurement, Inventory,
+DPR, Quality, Billing & Collection, O&M/AMC) are untouched. Applied with
+a module upgrade (zero errors) and a live server restart.
+
+---
+
+## Step 36 — Simplified the DPR report + "New Daily Progress Report" is now an instant download
+
+**What:** Two changes to Daily Progress Report reporting:
+1. Reporting > DPR Report no longer prints the 6-column summary row
+   (Project/Reference/Date/Weather/Manpower/Reported By) above each
+   project's timesheet table. Each block is now just a plain
+   "Project — Date" heading followed straight by the Employee/Task/Work
+   Description/Hours table (pulled live from real Timesheets, unchanged
+   logic from Step 31/32) — the block markup itself was factored into a
+   shared sub-template (`epc_report_dpr_project_block`) so it isn't
+   duplicated.
+2. The "New Daily Progress Report" button on the Project form no longer
+   opens a blank `epc.dpr` form to fill in by hand. It's renamed
+   "Download Today's Report" and now instantly downloads a report of
+   exactly who worked on that project **today**, in the same simplified
+   format as (1) — `project.project.action_print_today_dpr()` calls a new
+   report action (`epc_report_dpr_today_pdf_action`) directly. Nothing is
+   saved to the database; it's a pure print, so it can be run again any
+   day.
+
+**Why:** Asked for directly — the summary row wasn't wanted, and the
+create-a-DPR-by-hand form (weather/manpower/material/issues fields) was
+never what was actually wanted from that button; a same-day "who worked
+today" printout was.
+
+**Impact:** The `epc.dpr` model, its own fields and its list/form view
+are untouched — they still exist and are still reachable via the
+project's "Daily Progress Reports" stat button (once any record exists)
+or a list view "New". They're just no longer wired to this particular
+project-form button, which is now purely a print action. Verified via
+`odoo shell`: the main DPR Report's rendered HTML no longer contains the
+old "Reference" summary column; the new per-project "today" report
+correctly names the project and, once a real timesheet line was created
+for today against it (created and immediately rolled back, not left in
+the DB), showed that exact employee/task/description/hours row. Applied
+with a module upgrade (zero errors) and a live server restart.
+
+---
+
+## Step 37 — Reporting > DPR Report now shows today's work, not stale old dates
+
+**What:** Following straight on from Step 36: the menu-level Reporting >
+DPR Report was still looping over historic `epc.dpr` records (old demo
+data from 30/31 Aug), so it kept showing yesterday's dates even when
+opened today (1 Sept). Changed `epc_report_dpr_pdf_action`'s model to
+`project.project` and rewrote `epc_report_dpr_template` to stop reading
+`epc.dpr` at all — it now searches real Timesheets for `date = today`,
+finds every distinct project that has one, and renders each through the
+same shared `epc_report_dpr_project_block` used by the per-project
+"Download Today's Report" button. Shows a plain "No project has any
+timesheet entries logged today" message if nothing was logged yet.
+
+**Why:** Asked for directly — "why 31st aug when today is 1 sept...
+it should show projects in which work was done today."
+
+**Impact:** Reporting > DPR Report and the project's own "Download
+Today's Report" button now share identical logic and always agree with
+each other and with the real Timesheets tab. Verified via `odoo shell`:
+re-rendered the report with no filters and confirmed it lists exactly
+the projects/employees/tasks/hours that already had real timesheet lines
+dated 2026-09-01 in the test DB (found live, not synthetic), and none of
+the old 2026-08-30/31 dates appear anywhere. Applied with a module
+upgrade (zero errors) and a live server restart.
+
+---
+
+## Step 38 — Dashboard scrolls both ways and adapts down to phone-width screens
+
+**What:** `static/src/scss/epc_dashboard.scss` / `static/src/xml/epc_dashboard.xml`:
+- The dashboard's root (`.o_epc_dashboard`) now sets `height: 100%` and
+  `overflow: auto` (both axes), so it always scrolls itself — vertically
+  if its content is taller than the visible area, horizontally if
+  anything can't shrink far enough to fit — instead of relying on
+  whatever the surrounding Odoo action frame happens to do.
+- Added a phone-width breakpoint (`max-width: 420px`) collapsing the KPI
+  tile grid to a single column, and a `max-width: 360px` breakpoint
+  letting the chart/table cards shrink to fill the row instead of
+  holding a fixed 320px minimum that could exceed a very narrow phone's
+  actual width.
+- The "Upcoming AMC Preventive Services" table (the one part of the
+  dashboard with several fixed columns that can't reflow) is now wrapped
+  in its own `.o_epc_table_scroll` (`overflow-x: auto`) container, so a
+  long project name or a narrow window scrolls just that table sideways
+  instead of squashing its columns unreadably or scrolling the whole page.
+
+**Why:** Asked for directly — "add both vertical and horizontal scroller
+for dashboard and make it responsive for all screen sized."
+
+**Impact:** The KPI row and chart row already reflowed reasonably via
+existing grid/flex-wrap breakpoints (7→4→2 tile columns, chart cards
+wrapping to their own row); this step adds the missing phone-width step,
+the dashboard's own scroll behaviour, and the one place (the table) that
+genuinely needed its own horizontal scroller rather than a reflow.
+Nothing here touches the dashboard's data/JS logic — CSS/XML only.
+Applied with a module upgrade (zero errors) and a live server restart so
+the updated static assets are actually served.
+
+---
+
+## Step 39 — Added real backend data so the dashboard isn't sparse (no code changes)
+
+**What:** No code/view changes — added real records directly to the
+`csl_solar_epc_test` database (via `odoo shell`, not `demo/epc_demo.xml`,
+so it took effect immediately with no reinstall) to fill in the parts of
+the dashboard that were sitting at 0 or showing only one bar:
+- 3 new leads (Sunrise Apartments, Green Valley Textiles, Coastal Foods
+  Pvt Ltd), each carried to a different pending-approval stage — a
+  submitted Site Survey, an approved-survey-with-submitted-Feasibility,
+  and an approved-survey-and-feasibility-with-submitted-BOQ — so "Site
+  Surveys", "Feasibility Studies" and "BOQs Pending Approval" on the
+  Pipeline Activity chart aren't stuck at 0.
+- 2 new Material Requests (`to_submit` / `submitted`) on two existing
+  active projects — feeds both "Material Requests" on Pipeline Activity
+  and the "Pending Material Requests" KPI tile (same domain, both moved
+  0 → 2).
+- 1 new approved Commissioning on project 19 (Metro Textiles, S00039)
+  with no Handover created for it — so the Portfolio by Phase donut
+  shows a real "Commissioned" slice (was 0) instead of only Execution/
+  Handed Over/Under AMC.
+- 4 new Purchase Orders (linked to real projects, real order lines) at
+  draft/sent/to approve/done, so the Procurement Status chart shows all
+  5 stages instead of one big "Purchase Order" bar and nothing else.
+
+**Why:** Asked for directly — the dashboard looked empty in several
+spots even though it was rendering correctly; it needed more real data
+behind it, added from the backend rather than the module's demo fixture.
+
+**Impact:** Every new record was created with the same required fields
+and approval-mixin conventions as the existing data (proper sequence
+numbers, real product/partner/project references) — nothing orphaned or
+fabricated to look right only in the dashboard. Verified by re-calling
+`epc.dashboard.get_dashboard_data()` both in `odoo shell` and over real
+HTTP against the live server: `pending_material_requests` 0→2,
+`portfolio_phase` counts `[2,1,5,3]` (Commissioned now populated),
+`pipeline_activity` counts `[1,2,1,2,2]` (all five stages now non-zero),
+`procurement_status` counts `[1,1,1,9,1]` (all five RFQ→Locked stages
+now non-zero). Also read back every new record's `display_name` and ran
+`get_views` on the affected models to confirm nothing errors when
+opened. No module upgrade or server restart needed — this was pure data,
+already live in the same database the running server reads from.
+
+---
+
+## Step 40 — More dashboard data, fixed a black-bar chart bug, "RFQ Sent" colour
+
+**What:** Follow-up round on the dashboard:
+1. Found and fixed a real bug while doing the color change: the palette
+   in `static/src/js/epc_dashboard.js` (`CHART_COLORS`) never actually
+   defined a `warn` key, so both the Procurement Status chart's "RFQ
+   Sent" bar and the AMC Contract Health chart's "Expired" bar were
+   silently falling back to Chart.js's default black whenever their
+   count went above 0 — that's why "RFQ Sent" rendered black. Fixed by
+   adding a real `sentLight` (light sky blue, `#7ec8e3`) colour for RFQ
+   Sent, and reusing the existing amber `pending` colour for "Expired"
+   (same latent bug, same fix, fixed proactively before it ever showed
+   up in a screenshot the way RFQ Sent did).
+2. Added more real backend data (again via `odoo shell`, not
+   `demo/epc_demo.xml`): 9 more Purchase Orders (3 more each at RFQ /
+   RFQ Sent / Locked) so those bars are properly visible next to the
+   Purchase Order bar, and 3 more complete project chains (lead → survey
+   → feasibility → BOQ → project → commissioning → handover → an active
+   AMC contract with its own `next_service_date`) — Horizon Retail Park,
+   Blue Ridge Dairy, Palm Grove Resorts.
+
+**Why:** Asked for directly — more data for RFQ/RFQ Sent/Locked, more
+completed projects, more Upcoming AMC Preventive Services rows, and the
+RFQ Sent bar's colour fixed.
+
+**Impact:** `pending_material_requests`/other counts from Step 39
+unaffected; new counts confirmed over real HTTP against the live
+server: Completed Projects 8→11, Active AMC Contracts 3→6, Procurement
+Status `[4,4,1,9,4]` (was `[1,1,1,9,1]`), Portfolio by Phase
+`[2,1,5,6]` (the 3 new projects landed in "Under AMC", since they got
+both an approved Handover and an active AMC contract), and Upcoming AMC
+Preventive Services now lists 6 rows instead of 3, correctly sorted by
+next service date. Confirmed the fixed JS bundle is actually being
+served (`sentLight` present, no remaining `CHART_COLORS.warn`
+reference) and the server is alive. Applied with a module upgrade (zero
+errors) and two live server restarts (one per JS edit).
+
+---
+
+## Step 41 — O&M / AMC Report redesigned ("Solar Bold Brand")
+
+**What:** Restyled the O&M / AMC Report's QWeb template
+(`epc_report_amc_template` in `views/epc_reports_board.xml`) — a
+sunrise-gradient title banner, a 4-tile KPI strip (Total Contracts,
+Active, Contract Value, Next Service Due), and the contract table with
+colour-coded status badges (Active green / Draft grey / Terminated red
+/ Expired amber) and right-aligned, bold monetary values. Everything is
+scoped under one `.o_epc_amc_report` wrapper with its own `<style>`
+block so it can't affect any other report. The KPI numbers and every
+table cell are computed from the exact same `epc.amc.contract` recordset
+and fields as before (`project_id`, `name`, `partner_id`, `start_date`,
+`end_date`, `state`, `next_service_date`, `contract_value`) — no field,
+column, or underlying value changed, only how they're presented.
+
+**Why:** Asked for directly — five design directions were mocked up in
+an artifact first (Corporate Ledger, Scandinavian Minimal, Ops
+Dashboard, Formal Ledger, Solar Bold Brand) using the report's own real
+data, and "Solar Bold Brand" was the one picked.
+
+**Impact:** Verified via `odoo shell` by rendering the actual report
+template (`_render_qweb_html`) with no filters: the banner, KPI strip
+and badge classes all render, and the KPI numbers match hand-computed
+totals exactly (8 contracts, 6 active, $372,950.00 total value) — same
+totals as Step 40's verification, confirming no data changed, only
+presentation. Applied with a module upgrade (zero errors) and a live
+server restart.
+
+---
+
+## Step 42 — O&M / AMC Report now draws its own branded header/footer
+
+**What:** Step 41's redesign left Odoo's own default plain logo/address
+header and contact-info footer (from `web.external_layout`) sitting
+above and below the new gradient banner, looking disconnected from it.
+Switched this one report's `t-call` from `web.external_layout` to
+`web.basic_layout` (which draws no header/footer of its own) and built
+the company logo, name, address, phone, email and website directly into
+the "Solar Bold Brand" design instead: the logo (or a 2-letter fallback
+mark if none is set) plus company name/address now sit inside the top
+of the gradient banner itself, and a matching light contact-info strip
+now sits below the table as the report's own footer. All pulled from
+the exact same `res.company` fields (`logo`, `name`, `street`,
+`street2`, `city`, `state_id`, `zip`, `country_id`, `phone`, `email`,
+`website`) the default layout would have used — nothing invented.
+
+**Why:** Asked for directly — "add header footer also the company
+address logo etc" for this report, once the mismatch between the new
+banner and the old plain header/footer became visible.
+
+**Impact:** Scoped to this one report only (`epc_report_amc_template`)
+— every other report still uses `web.external_layout` and is
+unaffected. Verified via `odoo shell` by rendering the actual template:
+the real company logo renders as a base64 image inside the banner, the
+name/address block matches the company's real address exactly
+("My Company (San Francisco)", "250 Executive Park Blvd, Suite 3400",
+"San Francisco CA 94134", "United States" — including the state code,
+fixed after a first pass that was missing it), and the footer shows the
+real phone/email/website. Applied with two module upgrades (zero
+errors, the second for the missing-state fix) and a live server
+restart.
+
+---
+
+## Step 43 — "Solar Bold Brand" applied to all 7 reports
+
+**What:** Extended the O&M/AMC Report's redesign (Steps 41-42) to every
+other report in `views/epc_reports_board.xml` — Procurement, Inventory,
+DPR Report, "Download Today's Report", and Quality Report, plus Billing
+& Collection Report. To do this without copy-pasting the same large CSS
+block and header/footer markup into 6 more templates, pulled the shared
+pieces out into three small reusable templates that every report now
+`t-call`s:
+- `epc_report_style` — the one shared `<style>` block (renamed classes
+  from `o_epc_amc_*` to generic `o_epc_report_*`, and added a small
+  5-colour badge system — `o_epc_badge_pass/info/warn/fail/neutral` —
+  reused by every report's status column instead of a bespoke palette
+  per report).
+- `epc_report_header` — the gradient banner with company logo/name/
+  address plus that report's own `title`/`subtitle` (set via `t-set`
+  just before calling it).
+- `epc_report_footer` — the phone/email/website contact strip.
+
+Each report also got a small KPI strip relevant to its own data
+(Procurement: Total/Confirmed/Pending Approval/Total Amount; Inventory:
+Total Transfers/Done/In Progress/Projects Covered; DPR: Projects Active
+Today/Timesheet Entries/Total Hours; Quality: Total/Passed/Failed/
+Pending; Billing: Total Invoices/Total Billed/Collected/Outstanding;
+AMC: unchanged from Step 41) and its status-like column now renders as
+a colour-coded badge via a small `badge_map` dict mapping that model's
+own state values to one of the 5 shared colours (e.g. Purchase Order
+`purchase`/`done` → info/pass, `to approve` → warn, `cancel` → fail).
+No field, domain, or underlying value changed on any report — same
+`env[...].search(...)` calls as before, same columns, just restyled and
+reformatted (e.g. `not_paid` → "Not paid").
+
+**Why:** Asked for directly — "this layout is good and perfect do this
+for other reports as well."
+
+**Impact:** Verified via `odoo shell` by rendering all 7 report actions
+(the six from the Reporting menu plus the project-level "Download
+Today's Report" instant action) with `_render_qweb_html` — all render
+with zero errors and every one includes the shared banner and footer.
+Spot-checked two reports' numbers against hand-computed totals to
+confirm no data changed: Procurement (22 orders, 13 confirmed, 5 pending
+approval, $2,459,085.25 total — matches exactly) and Quality (20 checks,
+16 pass, 2 fail, 2 pending — matches exactly). Applied with a module
+upgrade (zero errors) and a live server restart.
+
+---
+
+## Step 44 — Commissioning Certificate redesigned ("Premium Seal")
+
+**What:** Restyled the Commissioning Certificate PDF
+(`epc_commissioning_certificate_template` in
+`report/epc_commissioning_report.xml`) — a cream parchment page inside a
+double gold rule border, a circular gold seal mark, formal serif
+typography, the certification statement, a facts table (Certificate No.,
+Project, System Capacity, Commissioning Date, Verified Generation), the
+three pass/fail checklist items as ✓/✗ marks, an (only-if-filled-in)
+"Checklist Notes" section for `commissioning_checklist`'s free text, and
+the same blank signature lines as before. Picked from 5 design options
+mocked up in an artifact first ("Classic Diploma", "Modern Minimalist",
+"Solar Bold Brand", "Technical/Compliance", "Premium Seal" — this one).
+No field or value changed — same `doc.name`, `project_id`, `partner_id`,
+`capacity_kw`, `commissioning_date`, `generation_verification_kwh`,
+`system_testing_done`/`customer_walkthrough_done`/`customer_approved`,
+and `commissioning_checklist` as before.
+
+Two things specific to this report, different from the other 6 (which
+are all `qweb-html` previewed in the browser): this one is `qweb-pdf` —
+actually rendered server-side by this machine's wkhtmltopdf binary,
+confirmed **unpatched** (seen in a prior log warning) — so the CSS was
+kept deliberately conservative (solid colours, no gradients, no
+flexbox/grid, table-based signature layout) rather than reusing the
+gradient-banner approach from the other reports. It also switched from
+`web.external_layout` to `web.basic_layout` (no company letterhead) to
+match the approved design exactly — real certificates don't carry one
+either. That surfaced a real cosmetic bug: the default company
+paperformat reserves ~52mm at the top of the page for a logo header,
+which left the certificate floating in a large empty gap once that
+header was removed — fixed by adding a dedicated
+`epc_commissioning_certificate_paperformat` (15mm margins, no header
+spacing) and assigning it to this one report action via
+`paperformat_id`.
+
+**Why:** Asked for directly — "improve this report also give me the
+artifact first... do the premium seal one."
+
+**Impact:** Scoped to this one report only — every other report is
+untouched. Verified by actually generating the real PDF (not just the
+HTML preview) via `_render_qweb_pdf` against a real approved
+commissioning record (`COM/2026/00019`, Aka Foster, S00050) and reading
+it back: renders cleanly through the real unpatched wkhtmltopdf binary
+with no errors, the seal/border/facts/checklist/signatures all appear
+correctly, and after the paperformat fix the certificate sits properly
+near the top of the page instead of in a large empty gap. Applied with
+a module upgrade (zero errors) and a live server restart.
+
+---
+
+## Step 45 — Two more "proceed to the next stage" chain buttons
+
+**What:** Two new pre-filled shortcut buttons, matching the pattern
+already used for "New Material Request" and the incoming-QC/Final-QC
+"Log Quality Check" buttons earlier this session:
+1. **Project form → "Proceed to Commissioning"**: shows once every task
+   on the project is actually finished (`epc_all_tasks_done`, a new
+   compute field on `project.project`) and no Commissioning record
+   exists for it yet (`commissioning_count == 0`). Opens a blank
+   Commissioning form with `default_project_id` already set.
+2. **Commissioning form → "Proceed to Handover"**: shows once a
+   commissioning is approved and its project has no Handover & Closure
+   record yet (`epc_needs_handover`, a new compute field on
+   `epc.commissioning`). Opens a blank Handover form with
+   `default_project_id` already set (the form's own `partner_id` is
+   already a `related='project_id.partner_id'` field, so the customer
+   fills in automatically too).
+
+**Why:** Asked for directly — "make everything connected through
+chains, no break," continuing the pattern used for procurement and
+quality-check earlier.
+
+**Impact:** Caught a real bug while building `epc_all_tasks_done`: the
+obvious approach (checking `project.task_ids`) is wrong, because that
+field's own domain (`[('is_closed', '=', False)]`, in Odoo's own
+`project` module) excludes closed tasks — so it goes *empty* the moment
+every task is actually done, making a naive `bool(task_ids) and
+all(task_ids.mapped('is_closed'))` check permanently False exactly when
+it should be True. Fixed by searching `project.task` directly by
+`project_id` instead of using that field. Verified via `odoo shell`
+against the real project from the screenshots (Aka Foster, S00050):
+with its one task done, `epc_all_tasks_done` is `True`; after adding a
+second, still-open task to the same project (then rolled back, not
+left in the DB), it correctly flips back to `False`; a project with
+zero tasks correctly reads `False` too. Also confirmed
+`epc_needs_handover` is `False` for that project's commissioning since
+it already has a real Handover record (COM/2026/00019 → HO already
+exists), so the button correctly doesn't invite a duplicate. Both forms'
+`get_view()` render with no errors. Applied with a module upgrade (zero
+errors) and a live server restart.

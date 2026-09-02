@@ -18,6 +18,10 @@ const CHART_COLORS = {
     pending: "#eba93f",
     accent: "#2f7fb6",
     grid: "#eaecf1",
+    // A light sky blue for "RFQ Sent" on the Procurement Status chart —
+    // there was no "warn" key in this palette, so that bar was quietly
+    // falling back to Chart.js's default black.
+    sentLight: "#7ec8e3",
     categorical: ["#2f7fb6", "#eba93f", "#46b980", "#8b8fd6", "#e0684f", "#6fc48a"],
 };
 
@@ -192,8 +196,14 @@ export class EpcDashboard extends Component {
         });
     }
 
-    // Every AMC contract, by status — the health of the maintenance book
-    // at a glance
+    // Every AMC contract, by status — the health of the maintenance book at a
+    // glance, drawn as a funnel (Draft -> Active -> Expired -> Terminated)
+    // instead of a pie so the natural progression of a contract's lifecycle
+    // reads top-to-bottom. Chart.js has no built-in funnel type, so this is
+    // a standard funnel-without-a-plugin trick: a horizontal bar chart where
+    // each bar is a "floating" [-count/2, +count/2] segment centered on the
+    // same vertical axis, which reads as a symmetric funnel narrowing down
+    // the page instead of a plain bar list.
     _renderAmcHealthChart() {
         this._destroy("amcHealth");
         const el = this.chartRefs.amcHealth.el;
@@ -201,26 +211,75 @@ export class EpcDashboard extends Component {
             return;
         }
         const amc = this.state.data.amc_contract_health;
+        // Same fix as the Procurement Status chart below: there was no
+        // "warn" key in the palette, so "Expired" would render as an
+        // undefined-color (black) bar the moment its count went above 0.
+        const rawColors = [CHART_COLORS.pass, CHART_COLORS.accent, CHART_COLORS.pending, CHART_COLORS.fail];
+        // A funnel only reads as a funnel if the bars actually narrow going
+        // down the page. The backend always returns Draft/Active/Expired/
+        // Terminated in that fixed order, which is rarely in descending
+        // count order (e.g. 1/3/0/1 doesn't taper at all) -- sorting by
+        // count here, largest first, is what turns this into a real funnel
+        // shape instead of a lopsided bar chart with a "missing" small bar.
+        // A stage with 0 contracts is dropped entirely (not shown as an
+        // empty zero-width row) -- there's nothing to fill a funnel stage
+        // with, so it shouldn't take up a slot in it.
+        const order = amc.labels
+            .map((_l, i) => i)
+            .filter((i) => amc.counts[i] > 0)
+            .sort((a, b) => amc.counts[b] - amc.counts[a]);
+        const labels = order.map((i) => amc.labels[i]);
+        const counts = order.map((i) => amc.counts[i]);
+        const colors = order.map((i) => rawColors[i]);
+        const domains = order.map((i) => amc.domains[i]);
         this.charts.amcHealth = new Chart(el, {
-            type: "doughnut",
+            type: "bar",
             data: {
-                labels: amc.labels,
+                labels,
                 datasets: [{
-                    data: amc.counts,
-                    backgroundColor: [CHART_COLORS.pass, CHART_COLORS.accent, CHART_COLORS.warn, CHART_COLORS.fail],
-                    borderColor: "#fff",
-                    borderWidth: 2,
-                    hoverOffset: 10,
+                    data: counts.map((count) => [-(count / 2), count / 2]),
+                    backgroundColor: colors,
+                    borderRadius: 4,
+                    borderSkipped: false,
+                    maxBarThickness: 40,
                 }],
             },
             options: {
                 animation: CHART_ANIMATION,
-                plugins: { legend: { position: "bottom", onClick: NO_TOGGLE_LEGEND_CLICK } },
+                indexAxis: "y",
                 maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        onClick: NO_TOGGLE_LEGEND_CLICK,
+                        // The chart has one dataset (multi-coloured per bar), so
+                        // Chart.js's default legend (one entry per dataset) would
+                        // show nothing useful — build the label/colour pairs by
+                        // hand instead, the same way the doughnut charts' legend
+                        // already reads one entry per slice.
+                        labels: {
+                            generateLabels: () => labels.map((label, i) => ({
+                                text: `${label} (${counts[i]})`,
+                                fillStyle: colors[i],
+                                strokeStyle: colors[i],
+                                index: i,
+                            })),
+                        },
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `${ctx.label}: ${counts[ctx.dataIndex]}`,
+                        },
+                    },
+                },
+                scales: {
+                    x: { display: false, grid: { display: false } },
+                    y: { grid: { display: false } },
+                },
                 onClick: (_ev, elements) => {
                     if (!elements.length) return;
                     const i = elements[0].index;
-                    this.openList(amc.domains[i], `${_t("AMC Contracts")} - ${amc.labels[i]}`, "epc.amc.contract");
+                    this.openList(domains[i], `${_t("AMC Contracts")} - ${labels[i]}`, "epc.amc.contract");
                 },
             },
         });
@@ -242,7 +301,7 @@ export class EpcDashboard extends Component {
                 datasets: [{
                     label: _t("Purchase Orders"), data: proc.counts,
                     backgroundColor: [
-                        CHART_COLORS.pending, CHART_COLORS.warn, CHART_COLORS.categorical[3],
+                        CHART_COLORS.pending, CHART_COLORS.sentLight, CHART_COLORS.categorical[3],
                         CHART_COLORS.accent, CHART_COLORS.pass,
                     ],
                     borderRadius: 6, borderSkipped: false, maxBarThickness: 46,

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Adds a "Log Quality Check" header button to a project's incoming
+             receipts, sitting between Validate and Print — a permanent,
+             always-visible way in (once one is actually needed), rather than
+             only surfacing inside the blocking error when Validate is
+             clicked without one logged yet. Opens as a dialog (wizard-style)
+             right on top of the receipt, not a page navigation away from it. -->
+        <record id="stock_picking_view_form_epc" model="ir.ui.view">
+            <field name="name">stock.picking.form.epc</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='do_print_picking']" position="before">
+                    <button name="action_log_quality_check" string="Log Quality Check" type="object"
+                            class="oe_highlight" invisible="not epc_needs_incoming_qc"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

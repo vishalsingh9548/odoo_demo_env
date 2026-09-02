@@ -26,7 +26,13 @@
                 <form string="Commissioning">
                     <header>
                         <button name="action_submit" string="Submit for Approval" type="object"
-                                class="oe_highlight" invisible="approval_state != 'to_submit'"/>
+                                class="oe_highlight"
+                                invisible="approval_state != 'to_submit' or epc_needs_final_qc"/>
+                        <button name="action_consume_site_stock" string="Consume Site Stock" type="object"
+                                invisible="approval_state != 'to_submit' or epc_needs_final_qc or not epc_can_consume_site_stock"/>
+                        <button name="action_log_quality_check" string="Log Quality Check" type="object"
+                                class="oe_highlight"
+                                invisible="approval_state != 'to_submit' or not epc_needs_final_qc"/>
                         <button name="action_approve" string="Approve" type="object"
                                 class="oe_highlight" groups="csl_solar_epc.group_epc_manager"
                                 invisible="approval_state != 'submitted'"/>
@@ -37,6 +43,8 @@
                                 invisible="approval_state not in ('submitted', 'rejected')"/>
                         <button name="%(epc_commissioning_report_action)d" string="Print Certificate" type="action"
                                 invisible="approval_state != 'approved'"/>
+                        <button name="action_create_handover" string="Proceed to Handover" type="object"
+                                class="oe_highlight" invisible="not epc_needs_handover"/>
                         <field name="approval_state" widget="statusbar"
                                statusbar_visible="to_submit,submitted,approved"/>
                     </header>
