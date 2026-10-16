@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ug_recycling_overview_view_kanban" model="ir.ui.view">
+        <field name="name">ug.recycling.overview.kanban</field>
+        <field name="model">ug.recycling.overview</field>
+        <field name="arch" type="xml">
+            <kanban highlight_color="color" class="o_stock_kanban" create="0" records_draggable="0" group_create="false" can_open="0">
+                <field name="card_type"/>
+                <field name="color"/>
+                <templates>
+                    <t t-name="menu">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-12">
+                                    <h5 role="menuitem" class="o_kanban_card_manage_title"><span>View</span></h5>
+                                    <div role="menuitem" t-if="['dismantle', 'shred', 'recover'].includes(record.card_type.raw_value)">
+                                        <a name="action_open" type="object" context="{'ug_view': 'month'}">Done this month</a>
+                                    </div>
+                                    <div role="menuitem" t-if="['dismantle', 'shred', 'recover'].includes(record.card_type.raw_value)">
+                                        <a name="action_open" type="object">All orders</a>
+                                    </div>
+                                    <div role="menuitem" t-if="record.card_type.raw_value == 'lab'">
+                                        <a name="action_open" type="object" context="{'ug_view': 'approved'}">Approved assays</a>
+                                    </div>
+                                    <div role="menuitem" t-if="record.card_type.raw_value == 'epr'">
+                                        <a name="action_open" type="object" context="{'ug_view': 'all'}">All certificates</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div t-if="widget.editable" class="o_kanban_card_manage_settings row">
+                                <div class="col-8" role="menuitem" aria-haspopup="true">
+                                    <field name="color" widget="kanban_color_picker"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-name="card">
+                        <div class="px-2">
+                            <a name="action_open" type="object">
+                                <field class="fw-bold fs-4" name="name"/>
+                            </a>
+                            <field name="description" class="d-block text-muted"/>
+
+                            <!-- Dismantle / Shred / Recover -->
+                            <t t-if="['dismantle', 'shred', 'recover'].includes(record.card_type.raw_value)">
+                                <div class="row mt-3">
+                                    <div class="col-6">
+                                        <button name="action_open" type="object" context="{'ug_view': 'queue'}"
+                                            t-attf-class="btn {{record.queue_count.raw_value ? 'btn-primary' : 'btn-secondary'}}">
+                                            <t t-if="record.queue_count.raw_value">
+                                                <field name="queue_count"/> To Process
+                                            </t>
+                                            <t t-else="">Nothing to Process</t>
+                                        </button>
+                                        <div t-if="record.queue_count.raw_value" class="text-muted small mt-1">
+                                            <field name="queue_kg"/> kg waiting
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <a t-if="record.waiting_lab_count.raw_value" class="row text-warning" name="action_open" type="object" context="{'ug_view': 'waiting_lab'}">
+                                            <span class="col-8">Waiting for Lab</span><field class="col-4 text-end" name="waiting_lab_count"/>
+                                        </a>
+                                        <a t-if="record.mo_draft_count.raw_value" class="row" name="action_open" type="object" context="{'ug_view': 'draft'}">
+                                            <span class="col-8">Draft</span><field class="col-4 text-end" name="mo_draft_count"/>
+                                        </a>
+                                        <a t-if="record.mo_open_count.raw_value" class="row" name="action_open" type="object" context="{'ug_view': 'open'}">
+                                            <span class="col-8">In Progress</span><field class="col-4 text-end" name="mo_open_count"/>
+                                        </a>
+                                        <a t-if="record.mo_late_count.raw_value" class="row text-danger" name="action_open" type="object" context="{'ug_view': 'late'}">
+                                            <span class="col-8">Late</span><field class="col-4 text-end" name="mo_late_count"/>
+                                        </a>
+                                        <a t-if="record.loss_alert_count.raw_value" class="row text-danger" name="action_open" type="object" context="{'ug_view': 'loss'}">
+                                            <span class="col-8">Loss Alerts</span><field class="col-4 text-end" name="loss_alert_count"/>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="border-top mt-3 pt-2 small">
+                                    <a name="action_open" type="object" context="{'ug_view': 'month'}" class="text-reset">
+                                        <span class="text-muted">This month: </span>
+                                        <t t-if="record.card_type.raw_value != 'recover'">
+                                            in <b><field name="month_input_kg"/> kg</b> ·
+                                            out <b><field name="month_output_kg"/> kg</b> ·
+                                            loss <b><field name="month_loss_pct"/> %</b>
+                                        </t>
+                                        <t t-else="">
+                                            black mass <b><field name="month_input_kg"/> kg</b> ·
+                                            recovered <b><field name="month_recovered_kg"/> kg</b> ·
+                                            efficiency <b><field name="month_efficiency_pct"/> %</b>
+                                        </t>
+                                    </a>
+                                </div>
+                            </t>
+
+                            <!-- Lab -->
+                            <t t-if="record.card_type.raw_value == 'lab'">
+                                <div class="row mt-3">
+                                    <div class="col-6">
+                                        <button name="action_open" type="object" context="{'ug_view': 'submitted'}"
+                                            t-attf-class="btn {{record.assay_submitted_count.raw_value ? 'btn-primary' : 'btn-secondary'}}">
+                                            <t t-if="record.assay_submitted_count.raw_value">
+                                                <field name="assay_submitted_count"/> To Approve
+                                            </t>
+                                            <t t-else="">Nothing to Approve</t>
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <a t-if="record.assay_draft_count.raw_value" class="row" name="action_open" type="object" context="{'ug_view': 'draft'}">
+                                            <span class="col-8">To Analyse</span><field class="col-4 text-end" name="assay_draft_count"/>
+                                        </a>
+                                        <a t-if="record.lot_pending_count.raw_value" class="row text-warning" name="action_open" type="object" context="{'ug_view': 'lots'}">
+                                            <span class="col-8">Lots Pending</span><field class="col-4 text-end" name="lot_pending_count"/>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="border-top mt-3 pt-2 small">
+                                    <span class="text-muted">This month: </span>
+                                    <b><field name="assay_month_approved_count"/></b> assays approved
+                                </div>
+                            </t>
+
+                            <!-- EPR -->
+                            <t t-if="record.card_type.raw_value == 'epr'">
+                                <field name="currency_id" invisible="1"/>
+                                <div class="row mt-3">
+                                    <div class="col-6">
+                                        <button name="action_open" type="object" context="{'ug_view': 'available'}"
+                                            t-attf-class="btn {{record.epr_available_kg.raw_value ? 'btn-primary' : 'btn-secondary'}}">
+                                            <t t-if="record.epr_available_kg.raw_value">
+                                                <field name="epr_available_kg"/> kg to Claim
+                                            </t>
+                                            <t t-else="">Nothing to Claim</t>
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <a t-if="record.epr_draft_count.raw_value" class="row" name="action_open" type="object" context="{'ug_view': 'draft'}">
+                                            <span class="col-8">Draft</span><field class="col-4 text-end" name="epr_draft_count"/>
+                                        </a>
+                                        <a t-if="record.epr_listed_count.raw_value" class="row" name="action_open" type="object" context="{'ug_view': 'listed'}">
+                                            <span class="col-8">For Sale</span><field class="col-4 text-end" name="epr_listed_count"/>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="border-top mt-3 pt-2 small">
+                                    <a name="action_open" type="object" context="{'ug_view': 'sold'}" class="text-reset">
+                                        <span class="text-muted">FY <field name="financial_year"/> sold: </span>
+                                        <b><field name="epr_fy_sold_kg"/> kg</b> ·
+                                        <b><field name="epr_fy_sold_amount" widget="monetary"/></b>
+                                    </a>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="ug_recycling_overview_action" model="ir.actions.act_window">
+        <field name="name">Recycling Overview</field>
+        <field name="path">recycling</field>
+        <field name="res_model">ug.recycling.overview</field>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="ug_recycling_overview_view_kanban"/>
+    </record>
+
+    <menuitem id="menu_ug_overview" name="Overview" parent="ug_recycling_base.menu_ug_root"
+        action="ug_recycling_overview_action" sequence="1"/>
+</odoo>

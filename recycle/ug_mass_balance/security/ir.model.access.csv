@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ug_mass_balance_report_user,ug.mass.balance.report user,model_ug_mass_balance_report,ug_recycling_base.group_ug_user,1,0,0,0
+access_ug_element_balance_report_user,ug.element.balance.report user,model_ug_element_balance_report,ug_recycling_base.group_ug_user,1,0,0,0
+access_ug_material_output_report_user,ug.material.output.report user,model_ug_material_output_report,ug_recycling_base.group_ug_user,1,0,0,0
+access_ug_recycling_overview_user,ug.recycling.overview user,model_ug_recycling_overview,ug_recycling_base.group_ug_user,1,0,0,0
+access_ug_recycling_overview_manager,ug.recycling.overview manager,model_ug_recycling_overview,ug_recycling_base.group_ug_manager,1,1,0,0

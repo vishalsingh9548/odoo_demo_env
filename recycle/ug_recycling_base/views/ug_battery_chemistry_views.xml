@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ug_battery_chemistry_view_list" model="ir.ui.view">
+        <field name="name">ug.battery.chemistry.list</field>
+        <field name="model">ug.battery.chemistry</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="ug_battery_chemistry_view_search" model="ir.ui.view">
+        <field name="name">ug.battery.chemistry.search</field>
+        <field name="model">ug.battery.chemistry</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <filter name="inactive" string="Archived" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="ug_battery_chemistry_action" model="ir.actions.act_window">
+        <field name="name">Battery Chemistries</field>
+        <field name="res_model">ug.battery.chemistry</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

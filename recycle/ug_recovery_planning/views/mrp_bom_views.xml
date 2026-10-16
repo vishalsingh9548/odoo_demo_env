@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mrp_bom_form_view_ug_recovery" model="ir.ui.view">
+        <field name="name">mrp.bom.form.ug.recovery</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Recovery Rates" name="ug_recovery" invisible="ug_stage != 'recover'">
+                    <field name="ug_recovery_line_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="element_id"/>
+                            <field name="output_product_id"/>
+                            <field name="recovery_pct"/>
+                        </list>
+                    </field>
+                    <div class="text-muted">
+                        Expected output = Σ(input lot kg × assay %) × recovery % ÷ metal content % of the output product.
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,28 @@
+{
+    'name': 'Unicel Greens - Lot Assay',
+    'version': '18.0.1.0.0',
+    'summary': 'Lab assays per lot, composition, metal value estimate and Certificate of Analysis',
+    'category': 'Manufacturing/Manufacturing',
+    'author': 'Unicel Greens',
+    'license': 'LGPL-3',
+    'depends': ['ug_recycling_base', 'sale_stock'],
+    'data': [
+        'security/ir.model.access.csv',
+        'security/ug_rules.xml',
+        'data/ug_assay_data.xml',
+        'views/ug_assay_master_views.xml',
+        'views/ug_lot_assay_views.xml',
+        'views/ug_metal_price_views.xml',
+        'views/product_views.xml',
+        'views/stock_lot_views.xml',
+        'views/mrp_production_views.xml',
+        'views/stock_picking_views.xml',
+        'views/res_config_settings_views.xml',
+        'report/ug_coa_report.xml',
+        'views/ug_menus.xml',
+    ],
+    'demo': [
+        'demo/ug_assay_demo.xml',
+    ],
+    'installable': True,
+}

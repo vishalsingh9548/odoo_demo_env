@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ug_recycling_base.product_niso4" model="product.product">
+        <field name="ug_metal_element_id" ref="ug_lot_assay.element_ni"/>
+        <field name="ug_metal_content_pct">22.3</field>
+    </record>
+    <record id="ug_recycling_base.product_coso4" model="product.product">
+        <field name="ug_metal_element_id" ref="ug_lot_assay.element_co"/>
+        <field name="ug_metal_content_pct">21.0</field>
+    </record>
+    <record id="ug_recycling_base.product_li2co3" model="product.product">
+        <field name="ug_metal_element_id" ref="ug_lot_assay.element_li"/>
+        <field name="ug_metal_content_pct">18.8</field>
+    </record>
+    <record id="ug_recycling_base.product_mnso4" model="product.product">
+        <field name="ug_metal_element_id" ref="ug_lot_assay.element_mn"/>
+        <field name="ug_metal_content_pct">32.5</field>
+    </record>
+    <record id="ug_recycling_base.product_graphite" model="product.product">
+        <field name="ug_metal_element_id" ref="ug_lot_assay.element_c"/>
+        <field name="ug_metal_content_pct">95.0</field>
+    </record>
+    <!-- Recovery rates on the NMC recover BoM -->
+    <record id="recovery_nmc_ni" model="ug.bom.recovery.line">
+        <field name="bom_id" ref="ug_recycling_base.bom_recover_nmc"/>
+        <field name="sequence">10</field>
+        <field name="element_id" ref="ug_lot_assay.element_ni"/>
+        <field name="output_product_id" ref="ug_recycling_base.product_niso4"/>
+        <field name="recovery_pct">95</field>
+    </record>
+    <record id="recovery_nmc_co" model="ug.bom.recovery.line">
+        <field name="bom_id" ref="ug_recycling_base.bom_recover_nmc"/>
+        <field name="sequence">20</field>
+        <field name="element_id" ref="ug_lot_assay.element_co"/>
+        <field name="output_product_id" ref="ug_recycling_base.product_coso4"/>
+        <field name="recovery_pct">95</field>
+    </record>
+    <record id="recovery_nmc_mn" model="ug.bom.recovery.line">
+        <field name="bom_id" ref="ug_recycling_base.bom_recover_nmc"/>
+        <field name="sequence">30</field>
+        <field name="element_id" ref="ug_lot_assay.element_mn"/>
+        <field name="output_product_id" ref="ug_recycling_base.product_mnso4"/>
+        <field name="recovery_pct">95</field>
+    </record>
+    <record id="recovery_nmc_li" model="ug.bom.recovery.line">
+        <field name="bom_id" ref="ug_recycling_base.bom_recover_nmc"/>
+        <field name="sequence">40</field>
+        <field name="element_id" ref="ug_lot_assay.element_li"/>
+        <field name="output_product_id" ref="ug_recycling_base.product_li2co3"/>
+        <field name="recovery_pct">88</field>
+    </record>
+    <record id="recovery_nmc_c" model="ug.bom.recovery.line">
+        <field name="bom_id" ref="ug_recycling_base.bom_recover_nmc"/>
+        <field name="sequence">50</field>
+        <field name="element_id" ref="ug_lot_assay.element_c"/>
+        <field name="output_product_id" ref="ug_recycling_base.product_graphite"/>
+        <field name="recovery_pct">90</field>
+    </record>
+    <record id="ug_recycling_base.product_fepo4" model="product.product">
+        <field name="ug_metal_element_id" ref="ug_lot_assay.element_fe"/>
+        <field name="ug_metal_content_pct">37.0</field>
+    </record>
+    <!-- Recovery rates on the LFP recover BoM -->
+    <record id="recovery_lfp_li" model="ug.bom.recovery.line">
+        <field name="bom_id" ref="ug_recycling_base.bom_recover_lfp"/>
+        <field name="sequence">10</field>
+        <field name="element_id" ref="ug_lot_assay.element_li"/>
+        <field name="output_product_id" ref="ug_recycling_base.product_li2co3"/>
+        <field name="recovery_pct">88</field>
+    </record>
+    <record id="recovery_lfp_fe" model="ug.bom.recovery.line">
+        <field name="bom_id" ref="ug_recycling_base.bom_recover_lfp"/>
+        <field name="sequence">20</field>
+        <field name="element_id" ref="ug_lot_assay.element_fe"/>
+        <field name="output_product_id" ref="ug_recycling_base.product_fepo4"/>
+        <field name="recovery_pct">90</field>
+    </record>
+    <record id="recovery_lfp_c" model="ug.bom.recovery.line">
+        <field name="bom_id" ref="ug_recycling_base.bom_recover_lfp"/>
+        <field name="sequence">30</field>
+        <field name="element_id" ref="ug_lot_assay.element_c"/>
+        <field name="output_product_id" ref="ug_recycling_base.product_graphite"/>
+        <field name="recovery_pct">90</field>
+    </record>
+    <!-- Output purity gate: recovered material lots need an approved purity assay before delivery -->
+    <record id="template_niso4_purity" model="ug.assay.template">
+        <field name="name">Nickel sulphate purity</field>
+        <field name="element_ids" eval="[(6, 0, [ref('ug_lot_assay.element_ni'), ref('ug_lot_assay.element_co'), ref('ug_lot_assay.element_fe'), ref('ug_lot_assay.element_cu'), ref('ug_lot_assay.element_na')])]"/>
+    </record>
+    <record id="ug_recycling_base.product_niso4" model="product.product">
+        <field name="ug_requires_assay" eval="True"/>
+        <field name="ug_assay_template_id" ref="template_niso4_purity"/>
+    </record>
+    <record id="template_coso4_purity" model="ug.assay.template">
+        <field name="name">Cobalt sulphate purity</field>
+        <field name="element_ids" eval="[(6, 0, [ref('ug_lot_assay.element_co'), ref('ug_lot_assay.element_ni'), ref('ug_lot_assay.element_fe'), ref('ug_lot_assay.element_cu'), ref('ug_lot_assay.element_na')])]"/>
+    </record>
+    <record id="ug_recycling_base.product_coso4" model="product.product">
+        <field name="ug_requires_assay" eval="True"/>
+        <field name="ug_assay_template_id" ref="template_coso4_purity"/>
+    </record>
+    <record id="template_li2co3_purity" model="ug.assay.template">
+        <field name="name">Lithium carbonate purity</field>
+        <field name="element_ids" eval="[(6, 0, [ref('ug_lot_assay.element_li'), ref('ug_lot_assay.element_na'), ref('ug_lot_assay.element_fe'), ref('ug_lot_assay.element_al'), ref('ug_lot_assay.element_cu')])]"/>
+    </record>
+    <record id="ug_recycling_base.product_li2co3" model="product.product">
+        <field name="ug_requires_assay" eval="True"/>
+        <field name="ug_assay_template_id" ref="template_li2co3_purity"/>
+    </record>
+
+    <function model="ug.demo" name="_ug_demo_recovery_flow"/>
+</odoo>

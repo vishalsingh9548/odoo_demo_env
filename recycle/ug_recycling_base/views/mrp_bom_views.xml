@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mrp_bom_form_view_ug" model="ir.ui.view">
+        <field name="name">mrp.bom.form.ug.recycling</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+        <field name="arch" type="xml">
+            <field name="type" position="after">
+                <field name="ug_is_recycling" groups="ug_recycling_base.group_ug_user"/>
+                <field name="ug_stage" invisible="not ug_is_recycling" required="ug_is_recycling"/>
+                <field name="battery_chemistry_id" invisible="not ug_is_recycling"/>
+                <label for="ug_max_loss_pct" invisible="not ug_is_recycling"/>
+                <div class="o_row" invisible="not ug_is_recycling">
+                    <field name="ug_max_loss_pct" class="oe_inline"/>
+                    <span>%</span>
+                </div>
+                <label for="ug_yield_tolerance_pct" invisible="not ug_is_recycling or ug_stage == 'recover'"/>
+                <div class="o_row" invisible="not ug_is_recycling or ug_stage == 'recover'">
+                    <field name="ug_yield_tolerance_pct" class="oe_inline"/> %
+                    <span class="text-muted" invisible="not ug_yield_max_pct">
+                        → standard <field name="ug_standard_yield_pct" class="oe_inline" nolabel="1"/> %,
+                        accepted <field name="ug_yield_min_pct" class="oe_inline" nolabel="1"/> –
+                        <field name="ug_yield_max_pct" class="oe_inline" nolabel="1"/> %
+                    </span>
+                </div>
+            </field>
+            <xpath expr="//field[@name='bom_line_ids']/list/field[@name='product_qty']" position="before">
+                <field name="ug_is_primary_input" column_invisible="not parent.ug_is_recycling" widget="boolean_toggle"/>
+            </xpath>
+            <xpath expr="//field[@name='byproduct_ids']/list/field[@name='cost_share']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="mrp_bom_tree_view_ug" model="ir.ui.view">
+        <field name="name">mrp.bom.list.ug.recycling</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="type" position="after">
+                <field name="ug_stage" optional="show"/>
+                <field name="battery_chemistry_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_mrp_bom_filter_ug" model="ir.ui.view">
+        <field name="name">mrp.bom.search.ug.recycling</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.view_mrp_bom_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter name="ug_recycling" string="Recycling" domain="[('ug_is_recycling', '=', True)]"/>
+                <filter name="groupby_ug_stage" string="Recycling Stage" context="{'group_by': 'ug_stage'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="ug_mrp_bom_action" model="ir.actions.act_window">
+        <field name="name">Recycling BoMs</field>
+        <field name="res_model">mrp.bom</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('ug_is_recycling', '=', True)]</field>
+        <field name="context">{'default_ug_is_recycling': True}</field>
+    </record>
+</odoo>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_ug_epr_certificate" name="EPR Certificates" parent="ug_recycling_base.menu_ug_operations"
+        action="ug_epr_certificate_action" sequence="30"/>
+    <menuitem id="menu_ug_waste_manifest" name="Waste Manifests" parent="ug_recycling_base.menu_ug_operations"
+        action="ug_waste_manifest_action" sequence="40"/>
+    <menuitem id="menu_ug_epr_register" name="EPR Register" parent="ug_recycling_base.menu_ug_reporting"
+        action="ug_epr_register_action" sequence="50"/>
+    <menuitem id="menu_ug_epr_production" name="EPR Eligible vs Claimed" parent="ug_recycling_base.menu_ug_reporting"
+        action="ug_epr_production_action" sequence="60"/>
+    <menuitem id="menu_ug_epr_category" name="EPR Categories" parent="ug_recycling_base.menu_ug_configuration"
+        action="ug_epr_category_action" sequence="50"/>
+</odoo>

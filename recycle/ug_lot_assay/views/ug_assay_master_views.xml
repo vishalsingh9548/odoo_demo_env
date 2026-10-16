@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ug_assay_element_view_list" model="ir.ui.view">
+        <field name="name">ug.assay.element.list</field>
+        <field name="model">ug.assay.element</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+        </field>
+    </record>
+    <record id="ug_assay_element_action" model="ir.actions.act_window">
+        <field name="name">Assay Elements</field>
+        <field name="res_model">ug.assay.element</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="ug_assay_template_view_list" model="ir.ui.view">
+        <field name="name">ug.assay.template.list</field>
+        <field name="model">ug.assay.template</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="battery_chemistry_id"/>
+                <field name="element_ids" widget="many2many_tags"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+            </list>
+        </field>
+    </record>
+    <record id="ug_assay_template_view_form" model="ir.ui.view">
+        <field name="name">ug.assay.template.form</field>
+        <field name="model">ug.assay.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="battery_chemistry_id"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="element_ids">
+                        <list>
+                            <field name="sequence" widget="handle"/>
+                            <field name="code"/>
+                            <field name="name"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="ug_assay_template_action" model="ir.actions.act_window">
+        <field name="name">Assay Templates</field>
+        <field name="res_model">ug.assay.template</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

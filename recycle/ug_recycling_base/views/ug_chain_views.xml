@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mrp_production_view_list_ug_chain" model="ir.ui.view">
+        <field name="name">mrp.production.list.ug.chain</field>
+        <field name="model">mrp.production</field>
+        <field name="priority">60</field>
+        <field name="arch" type="xml">
+            <list create="0" decoration-muted="state == 'cancel'" decoration-info="state == 'draft'">
+                <field name="ug_stage"/>
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="lot_producing_id" string="Output Lot"/>
+                <field name="battery_chemistry_id" optional="show"/>
+                <field name="ug_input_weight_kg" string="Input (kg)"/>
+                <field name="ug_output_weight_kg" string="Output (kg)"/>
+                <field name="ug_loss_pct" string="Loss %" optional="show"/>
+                <field name="date_finished" optional="show"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'" decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="mrp_production_form_view_ug_chain" model="ir.ui.view">
+        <field name="name">mrp.production.form.ug.chain</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="ug_recycling_base.mrp_production_form_view_ug"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_ug_view_chain" type="object" class="oe_stat_button" icon="fa-sitemap"
+                    invisible="not ug_is_recycling or ug_chain_count &lt; 2">
+                    <field name="ug_chain_count" widget="statinfo" string="Chain"/>
+                </button>
+            </div>
+            <page name="ug_mass_balance" position="before">
+                <page string="Recycling Chain" name="ug_chain" invisible="not ug_is_recycling">
+                    <div class="text-muted mb-2">
+                        Orders linked to this one through lots: Dismantle → Shred → Recover.
+                    </div>
+                    <field name="ug_chain_production_ids" readonly="1"
+                        context="{'list_view_ref': 'ug_recycling_base.mrp_production_view_list_ug_chain'}"/>
+                </page>
+            </page>
+        </field>
+    </record>
+
+    <record id="view_production_lot_form_ug_chain" model="ir.ui.view">
+        <field name="name">stock.lot.form.ug.chain</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_ug_view_chain" type="object" class="oe_stat_button" icon="fa-sitemap"
+                    invisible="not ug_chain_count">
+                    <field name="ug_chain_count" widget="statinfo" string="Recycling Chain"/>
+                </button>
+            </div>
+        </field>
+    </record>
+</odoo>

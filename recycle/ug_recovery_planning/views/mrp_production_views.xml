@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mrp_production_form_view_ug_recovery" model="ir.ui.view">
+        <field name="name">mrp.production.form.ug.recovery</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="ug_next_ready" invisible="1"/>
+                <field name="ug_next_waiting_lab" invisible="1"/>
+                <button name="action_ug_create_next_mo" type="object" string="Create Next Stage MO" class="oe_highlight"
+                    invisible="state != 'done' or not ug_next_ready"/>
+                <button name="action_ug_compute_expected" type="object" string="Compute expected outputs from assay"
+                    invisible="state != 'draft' or ug_stage != 'recover' or not ug_input_lot_line_ids"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Input Lots" name="ug_recovery" invisible="not ug_is_recycling">
+                    <div class="text-muted" invisible="ug_stage == 'recover'">
+                        Lots to consume; they are reserved when the order is confirmed and the input weight follows them.
+                    </div>
+                    <group string="Input Lots">
+                        <field name="ug_input_lot_line_ids" nolabel="1" colspan="2" readonly="state != 'draft'">
+                            <list editable="bottom">
+                                <field name="product_id" column_invisible="True"/>
+                                <field name="lot_id" context="{'default_product_id': product_id}" options="{'no_create': True}"/>
+                                <field name="source_production_id"/>
+                                <field name="assay_id"/>
+                                <field name="available_kg"/>
+                                <field name="qty_kg" sum="Total"/>
+                            </list>
+                        </field>
+                    </group>
+                    <group string="Expected vs Actual" invisible="ug_stage != 'recover'">
+                        <field name="ug_recovery_line_ids" nolabel="1" colspan="2" readonly="1">
+                            <list>
+                                <field name="element_id"/>
+                                <field name="output_product_id"/>
+                                <field name="contained_kg" sum="Total"/>
+                                <field name="recovery_pct"/>
+                                <field name="metal_content_pct" optional="hide"/>
+                                <field name="expected_metal_kg" optional="hide"/>
+                                <field name="expected_qty_kg" sum="Total"/>
+                                <field name="actual_qty_kg" sum="Total"/>
+                                <field name="actual_metal_kg" optional="show"/>
+                                <field name="efficiency_pct" decoration-danger="actual_qty_kg and efficiency_pct &lt; recovery_pct"/>
+                            </list>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+            <page name="ug_chain" position="inside">
+                <group string="Next Stage" invisible="state != 'done' or not ug_next_queue_ids">
+                    <div colspan="2" class="alert alert-warning mb-2" role="alert" invisible="not ug_next_waiting_lab">
+                        Waiting for the lab: approve the assay of the output lot (Assays button) to plan the next stage.
+                    </div>
+                    <field name="ug_next_queue_ids" nolabel="1" colspan="2" readonly="1">
+                        <list decoration-muted="not ready">
+                            <field name="ready" column_invisible="True"/>
+                            <field name="stage"/>
+                            <field name="lot_id"/>
+                            <field name="product_id"/>
+                            <field name="assay_state" widget="badge" invisible="assay_state == 'not_required'"
+                                decoration-success="assay_state == 'approved'" decoration-warning="assay_state == 'pending'"/>
+                            <field name="available_kg" sum="Total"/>
+                        </list>
+                    </field>
+                    <div colspan="2">
+                        <button name="action_ug_create_next_mo" type="object" string="Create Next Stage MO"
+                            class="btn-primary" invisible="not ug_next_ready"/>
+                    </div>
+                </group>
+            </page>
+        </field>
+    </record>
+</odoo>

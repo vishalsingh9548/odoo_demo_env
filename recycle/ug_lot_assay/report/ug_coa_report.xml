@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_ug_coa" model="ir.actions.report">
+        <field name="name">Certificate of Analysis</field>
+        <field name="model">stock.lot</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ug_lot_assay.report_ug_coa</field>
+        <field name="print_report_name">'CoA - %s' % object.name</field>
+        <field name="binding_model_id" ref="stock.model_stock_lot"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_ug_coa_document">
+        <t t-call="web.external_layout">
+            <t t-set="assay" t-value="lot.ug_current_assay_id"/>
+            <div class="page">
+                <h2>Certificate of Analysis</h2>
+                <div class="row mt-4 mb-4">
+                    <div class="col-6">
+                        <table class="table table-sm table-borderless">
+                            <tr><td><strong>Lot</strong></td><td><span t-field="lot.name"/></td></tr>
+                            <tr><td><strong>Product</strong></td><td><span t-field="lot.product_id"/></td></tr>
+                            <tr t-if="lot.battery_chemistry_id"><td><strong>Chemistry</strong></td><td><span t-field="lot.battery_chemistry_id"/></td></tr>
+                            <tr><td><strong>Assay reference</strong></td><td><span t-field="assay.name"/></td></tr>
+                        </table>
+                    </div>
+                    <div class="col-6">
+                        <table class="table table-sm table-borderless">
+                            <tr><td><strong>Sample date</strong></td><td><span t-field="assay.sample_date"/></td></tr>
+                            <tr t-if="assay.sample_ref"><td><strong>Sample ref.</strong></td><td><span t-field="assay.sample_ref"/></td></tr>
+                            <tr>
+                                <td><strong>Laboratory</strong></td>
+                                <td>
+                                    <t t-if="assay.lab_type == 'external'"><span t-field="assay.lab_partner_id"/></t>
+                                    <t t-else="">In-house (<span t-field="lot.company_id"/>)</t>
+                                </td>
+                            </tr>
+                            <tr><td><strong>Basis weight</strong></td><td><span t-field="assay.basis_weight_kg"/> kg</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <table class="table table-sm o_main_table">
+                    <thead>
+                        <tr>
+                            <th>Element</th>
+                            <th class="text-end">%</th>
+                            <th class="text-end">Contained (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="assay.line_ids" t-as="line">
+                            <td><span t-field="line.element_id"/></td>
+                            <td class="text-end"><span t-field="line.percentage"/></td>
+                            <td class="text-end"><span t-field="line.contained_kg_basis"/></td>
+                        </tr>
+                        <tr>
+                            <td><em>Others</em></td>
+                            <td class="text-end"><span t-field="assay.others_pct"/></td>
+                            <td/>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="mt-5">
+                    <p>
+                        Approved by <strong t-field="assay.approved_by"/>
+                        on <span t-field="assay.approved_date" t-options="{'widget': 'date'}"/>.
+                    </p>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_ug_coa">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="lot">
+                <t t-call="ug_lot_assay.report_ug_coa_document" t-lang="lot.company_id.partner_id.lang or user.lang"/>
+            </t>
+        </t>
+    </template>
+</odoo>

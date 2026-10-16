@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recycling Process Flow</title>
+<style>
+:root {
+  --bg: #f6f7f9; --surface: #ffffff; --surface-2: #f0f2f5; --text: #1d2330; --muted: #5d6677; --line: #d9dee6;
+  --std: #4f6bed; --std-bg: #eaeefe;
+  --custom: #0f9d76; --custom-bg: #e2f5ef;
+  --auto: #8a57d8; --auto-bg: #f1eafc;
+  --gate: #d9822b; --gate-bg: #fcf0e2;
+  --doc: #5d6677; --doc-bg: #eceff3;
+  --money: #c2410c; --money-bg: #fdebe1;
+  --danger: #c93b3b; --ok: #1b8a4a;
+  --shadow: 0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --surface: #1a1f27; --surface-2: #222833; --text: #e6e9ef; --muted: #9aa3b2; --line: #2e3542;
+    --std: #8ea2ff; --std-bg: #1f2747; --custom: #3fd0a5; --custom-bg: #133229; --auto: #b996f2; --auto-bg: #2a2140;
+    --gate: #f0a75a; --gate-bg: #3a2a17; --doc: #aab3c2; --doc-bg: #262c37; --money: #ff9a66; --money-bg: #3a2219;
+    --danger: #ff7b7b; --ok: #4fd58a; --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --surface: #1a1f27; --surface-2: #222833; --text: #e6e9ef; --muted: #9aa3b2; --line: #2e3542;
+  --std: #8ea2ff; --std-bg: #1f2747; --custom: #3fd0a5; --custom-bg: #133229; --auto: #b996f2; --auto-bg: #2a2140;
+  --gate: #f0a75a; --gate-bg: #3a2a17; --doc: #aab3c2; --doc-bg: #262c37; --money: #ff9a66; --money-bg: #3a2219;
+  --danger: #ff7b7b; --ok: #4fd58a; --shadow: none;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+a { color: var(--std); }
+header.hero { background: linear-gradient(135deg, #0f9d76, #0b6e8a); color: #fff; padding: 40px 16px 32px; }
+header.hero .wrap { max-width: 1180px; margin: 0 auto; }
+header.hero h1 { margin: 0 0 6px; font-size: 30px; letter-spacing: -.01em; }
+header.hero p { margin: 0; opacity: .92; max-width: 780px; }
+header.hero .tags { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+header.hero .tags span { background: rgba(255,255,255,.16); border-radius: 999px; padding: 3px 12px; font-size: 13px; }
+nav.toc { position: sticky; top: 0; z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+nav.toc .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; display: flex; gap: 4px; overflow-x: auto; }
+nav.toc a { color: var(--muted); text-decoration: none; padding: 11px 10px; white-space: nowrap; font-size: 13.5px; border-bottom: 2px solid transparent; }
+nav.toc a:hover { color: var(--text); border-bottom-color: var(--custom); }
+main { max-width: 1180px; margin: 0 auto; padding: 8px 16px 60px; }
+section { margin-top: 36px; }
+h2 { font-size: 22px; margin: 0 0 4px; }
+h2 .num { display: inline-block; min-width: 30px; height: 30px; line-height: 30px; text-align: center; border-radius: 8px; background: var(--custom); color: #fff; font-size: 15px; margin-right: 8px; }
+.lead { color: var(--muted); margin: 0 0 16px; max-width: 860px; }
+h3 { font-size: 16px; margin: 18px 0 8px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; box-shadow: var(--shadow); }
+.grid { display: grid; gap: 14px; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.g5 { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+
+/* legend */
+.legend { display: flex; flex-wrap: wrap; gap: 10px 18px; }
+.legend .item { display: flex; align-items: center; gap: 8px; font-size: 13.5px; }
+.sw { width: 26px; height: 18px; border-radius: 5px; border: 2px solid; flex: none; }
+.sw.std { background: var(--std-bg); border-color: var(--std); }
+.sw.custom { background: var(--custom-bg); border-color: var(--custom); }
+.sw.auto { background: var(--auto-bg); border-color: var(--auto); border-style: dashed; }
+.sw.gate { background: var(--gate-bg); border-color: var(--gate); transform: rotate(45deg) scale(.8); width: 18px; }
+.sw.doc { background: var(--doc-bg); border-color: var(--doc); border-radius: 2px 10px 2px 2px; }
+.sw.money { background: var(--money-bg); border-color: var(--money); border-radius: 999px; }
+.arrowkey { font-weight: 700; color: var(--muted); }
+
+/* flow nodes */
+.node { border: 2px solid; border-radius: 10px; padding: 9px 11px; font-size: 13.5px; line-height: 1.35; background: var(--surface); position: relative; }
+.node b { display: block; font-size: 14px; }
+.node small { color: var(--muted); display: block; margin-top: 2px; }
+.node small b, .node small i { display: inline; font-size: inherit; }
+.node.std { background: var(--std-bg); border-color: var(--std); }
+.node.custom { background: var(--custom-bg); border-color: var(--custom); }
+.node.auto { background: var(--auto-bg); border-color: var(--auto); border-style: dashed; }
+.node.gate { background: var(--gate-bg); border-color: var(--gate); }
+.node.gate::before { content: "◆ "; color: var(--gate); font-weight: 700; }
+.node.doc { background: var(--doc-bg); border-color: var(--doc); border-radius: 3px 14px 3px 3px; }
+.node.money { background: var(--money-bg); border-color: var(--money); border-radius: 18px; }
+.flow { display: flex; align-items: stretch; flex-wrap: wrap; gap: 0; }
+.flow .node { flex: 1 1 150px; min-width: 140px; }
+.flow .arr { flex: 0 0 26px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 20px; font-weight: 700; }
+.vflow { display: flex; flex-direction: column; gap: 0; }
+.vflow .arr { text-align: center; color: var(--muted); font-size: 18px; line-height: 22px; }
+
+
+/* compact step chips (work-order sequences) */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
+.chip { border: 2px solid var(--std); background: var(--std-bg); border-radius: 10px; padding: 6px 10px; font-size: 13px; line-height: 1.3; }
+.chip.gate { border-color: var(--gate); background: var(--gate-bg); }
+.chip b { display: block; font-size: 13.5px; }
+.chip b::before { content: attr(data-n); display: inline-block; background: var(--text); color: var(--surface); border-radius: 999px; font-size: 10.5px; padding: 0 6px; margin-right: 5px; vertical-align: 1px; }
+.chip small { color: var(--muted); }
+.chips-note { color: var(--muted); font-size: 12.5px; margin-top: 6px; }
+
+/* swimlanes */
+.lanes { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.lane { display: grid; grid-template-columns: 150px 1fr; border-top: 1px solid var(--line); }
+.lane:first-child { border-top: 0; }
+.lane .who { background: var(--surface-2); padding: 12px; font-weight: 700; font-size: 13.5px; display: flex; flex-direction: column; justify-content: center; }
+.lane .who small { font-weight: 400; color: var(--muted); }
+.lane .what { padding: 12px; }
+.stepno { display: inline-block; background: var(--text); color: var(--surface); border-radius: 999px; font-size: 11px; font-weight: 700; padding: 0 7px; margin-right: 4px; vertical-align: 1px; }
+
+/* tables */
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { background: var(--surface-2); font-weight: 600; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.pill { display: inline-block; border-radius: 999px; padding: 1px 9px; font-size: 12px; font-weight: 600; }
+.pill.ok { background: color-mix(in srgb, var(--ok) 15%, transparent); color: var(--ok); }
+.pill.warn { background: var(--gate-bg); color: var(--gate); }
+.pill.bad { background: color-mix(in srgb, var(--danger) 15%, transparent); color: var(--danger); }
+.pill.std { background: var(--std-bg); color: var(--std); }
+.pill.custom { background: var(--custom-bg); color: var(--custom); }
+.menu { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; background: var(--surface-2); padding: 1px 6px; border-radius: 5px; white-space: nowrap; }
+.formula { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--surface-2); border-left: 4px solid var(--custom); padding: 10px 12px; border-radius: 6px; font-size: 13.5px; overflow-x: auto; }
+.note { border-left: 4px solid var(--gate); background: var(--gate-bg); padding: 10px 12px; border-radius: 6px; font-size: 13.5px; }
+.kpi { text-align: center; padding: 14px 10px; }
+.kpi .v { font-size: 24px; font-weight: 700; }
+.kpi .l { color: var(--muted); font-size: 12.5px; }
+ul.tight { margin: 6px 0; padding-left: 18px; }
+ul.tight li { margin: 3px 0; }
+.dash .dcard { border: 1px solid var(--line); border-radius: 10px; padding: 12px; background: var(--surface); border-top: 4px solid var(--custom); }
+.dash .btn { display: inline-block; background: var(--std); color: #fff; border-radius: 6px; padding: 4px 10px; font-size: 13px; font-weight: 600; margin: 6px 0; }
+.dash .row { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
+.dash .foot { border-top: 1px solid var(--line); margin-top: 8px; padding-top: 6px; font-size: 12.5px; }
+.statebar { display: flex; flex-wrap: wrap; gap: 0; align-items: center; }
+.statebar span { background: var(--surface-2); border: 1px solid var(--line); padding: 5px 10px; font-size: 13px; }
+.statebar span:first-child { border-radius: 999px 0 0 999px; }
+.statebar span:last-child { border-radius: 0 999px 999px 0; }
+.statebar span.on { background: var(--custom); color: #fff; border-color: var(--custom); }
+.statebar i { color: var(--muted); font-style: normal; padding: 0 4px; }
+footer { color: var(--muted); font-size: 12.5px; text-align: center; padding: 30px 16px; }
+.themebtn { position: fixed; right: 14px; bottom: 14px; background: var(--surface); border: 1px solid var(--line); color: var(--text); border-radius: 999px; padding: 6px 12px; font-size: 13px; cursor: pointer; box-shadow: var(--shadow); }
+@media (max-width: 640px) {
+  .lane { grid-template-columns: 1fr; }
+  .flow { flex-direction: column; }
+  .flow .node { flex: 0 0 auto; min-width: 0; }
+  .flow .arr { transform: rotate(90deg); height: 22px; flex-basis: 22px; }
+  header.hero h1 { font-size: 24px; }
+}
+@media print {
+  nav.toc, .themebtn { display: none; }
+  body { background: #fff; }
+  section { break-inside: avoid-page; }
+  .card, .lanes, .tablewrap { box-shadow: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>Unicel Greens – Battery Recycling on Odoo 20</h1>
+    <p>The complete flow from buying scrap batteries to selling recovered metals and EPR certificates: every step, the control at each stage, the automation, and the reports.</p>
+    <div class="tags">
+      <span>LFP &amp; NMC chemistries</span><span>Everything in kg, lot-tracked</span><span>Indian company · INR · GST chart</span><span>Assay-driven recovery</span><span>EPR (BWM Rules 2022)</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#legend">Legend</a><a href="#big">End-to-end flow</a><a href="#purchase">Purchase</a><a href="#inventory">Inventory</a>
+  <a href="#dismantle">Dismantle</a><a href="#shred">Shred</a><a href="#lab">Lab assay</a><a href="#recover">Recover</a>
+  <a href="#weights">Actual weights</a><a href="#sales">Sales &amp; CoA</a><a href="#epr">EPR</a><a href="#links">Navigation</a>
+  <a href="#overview">Overview</a><a href="#reports">Reports</a><a href="#roles">Roles</a><a href="#demo">Demo script</a>
+</div></nav>
+
+<main>
+
+<!-- LEGEND -->
+<section id="legend">
+  <h2><span class="num">i</span>How to read the flows</h2>
+  <p class="lead">Every flow on this page uses the same shapes and colours.</p>
+  <div class="card">
+    <div class="legend">
+      <div class="item"><span class="sw std"></span><span><b>Standard Odoo</b> – purchase, receipts, MOs, invoices</span></div>
+      <div class="item"><span class="sw custom"></span><span><b>Recycling feature</b> – built for Unicel Greens</span></div>
+      <div class="item"><span class="sw auto"></span><span><b>Automatic</b> – Odoo does it without a click</span></div>
+      <div class="item"><span class="sw gate"></span><span><b>Control / gate</b> – flow stops until the check passes</span></div>
+      <div class="item"><span class="sw doc"></span><span><b>Document / report</b></span></div>
+      <div class="item"><span class="sw money"></span><span><b>Revenue</b></span></div>
+      <div class="item"><span class="arrowkey">→</span><span>material or document moves to the next step</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- BIG PICTURE -->
+<section id="big">
+  <h2><span class="num">0</span>End-to-end flow</h2>
+  <p class="lead">Who does what, from the vendor's truck to the customer's invoice. Material always moves as <b>lots in kg</b>, so every kilogram can be traced backwards and forwards.</p>
+  <div class="lanes">
+    <div class="lane"><div class="who">Purchase<small>buyer</small></div><div class="what">
+      <div class="flow">
+        <div class="node std"><span class="stepno">1</span><b>Purchase Order</b><small>Scrap battery packs, LFP / NMC, price per kg</small></div>
+        <div class="arr">→</div>
+        <div class="node std"><span class="stepno">2</span><b>Vendor Bill</b><small>3-way match with receipt</small></div>
+      </div></div></div>
+    <div class="lane"><div class="who">Stores<small>inventory</small></div><div class="what">
+      <div class="flow">
+        <div class="node std"><span class="stepno">3</span><b>Receipt</b><small>Weigh in, one lot per consignment (kg)</small></div>
+        <div class="arr">→</div>
+        <div class="node custom"><span class="stepno">4</span><b>To Process queue</b><small>Packs waiting for Dismantle</small></div>
+      </div></div></div>
+    <div class="lane"><div class="who">Production<small>plant floor</small></div><div class="what">
+      <div class="flow">
+        <div class="node custom"><span class="stepno">5</span><b>Dismantle MO</b><small>Packs → cells + casing, plastic, cables, BMS</small></div>
+        <div class="arr">→</div>
+        <div class="node custom"><span class="stepno">6</span><b>Shred MO</b><small>Cells → black mass + Cu / Al foil</small></div>
+        <div class="arr">→</div>
+        <div class="node custom"><span class="stepno">8</span><b>Recover MO</b><small>Black mass + chemicals → metal salts</small></div>
+      </div></div></div>
+    <div class="lane"><div class="who">Lab<small>quality</small></div><div class="what">
+      <div class="flow">
+        <div class="node auto"><b>Draft assay created</b><small>For every black-mass lot</small></div>
+        <div class="arr">→</div>
+        <div class="node gate"><span class="stepno">7</span><b>Black-mass assay approved</b><small>% Li, Ni, Co, Mn, Fe, C…</small></div>
+        <div class="arr">→</div>
+        <div class="node gate"><span class="stepno">9</span><b>Purity assay approved</b><small>Salt lots before sale</small></div>
+      </div></div></div>
+    <div class="lane"><div class="who">Sales &amp; Accounts</div><div class="what">
+      <div class="flow">
+        <div class="node std"><span class="stepno">10</span><b>Sale Order → Delivery</b><small>Salts &amp; scrap by-products</small></div>
+        <div class="arr">→</div>
+        <div class="node doc"><b>Certificate of Analysis</b><small>Printed from the lot / delivery</small></div>
+        <div class="arr">→</div>
+        <div class="node money"><span class="stepno">11</span><b>Customer Invoice</b><small>GST, INR</small></div>
+      </div></div></div>
+    <div class="lane"><div class="who">Compliance<small>EPR officer</small></div><div class="what">
+      <div class="flow">
+        <div class="node auto"><b>EPR kg earned</b><small>From each done Dismantle MO</small></div>
+        <div class="arr">→</div>
+        <div class="node custom"><span class="stepno">12</span><b>EPR Certificate</b><small>CPCB number, sold to battery producers</small></div>
+        <div class="arr">→</div>
+        <div class="node money"><b>EPR Invoice</b><small>₹ per kg</small></div>
+        <div class="arr">→</div>
+        <div class="node doc"><b>Waste manifest</b><small>Hazardous residues to TSDF</small></div>
+      </div></div></div>
+    <div class="lane"><div class="who">Management</div><div class="what">
+      <div class="flow">
+        <div class="node custom"><b>Overview dashboard</b><small>Backlog, alerts, month KPIs</small></div>
+        <div class="arr">→</div>
+        <div class="node doc"><b>Reports</b><small>Mass balance, element recovery, cost per kg, EPR register</small></div>
+      </div></div></div>
+  </div>
+</section>
+
+<!-- PURCHASE -->
+<section id="purchase">
+  <h2><span class="num">1</span>Purchase of scrap batteries</h2>
+  <p class="lead">Standard Odoo Purchase. Scrap packs are bought by weight; the chemistry is part of the product, so every lot already knows if it is LFP or NMC.</p>
+  <div class="grid g2">
+    <div class="card">
+      <div class="vflow">
+        <div class="node std"><b>Request for Quotation</b><small><span class="menu">Purchase › Orders › New</span> · vendor, product <i>Battery pack – LFP (scrap)</i>, kg, ₹/kg</small></div>
+        <div class="arr">↓</div>
+        <div class="node std"><b>Confirm Order</b><small>Creates the incoming receipt automatically</small></div>
+        <div class="arr">↓</div>
+        <div class="node std"><b>Receive</b><small>Weigh the consignment, enter kg and a lot number per batch</small></div>
+        <div class="arr">↓</div>
+        <div class="node std"><b>Vendor Bill</b><small>Billed on received kg; GST from the Indian chart of accounts</small></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>What is set up on scrap battery products</h3>
+      <table>
+        <tr><th>Setting</th><th>Value</th></tr>
+        <tr><td>Unit</td><td>kg (purchase, stock and production)</td></tr>
+        <tr><td>Tracking</td><td>By lots</td></tr>
+        <tr><td>Material type</td><td><span class="pill custom">Scrap battery</span></td></tr>
+        <tr><td>Battery chemistry</td><td>LFP / NMC / LCO / NCA / LMO / Mixed</td></tr>
+        <tr><td>Can be sold</td><td>No – Unicel Greens never resells batteries</td></tr>
+      </table>
+      <p class="note" style="margin-top:12px">From the receipt onwards the lot is visible in <b>Recycling › To Process</b> under <i>Dismantle</i>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- INVENTORY -->
+<section id="inventory">
+  <h2><span class="num">2</span>Inventory: lots, material types and the To Process queue</h2>
+  <p class="lead">Every product carries a <b>material type</b>, so stock can be read by stage. Lots move from one stage to the next; nothing is planned twice.</p>
+  <div class="grid g2">
+    <div class="card">
+      <h3>Material types</h3>
+      <table>
+        <tr><th>Type</th><th>Examples</th><th>Sold?</th></tr>
+        <tr><td><span class="pill std">Scrap battery</span></td><td>Battery pack – LFP / NMC</td><td>No</td></tr>
+        <tr><td><span class="pill std">Intermediate</span></td><td>Cells/modules, Black mass</td><td>No (next stage)</td></tr>
+        <tr><td><span class="pill std">Scrap by-product</span></td><td>Casing, plastic, cables, BMS, Cu / Al foil</td><td>Yes</td></tr>
+        <tr><td><span class="pill custom">Recovered material</span></td><td>NiSO₄, CoSO₄, Li₂CO₃, MnSO₄, graphite, FePO₄</td><td>Yes, after purity assay</td></tr>
+        <tr><td><span class="pill std">Chemical</span></td><td>H₂SO₄, H₂O₂, NaOH, extractant, Na₂CO₃</td><td>No (consumed)</td></tr>
+      </table>
+      <p style="margin-top:10px"><b>Stock by Stage</b> report: <span class="menu">Recycling › Reporting › Stock by Stage</span> – kg on hand by material type × chemistry.</p>
+    </div>
+    <div class="card">
+      <h3>To Process queue <span class="pill custom">Recycling</span></h3>
+      <p style="margin-top:0">Lots in stock that are waiting for their next stage. <span class="menu">Recycling › Operations › To Process</span></p>
+      <div class="vflow">
+        <div class="node std"><b>Battery packs</b><small>→ waiting for <b>Dismantle</b></small></div>
+        <div class="arr">↓</div>
+        <div class="node std"><b>Cells / modules</b><small>→ waiting for <b>Shred</b></small></div>
+        <div class="arr">↓</div>
+        <div class="node gate"><b>Black mass</b><small>→ <b>Recover</b>, only once its assay is approved (greyed while <i>waiting for lab</i>)</small></div>
+      </div>
+      <ul class="tight" style="margin-top:10px">
+        <li>Kg to process = on hand − reserved by confirmed MOs − planned in draft MOs</li>
+        <li>Select lots → <b>Create MO</b>: one draft MO with all selected lots as input</li>
+        <li>Refuses mixed products, mixed chemistries, unapproved black mass</li>
+        <li>Days waiting shown; red after 30 days</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- DISMANTLE -->
+<section id="dismantle">
+  <h2><span class="num">3</span>Stage 1 – Dismantle</h2>
+  <p class="lead">Battery packs are discharged, opened and sorted. The plant thinks in input weight ("process 1,000 kg of packs"), so the MO is planned by <b>Input Weight</b>.</p>
+  <div class="grid g2">
+    <div class="card">
+      <h3>Process (work orders, in this order)</h3>
+      <div class="chips">
+        <div class="chip"><b data-n="1">Discharge</b><small>Discharge station · 120 min</small></div>
+        <div class="chip gate"><b data-n="◆">Voltage check</b><small>Quality point · must pass</small></div>
+        <div class="chip"><b data-n="2">Dismantle</b><small>Dismantling line · 180 min</small></div>
+        <div class="chip"><b data-n="3">Weigh &amp; sort</b><small>Weighing station · 30 min</small></div>
+      </div>
+      <div class="chips-note">Dismantle cannot start before Discharge is finished (operation dependency).</div>
+      <h3>Bill of materials (illustrative yields)</h3>
+      <table>
+        <tr><th>Line</th><th class="num">kg</th><th class="num">Cost share</th></tr>
+        <tr><td><b>Input</b> – Battery pack (primary input)</td><td class="num">1,000</td><td></td></tr>
+        <tr><td><b>Main output</b> – Cells/modules</td><td class="num">650</td><td class="num">82 %</td></tr>
+        <tr><td>By-product – Casing metal</td><td class="num">200</td><td class="num">8 %</td></tr>
+        <tr><td>By-product – Plastic</td><td class="num">60</td><td class="num">2 %</td></tr>
+        <tr><td>By-product – Cables &amp; copper</td><td class="num">40</td><td class="num">5 %</td></tr>
+        <tr><td>By-product – BMS / electronics</td><td class="num">20</td><td class="num">3 %</td></tr>
+        <tr><td><i>Planned loss</i></td><td class="num"><i>30 (3 %)</i></td><td class="num">max 5 %</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>From order to done</h3>
+      <div class="vflow">
+        <div class="node custom"><b>Create MO</b><small>From the To Process queue, or New with <i>Input Weight 1,000 kg</i> → quantity 650 kg, components and by-products follow</small></div>
+        <div class="arr">↓</div>
+        <div class="node std"><b>Confirm</b><small>The selected pack lots are reserved</small></div>
+        <div class="arr">↓</div>
+        <div class="node custom"><b>Record Weights</b><small>Weighing station enters actual kg in / out (the Produce button is replaced on recycling MOs)</small></div>
+        <div class="arr">↓</div>
+        <div class="node auto"><b>Automatic on Done</b><small>Lots for every by-product · mass balance · yield · loss / yield alerts to managers · EPR kg earned</small></div>
+        <div class="arr">↓</div>
+        <div class="node custom"><b>Create Next Stage MO</b><small>Button on the done MO → draft Shred MO with this cells lot</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHRED -->
+<section id="shred">
+  <h2><span class="num">4</span>Stage 2 – Shred</h2>
+  <p class="lead">Cells are shredded and sieved. The fine powder is <b>black mass</b>, a mix of metals and graphite whose composition is only known after a lab assay.</p>
+  <div class="card">
+    <div class="flow">
+      <div class="node std"><b>Cells/modules lot</b><small>650 kg from Dismantle</small></div>
+      <div class="arr">→</div>
+      <div class="node custom"><b>Shred MO</b><small>Shredder · 120 min · max loss 12 %</small></div>
+      <div class="arr">→</div>
+      <div class="node std"><b>Black mass lot</b><small>487.5 kg</small></div>
+      <div class="arr">→</div>
+      <div class="node auto"><b>Draft assay</b><small>Created automatically · To-Do for every Lab Technician</small></div>
+      <div class="arr">→</div>
+      <div class="node gate"><b>Waiting for lab</b><small>Recover is blocked until the assay is approved</small></div>
+    </div>
+    <p style="margin:12px 0 0">By-products: <b>copper foil</b> 9 % and <b>aluminium foil</b> 6 % of input, each in its own lot, sellable as scrap.</p>
+  </div>
+</section>
+
+<!-- LAB -->
+<section id="lab">
+  <h2><span class="num">5</span>Lab assay – the quality gate</h2>
+  <p class="lead">The assay records the mass % of each element in a lot. It drives the expected outputs of Recover, the metal-value estimate and the Certificate of Analysis.</p>
+  <div class="grid g2">
+    <div class="card">
+      <h3>Assay workflow</h3>
+      <div class="statebar"><span>Draft</span><i>→</i><span>Submitted</span><i>→</i><span class="on">Approved</span><i>/</i><span>Rejected</span></div>
+      <ul class="tight" style="margin-top:12px">
+        <li><b>Lab Technician</b> enters results and <b>Submits</b></li>
+        <li><b>Recycling Manager</b> <b>Approves</b> or rejects</li>
+        <li>External lab: lab partner and PDF certificate required before approval</li>
+        <li>All-zero results cannot be submitted</li>
+        <li>Approved assays are locked; a corrected one replaces it as <i>current</i> (history kept, note on the lot)</li>
+      </ul>
+      <h3>What the lab enters</h3>
+      <table>
+        <tr><th>Element</th><th class="num">NMC black mass</th><th class="num">LFP black mass</th></tr>
+        <tr><td>Nickel (Ni)</td><td class="num">20 %</td><td class="num">–</td></tr>
+        <tr><td>Cobalt (Co)</td><td class="num">7 %</td><td class="num">–</td></tr>
+        <tr><td>Manganese (Mn)</td><td class="num">6 %</td><td class="num">–</td></tr>
+        <tr><td>Lithium (Li)</td><td class="num">3.5 %</td><td class="num">2.8 %</td></tr>
+        <tr><td>Iron (Fe) / Phosphorus (P)</td><td class="num">–</td><td class="num">22 % / 12 %</td></tr>
+        <tr><td>Graphite (C)</td><td class="num">35 %</td><td class="num">33 %</td></tr>
+        <tr><td>Al / Cu</td><td class="num">1 % / 1 %</td><td class="num">1.5 % / 1 %</td></tr>
+      </table>
+      <p style="color:var(--muted);font-size:12.5px">Illustrative demo values – replaced by the lab report.</p>
+    </div>
+    <div class="card">
+      <h3>Where the assay is used</h3>
+      <div class="vflow">
+        <div class="node gate"><b>Lot assay status</b><small>Not required · <b>Pending</b> · Approved – filter <i>Assay pending</i> on lots</small></div>
+        <div class="arr">↓</div>
+        <div class="node custom"><b>Composition tab on the lot</b><small>% and kg of each element, now and at sampling</small></div>
+        <div class="arr">↓</div>
+        <div class="node custom"><b>Metal value estimate</b><small>Contained kg × latest metal price (₹/kg) – estimate only, not accounting</small></div>
+        <div class="arr">↓</div>
+        <div class="node custom"><b>Recover planning</b><small>Expected outputs computed from the assay</small></div>
+        <div class="arr">↓</div>
+        <div class="node doc"><b>Certificate of Analysis</b><small>PDF from the lot or the delivery order</small></div>
+      </div>
+      <p class="note" style="margin-top:12px"><b>Optional block</b> (Inventory settings): a lot with a pending assay can be neither consumed in Recover nor delivered to a customer.</p>
+    </div>
+  </div>
+</section>
+
+<!-- RECOVER -->
+<section id="recover">
+  <h2><span class="num">6</span>Stage 3 – Recover (hydrometallurgy)</h2>
+  <p class="lead">Black mass is leached and purified into battery-grade salts. Here the expected output comes from the <b>actual assay of the lots consumed</b>, not from fixed BoM figures.</p>
+  <div class="grid g2">
+    <div class="card">
+      <h3>Process (work orders, in this order)</h3>
+      <div class="chips">
+        <div class="chip"><b data-n="1">Leaching</b><small>Leach reactor</small></div>
+        <div class="chip"><b data-n="2">Filtration</b><small>Filter press</small></div>
+        <div class="chip"><b data-n="3">Purification</b><small>Purification tanks</small></div>
+        <div class="chip"><b data-n="4">Solvent extraction</b><small>SX circuit · NMC</small></div>
+        <div class="chip"><b data-n="5">Crystallisation</b><small>Crystallizer · NMC</small></div>
+        <div class="chip"><b data-n="6">Li precipitation</b><small>Precipitation reactor</small></div>
+        <div class="chip"><b data-n="7">Drying &amp; packing</b><small>Dryer and packing</small></div>
+      </div>
+      <h3>Expected output formula</h3>
+      <div class="formula">contained metal kg = Σ (input lot kg × element % from assay)<br>expected metal kg  = contained × recovery %<br>expected product kg = expected metal ÷ metal content % of the salt</div>
+      <h3>Outputs per chemistry</h3>
+      <table>
+        <tr><th>Chemistry</th><th>Main product</th><th>By-products</th></tr>
+        <tr><td>NMC</td><td>Nickel sulphate</td><td>Cobalt sulphate, Lithium carbonate, Manganese sulphate, Graphite, Sodium sulphate</td></tr>
+        <tr><td>LFP</td><td>Lithium carbonate</td><td>Iron phosphate, Graphite, Sodium sulphate</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Worked example – 1,000 kg NMC black mass</h3>
+      <div class="tablewrap"><table>
+        <tr><th>Element</th><th class="num">Assay</th><th class="num">Contained</th><th class="num">Recovery</th><th>Product (metal %)</th><th class="num">Expected</th></tr>
+        <tr><td>Ni</td><td class="num">20 %</td><td class="num">200 kg</td><td class="num">95 %</td><td>Nickel sulphate (22.3 %)</td><td class="num"><b>852 kg</b></td></tr>
+        <tr><td>Co</td><td class="num">7 %</td><td class="num">70 kg</td><td class="num">95 %</td><td>Cobalt sulphate (21.0 %)</td><td class="num"><b>317 kg</b></td></tr>
+        <tr><td>Mn</td><td class="num">6 %</td><td class="num">60 kg</td><td class="num">95 %</td><td>Manganese sulphate (32.5 %)</td><td class="num"><b>175 kg</b></td></tr>
+        <tr><td>Li</td><td class="num">3.5 %</td><td class="num">35 kg</td><td class="num">88 %</td><td>Lithium carbonate (18.8 %)</td><td class="num"><b>164 kg</b></td></tr>
+        <tr><td>C</td><td class="num">35 %</td><td class="num">350 kg</td><td class="num">90 %</td><td>Graphite (95 %)</td><td class="num"><b>332 kg</b></td></tr>
+      </table></div>
+      <h3>From black mass to salts</h3>
+      <div class="vflow">
+        <div class="node custom"><b>Create Next Stage MO</b><small>From the shred MO (or To Process) once the assay is approved</small></div>
+        <div class="arr">↓</div>
+        <div class="node auto"><b>Expected outputs filled</b><small>Main product and every by-product set from the assay; chemicals scale with input</small></div>
+        <div class="arr">↓</div>
+        <div class="node custom"><b>Confirm → Record Weights → Done</b><small>Several lots per MO supported (one MO per shift)</small></div>
+        <div class="arr">↓</div>
+        <div class="node auto"><b>Recovery tab</b><small>Expected vs actual kg, actual metal, <b>efficiency %</b> per element · purity assays created for salt lots</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WEIGHTS -->
+<section id="weights">
+  <h2><span class="num">7</span>Actual weights – when the yield differs</h2>
+  <p class="lead">Recycling yields are never exact. Odoo records what the scale shows; the input stays at what was really consumed, and alerts tell the manager when something is off.</p>
+  <div class="grid g2">
+    <div class="card">
+      <h3>Record Weights screen</h3>
+      <div class="vflow">
+        <div class="node custom"><b>Input weighed in</b><small>One line per battery lot</small></div>
+        <div class="arr">↓</div>
+        <div class="node custom"><b>Output weighed out</b><small>Main product (vs planned) + every by-product</small></div>
+        <div class="arr">↓</div>
+        <div class="node gate"><b>Live mass balance</b><small>Loss % vs BoM max · Yield % vs accepted range</small></div>
+        <div class="arr">↓</div>
+        <div class="node custom"><b>Confirm &amp; Finish Order</b><small>No backorder or consumption pop-ups on recycling MOs</small></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Scenarios (BoM: 1,000 kg → 650 kg cells, range 58.5 – 71.5 %)</h3>
+      <div class="tablewrap"><table>
+        <tr><th>Weighed out</th><th class="num">Yield</th><th>Screen</th><th>Result</th></tr>
+        <tr><td>650 cells + by-products as planned</td><td class="num">65 %</td><td><span class="pill ok">Green</span></td><td>Done, no alert</td></tr>
+        <tr><td>600 cells</td><td class="num">60 %</td><td><span class="pill ok">Green</span></td><td>Done; lot holds 600 kg</td></tr>
+        <tr><td>550 cells</td><td class="num">55 %</td><td><span class="pill warn">Orange</span></td><td>Done; <b>Yield out of range</b> alert to manager</td></tr>
+        <tr><td>760 cells</td><td class="num">76 %</td><td><span class="pill warn">Orange</span></td><td>Done; yield alert</td></tr>
+        <tr><td>Output above input (1,060 kg)</td><td class="num">–</td><td><span class="pill bad">Red</span></td><td>Blocked – "check the scale"; manager may override</td></tr>
+      </table></div>
+      <p style="margin-top:10px">In every case the batteries consumed stay at <b>1,000 kg</b>. A low yield raises the <b>cost per kg</b> of the cells; a high yield lowers it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SALES -->
+<section id="sales">
+  <h2><span class="num">8</span>Sales, delivery and Certificate of Analysis</h2>
+  <p class="lead">Only recovered materials and scrap by-products are sold. Salt lots must pass a purity assay first.</p>
+  <div class="card">
+    <div class="flow">
+      <div class="node auto"><b>Purity assay (draft)</b><small>Created for each salt lot when Recover is done</small></div>
+      <div class="arr">→</div>
+      <div class="node gate"><b>Purity approved</b><small>Ni sulphate: Ni, Co, Fe, Cu, Na…</small></div>
+      <div class="arr">→</div>
+      <div class="node std"><b>Sale Order</b><small><span class="menu">Sales › Orders</span> · kg, ₹/kg, GST</small></div>
+      <div class="arr">→</div>
+      <div class="node gate"><b>Delivery</b><small>Blocked while the lot's assay is pending (setting)</small></div>
+      <div class="arr">→</div>
+      <div class="node doc"><b>Certificate of Analysis</b><small>Print CoA on the delivery or the lot</small></div>
+      <div class="arr">→</div>
+      <div class="node money"><b>Invoice</b></div>
+    </div>
+    <p style="margin:12px 0 0"><b>Ready to sell</b> filter on lots (<span class="menu">Inventory › Lots</span>): recovered materials and scrap by-products in stock whose assay is not pending.</p>
+  </div>
+</section>
+
+<!-- EPR -->
+<section id="epr">
+  <h2><span class="num">9</span>EPR certificates – second revenue stream</h2>
+  <p class="lead">Under the Battery Waste Management Rules 2022, recyclers generate EPR certificates on the CPCB portal for the batteries they process, and sell them to battery producers who must meet recycling targets.</p>
+  <div class="grid g2">
+    <div class="card">
+      <h3>Certificate lifecycle</h3>
+      <div class="statebar"><span>Draft</span><i>→</i><span>Generated</span><i>→</i><span>Listed</span><i>→</i><span>Sold</span><i>→</i><span class="on">Transferred</span></div>
+      <div class="vflow" style="margin-top:12px">
+        <div class="node auto"><b>EPR eligible kg</b><small>Each done Dismantle MO earns its battery input (basis configurable: battery weight or recovered material)</small></div>
+        <div class="arr">↓</div>
+        <div class="node custom"><b>Create EPR Certificate</b><small>Button on the MO – quantity, chemistry, MO pre-filled; choose category (Portable / Automotive / Industrial / EV)</small></div>
+        <div class="arr">↓</div>
+        <div class="node gate"><b>No double claiming</b><small>Kg can never exceed what the linked MOs still have available</small></div>
+        <div class="arr">↓</div>
+        <div class="node std"><b>Generated</b><small>CPCB certificate number entered</small></div>
+        <div class="arr">↓</div>
+        <div class="node custom"><b>Create Quotation</b><small>Buyer + ₹/kg → sale order with the EPR service product</small></div>
+        <div class="arr">↓</div>
+        <div class="node money"><b>Invoice posted → Sold</b><small>Automatic</small></div>
+        <div class="arr">↓</div>
+        <div class="node std"><b>Transferred</b><small>CPCB transfer reference entered</small></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Two revenues from the same batteries</h3>
+      <table>
+        <tr><th>Revenue</th><th>What is sold</th><th>Buyer</th></tr>
+        <tr><td><span class="pill custom">Materials</span></td><td>Salts, graphite, copper, casing…</td><td>Battery &amp; chemical industry</td></tr>
+        <tr><td><span class="pill custom">EPR</span></td><td>Proof of recycling, per kg</td><td>Battery producers (EV, inverter, phone brands)</td></tr>
+      </table>
+      <h3>Demo data</h3>
+      <ul class="tight">
+        <li>Dismantle MO 1,000 kg → 1,000 kg eligible</li>
+        <li>Certificate 600 kg <b>Listed</b> at ₹18/kg → quotation ₹10,800</li>
+        <li>Certificate 400 kg <b>Draft</b> → MO fully claimed</li>
+      </ul>
+      <h3>Hazardous waste manifest</h3>
+      <div class="flow">
+        <div class="node std"><b>Draft</b><small>Waste, kg, transporter, TSDF</small></div><div class="arr">→</div>
+        <div class="node std"><b>Dispatched</b></div><div class="arr">→</div>
+        <div class="node doc"><b>Acknowledged</b><small>Manifest no. + documents</small></div>
+      </div>
+      <p class="note" style="margin-top:12px">To confirm with the client: the CPCB certificate basis and the registered battery categories – both are settings, no change in code.</p>
+    </div>
+  </div>
+</section>
+
+<!-- LINKS -->
+<section id="links">
+  <h2><span class="num">10</span>Everything linked from the MO</h2>
+  <p class="lead">The manufacturing order is the hub. From any recycling MO you can reach the whole chain, its lots, assays and EPR in one click.</p>
+  <div class="grid g3">
+    <div class="card">
+      <h3>Smart buttons &amp; tabs</h3>
+      <table>
+        <tr><th>On the MO</th><th>Opens</th></tr>
+        <tr><td><b>Chain</b> / Recycling Chain tab</td><td>Dismantle → Shred → Recover orders linked through lots</td></tr>
+        <tr><td><b>Assays</b></td><td>Assays of the lots it produced and consumed</td></tr>
+        <tr><td><b>EPR</b></td><td>Its certificates</td></tr>
+        <tr><td>Input Lots tab</td><td>Lots consumed, with their source MO</td></tr>
+        <tr><td>Mass Balance / EPR tabs</td><td>Input, output, loss, yield · eligible / claimed kg</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Header buttons</h3>
+      <table>
+        <tr><th>Button</th><th>When</th></tr>
+        <tr><td>Record Weights</td><td>Confirmed recycling MO</td></tr>
+        <tr><td>Create Next Stage MO</td><td>Done Dismantle / Shred MO with lots waiting</td></tr>
+        <tr><td>Compute expected outputs</td><td>Draft Recover MO</td></tr>
+        <tr><td>Create EPR Certificate</td><td>Done MO with EPR kg available</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>On the lot and the assay</h3>
+      <ul class="tight">
+        <li>Lot: <b>Recycling Chain</b>, <b>Assays</b>, Composition, <b>Print CoA</b></li>
+        <li>Assay: <b>Source MO</b> and <b>Manufacturing</b> button (producer + consumers)</li>
+        <li>Standard <b>Traceability</b> report from any lot, upstream and downstream</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- OVERVIEW -->
+<section id="overview">
+  <h2><span class="num">11</span>Recycling Overview dashboard</h2>
+  <p class="lead">The Recycling app opens on this page. Every number is clickable.</p>
+  <div class="grid g5 dash">
+    <div class="dcard"><b>Dismantle</b><div style="color:var(--muted);font-size:12px">Packs → cells</div><span class="btn">2 To Process</span>
+      <div class="row"><span>Draft</span><span>1</span></div><div class="row"><span>In progress</span><span>0</span></div><div class="row" style="color:var(--danger)"><span>Loss alerts</span><span>0</span></div>
+      <div class="foot">Month: in / out kg · loss %</div></div>
+    <div class="dcard"><b>Shred</b><div style="color:var(--muted);font-size:12px">Cells → black mass</div><span class="btn">1 To Process</span>
+      <div class="row"><span>Draft</span><span>0</span></div><div class="row"><span>Late</span><span>0</span></div>
+      <div class="foot">Month: in / out kg · loss %</div></div>
+    <div class="dcard"><b>Recover</b><div style="color:var(--muted);font-size:12px">Black mass → salts</div><span class="btn">0 To Process</span>
+      <div class="row" style="color:var(--gate)"><span>Waiting for lab</span><span>1</span></div><div class="row"><span>Draft</span><span>1</span></div>
+      <div class="foot">Month: recovered kg · efficiency %</div></div>
+    <div class="dcard"><b>Lab</b><div style="color:var(--muted);font-size:12px">Lot assays</div><span class="btn">To Approve</span>
+      <div class="row"><span>To analyse</span><span>3</span></div><div class="row"><span>Lots pending</span><span>3</span></div>
+      <div class="foot">Approved this month</div></div>
+    <div class="dcard"><b>EPR</b><div style="color:var(--muted);font-size:12px">Certificates</div><span class="btn">kg to Claim</span>
+      <div class="row"><span>Draft</span><span>1</span></div><div class="row"><span>For sale</span><span>1</span></div>
+      <div class="foot">FY 2026-27 sold: kg · ₹</div></div>
+  </div>
+  <p style="color:var(--muted);font-size:12.5px;margin-top:8px">Illustration – live figures come from the database.</p>
+</section>
+
+<!-- REPORTS -->
+<section id="reports">
+  <h2><span class="num">12</span>Reporting</h2>
+  <p class="lead"><span class="menu">Recycling › Reporting</span> – pivot, graph and list views, filter by date, stage, chemistry.</p>
+  <div class="grid g3">
+    <div class="card"><div class="node doc"><b>Mass Balance</b><small>Per done MO: input, output, loss kg / %, loss exceeded. Pivot by stage × chemistry × month.</small></div></div>
+    <div class="card"><div class="node doc"><b>Element Recovery</b><small>Per recover MO and element: contained kg, actual metal kg, efficiency %.</small></div></div>
+    <div class="card"><div class="node doc"><b>Material Output &amp; Cost</b><small>Per output product: kg, stock value, cost per kg (by-products valued by cost share).</small></div></div>
+    <div class="card"><div class="node doc"><b>Stock by Stage</b><small>Kg on hand by material type × chemistry.</small></div></div>
+    <div class="card"><div class="node doc"><b>EPR Register</b><small>Certificates by financial year, category, chemistry, state, buyer; kg and ₹.</small></div></div>
+    <div class="card"><div class="node doc"><b>EPR Eligible vs Claimed</b><small>Per MO: eligible, claimed and available kg.</small></div></div>
+  </div>
+  <div class="grid g3" style="margin-top:14px">
+    <div class="card"><h3 style="margin-top:0">Alerts &amp; activities</h3><ul class="tight"><li>Process loss above BoM max</li><li>Yield outside the accepted range</li><li>New draft assay for the lab</li></ul></div>
+    <div class="card"><h3 style="margin-top:0">Documents</h3><ul class="tight"><li>Certificate of Analysis (PDF)</li><li>Standard delivery slip, invoice, PO</li><li>Lot traceability report</li></ul></div>
+    <div class="card"><h3 style="margin-top:0">Standard Odoo still available</h3><ul class="tight"><li>Manufacturing analysis, work-order times, OEE</li><li>Stock valuation, accounting reports (GST)</li><li>Purchase and sales analysis</li></ul></div>
+  </div>
+</section>
+
+<!-- ROLES -->
+<section id="roles">
+  <h2><span class="num">13</span>Roles</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Role</th><th>Can do</th></tr>
+    <tr><td><b>Recycling User</b></td><td>Create and run recycling MOs, record weights, see the queue, assays and reports</td></tr>
+    <tr><td><b>Lab Technician</b></td><td>Everything a user can, plus enter and submit assays</td></tr>
+    <tr><td><b>EPR Officer</b></td><td>Everything a user can, plus create EPR certificates and move them through their states, waste manifests</td></tr>
+    <tr><td><b>Recycling Manager</b></td><td>All of the above, approve / reject assays, override weighing blocks, configure BoMs, chemistries, metal prices; receives loss and yield alerts</td></tr>
+  </table></div>
+</section>
+
+<!-- DEMO SCRIPT -->
+<section id="demo">
+  <h2><span class="num">14</span>Demo script (about 20 minutes)</h2>
+  <p class="lead">Database <b>unicel_greens</b> · Unicel Greens Pvt Ltd · INR. Follow the numbered steps on screen.</p>
+  <div class="tablewrap"><table>
+    <tr><th>#</th><th>Show</th><th>Where</th><th>Point to make</th></tr>
+    <tr><td>1</td><td>Recycling Overview</td><td><span class="menu">Recycling</span></td><td>Backlog per stage, lab and EPR at a glance</td></tr>
+    <tr><td>2</td><td>Purchase order for LFP packs, receive with a lot</td><td><span class="menu">Purchase › Orders</span></td><td>Bought and stocked in kg, lot per consignment</td></tr>
+    <tr><td>3</td><td>To Process → select the pack lot → Create MO</td><td><span class="menu">Recycling › Operations › To Process</span></td><td>No retyping of lots or weights</td></tr>
+    <tr><td>4</td><td>Confirm → Record Weights (enter less cells than planned)</td><td>Dismantle MO</td><td>Input stays fixed, live loss / yield, alert to manager</td></tr>
+    <tr><td>5</td><td>Mass Balance tab, by-product lots, EPR tab</td><td>Same MO</td><td>Everything weighed and traceable; EPR kg earned</td></tr>
+    <tr><td>6</td><td>Create Next Stage MO → Shred → Record Weights</td><td>Dismantle MO header</td><td>One click to the next stage; chain builds up</td></tr>
+    <tr><td>7</td><td>Assays button → enter results → Submit → Approve</td><td>Shred MO</td><td>Lab gate; recover blocked until approved</td></tr>
+    <tr><td>8</td><td>Create Next Stage MO → Recovery tab</td><td>Shred MO header</td><td>Expected salts computed from the assay</td></tr>
+    <tr><td>9</td><td>Record Weights → efficiency per element</td><td>Recover MO</td><td>Actual vs expected, purity assays for salt lots</td></tr>
+    <tr><td>10</td><td>Recycling Chain tab</td><td>Any of the three MOs</td><td>Pack → cells → black mass → salts in one view</td></tr>
+    <tr><td>11</td><td>Approve purity → sell → Print CoA → invoice</td><td><span class="menu">Sales</span> / delivery</td><td>Quality gate before the customer</td></tr>
+    <tr><td>12</td><td>Create EPR Certificate → Generate → List → Quotation → Invoice</td><td>Dismantle MO</td><td>Second revenue, no double claiming</td></tr>
+    <tr><td>13</td><td>Reporting: Mass Balance, Element Recovery, Cost, EPR Register</td><td><span class="menu">Recycling › Reporting</span></td><td>Management view of yields, losses, costs and EPR</td></tr>
+  </table></div>
+  <h3>Ready-made demo records</h3>
+  <div class="grid g3">
+    <div class="card kpi"><div class="v">3 + 3</div><div class="l">Complete NMC and LFP chains (dismantle → shred → recover)</div></div>
+    <div class="card kpi"><div class="v">852 kg</div><div class="l">Expected nickel sulphate on the spec NMC lot BM-NMC-DEMO-001</div></div>
+    <div class="card kpi"><div class="v">₹10,800</div><div class="l">EPR quotation – 600 kg at ₹18/kg</div></div>
+  </div>
+  <p class="note" style="margin-top:14px"><b>To confirm with the client:</b> real BoM yields and loss / yield tolerances per stage · recovery rates and metal content per salt · residual-voltage threshold for discharge · GST rates and HSN codes · CPCB EPR basis and registered categories. All are configuration, not code.</p>
+</section>
+
+</main>
+
+<footer>Unicel Greens · Battery recycling on Odoo 20 Enterprise · modules ug_recycling_base, ug_lot_assay, ug_recovery_planning, ug_epr, ug_mass_balance</footer>
+
+<button class="themebtn" type="button" onclick="toggleTheme()" aria-label="Toggle dark mode">◐ Theme</button>
+<script>
+function toggleTheme() {
+  var root = document.documentElement;
+  var dark = root.getAttribute('data-theme') === 'dark' ||
+    (!root.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  root.setAttribute('data-theme', dark ? 'light' : 'dark');
+}
+</script>
+</body>
+</html>

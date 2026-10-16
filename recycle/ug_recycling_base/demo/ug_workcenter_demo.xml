@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="wc_discharge" model="mrp.workcenter">
+        <field name="name">Discharge station</field>
+        <field name="code">DIS</field>
+        <field name="costs_hour">600</field>
+    </record>
+    <record id="wc_dismantling" model="mrp.workcenter">
+        <field name="name">Dismantling line</field>
+        <field name="code">DMT</field>
+        <field name="costs_hour">900</field>
+    </record>
+    <record id="wc_weighing" model="mrp.workcenter">
+        <field name="name">Weighing station</field>
+        <field name="code">WGH</field>
+        <field name="costs_hour">300</field>
+    </record>
+    <record id="wc_shredder" model="mrp.workcenter">
+        <field name="name">Shredder</field>
+        <field name="code">SHR</field>
+        <field name="costs_hour">1500</field>
+    </record>
+    <record id="wc_leach" model="mrp.workcenter">
+        <field name="name">Leach reactor</field>
+        <field name="code">LCH</field>
+        <field name="costs_hour">1200</field>
+    </record>
+    <record id="wc_filter" model="mrp.workcenter">
+        <field name="name">Filter press</field>
+        <field name="code">FLT</field>
+        <field name="costs_hour">700</field>
+    </record>
+    <record id="wc_purification" model="mrp.workcenter">
+        <field name="name">Purification tanks</field>
+        <field name="code">PUR</field>
+        <field name="costs_hour">800</field>
+    </record>
+    <record id="wc_sx" model="mrp.workcenter">
+        <field name="name">SX circuit</field>
+        <field name="code">SX</field>
+        <field name="costs_hour">1100</field>
+    </record>
+    <record id="wc_crystallizer" model="mrp.workcenter">
+        <field name="name">Crystallizer</field>
+        <field name="code">CRY</field>
+        <field name="costs_hour">1000</field>
+    </record>
+    <record id="wc_precipitation" model="mrp.workcenter">
+        <field name="name">Precipitation reactor</field>
+        <field name="code">PRC</field>
+        <field name="costs_hour">900</field>
+    </record>
+    <record id="wc_dryer" model="mrp.workcenter">
+        <field name="name">Dryer and packing</field>
+        <field name="code">DRY</field>
+        <field name="costs_hour">500</field>
+    </record>
+</odoo>

@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dismantle, LFP -->
+    <record id="bom_dismantle_lfp" model="mrp.bom">
+        <field name="product_tmpl_id" ref="product_cells_lfp_product_template"/>
+        <field name="product_qty">650</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="type">normal</field>
+        <field name="ug_stage">dismantle</field>
+        <field name="ug_max_loss_pct">5.0</field>
+        <field name="allow_operation_dependencies" eval="True"/>
+        <field name="battery_chemistry_id" ref="chemistry_lfp"/>
+    </record>
+    <record id="op_dismantle_discharge" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_dismantle_lfp"/>
+        <field name="name">Discharge</field>
+        <field name="workcenter_id" ref="wc_discharge"/>
+        <field name="sequence">10</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">120</field>
+    </record>
+    <record id="op_dismantle_dismantle" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_dismantle_lfp"/>
+        <field name="name">Dismantle</field>
+        <field name="workcenter_id" ref="wc_dismantling"/>
+        <field name="sequence">20</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">180</field>
+        <field name="blocked_by_operation_ids" eval="[(6, 0, [ref('op_dismantle_discharge')])]"/>
+    </record>
+    <record id="op_dismantle_weigh" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_dismantle_lfp"/>
+        <field name="name">Weigh and sort</field>
+        <field name="workcenter_id" ref="wc_weighing"/>
+        <field name="sequence">30</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">30</field>
+    </record>
+    <record id="bom_dismantle_lfp_line_pack" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_dismantle_lfp"/>
+        <field name="product_id" ref="product_pack_lfp"/>
+        <field name="product_qty">1000</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_is_primary_input" eval="True"/>
+        <field name="operation_id" ref="op_dismantle_discharge"/>
+    </record>
+    <record id="bom_dismantle_lfp_bp_casing" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_dismantle_lfp"/>
+        <field name="product_id" ref="product_casing"/>
+        <field name="product_qty">200</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">8</field>
+    </record>
+    <record id="bom_dismantle_lfp_bp_plastic" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_dismantle_lfp"/>
+        <field name="product_id" ref="product_plastic"/>
+        <field name="product_qty">60</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">2</field>
+    </record>
+    <record id="bom_dismantle_lfp_bp_cables" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_dismantle_lfp"/>
+        <field name="product_id" ref="product_cables"/>
+        <field name="product_qty">40</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">5</field>
+    </record>
+    <record id="bom_dismantle_lfp_bp_bms" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_dismantle_lfp"/>
+        <field name="product_id" ref="product_bms"/>
+        <field name="product_qty">20</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">3</field>
+    </record>
+    <record id="bom_dismantle_lfp" model="mrp.bom">
+        <field name="ug_is_recycling" eval="True"/>
+    </record>
+    <!-- Dismantle, NMC (first stage of the connected NMC demo chain) -->
+    <record id="bom_dismantle_nmc" model="mrp.bom">
+        <field name="product_tmpl_id" ref="product_cells_nmc_product_template"/>
+        <field name="product_qty">650</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="type">normal</field>
+        <field name="ug_stage">dismantle</field>
+        <field name="ug_max_loss_pct">5.0</field>
+        <field name="allow_operation_dependencies" eval="True"/>
+        <field name="battery_chemistry_id" ref="chemistry_nmc"/>
+    </record>
+    <record id="op_dismantle_nmc_discharge" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_dismantle_nmc"/>
+        <field name="name">Discharge</field>
+        <field name="workcenter_id" ref="wc_discharge"/>
+        <field name="sequence">10</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">120</field>
+    </record>
+    <record id="op_dismantle_nmc_dismantle" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_dismantle_nmc"/>
+        <field name="name">Dismantle</field>
+        <field name="workcenter_id" ref="wc_dismantling"/>
+        <field name="sequence">20</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">180</field>
+        <field name="blocked_by_operation_ids" eval="[(6, 0, [ref('op_dismantle_nmc_discharge')])]"/>
+    </record>
+    <record id="op_dismantle_nmc_weigh" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_dismantle_nmc"/>
+        <field name="name">Weigh and sort</field>
+        <field name="workcenter_id" ref="wc_weighing"/>
+        <field name="sequence">30</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">30</field>
+    </record>
+    <record id="bom_dismantle_nmc_line_pack" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_dismantle_nmc"/>
+        <field name="product_id" ref="product_pack_nmc"/>
+        <field name="product_qty">1000</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_is_primary_input" eval="True"/>
+        <field name="operation_id" ref="op_dismantle_nmc_discharge"/>
+    </record>
+    <record id="bom_dismantle_nmc_bp_casing" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_dismantle_nmc"/>
+        <field name="product_id" ref="product_casing"/>
+        <field name="product_qty">200</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">8</field>
+    </record>
+    <record id="bom_dismantle_nmc_bp_plastic" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_dismantle_nmc"/>
+        <field name="product_id" ref="product_plastic"/>
+        <field name="product_qty">60</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">2</field>
+    </record>
+    <record id="bom_dismantle_nmc_bp_cables" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_dismantle_nmc"/>
+        <field name="product_id" ref="product_cables"/>
+        <field name="product_qty">40</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">5</field>
+    </record>
+    <record id="bom_dismantle_nmc_bp_bms" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_dismantle_nmc"/>
+        <field name="product_id" ref="product_bms"/>
+        <field name="product_qty">20</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">3</field>
+    </record>
+    <record id="bom_dismantle_nmc" model="mrp.bom">
+        <field name="ug_is_recycling" eval="True"/>
+    </record>
+    <!-- Shred, NMC (by-design loss is 10%, so the allowed loss is set to 12%) -->
+    <record id="bom_shred_nmc" model="mrp.bom">
+        <field name="product_tmpl_id" ref="product_bm_nmc_product_template"/>
+        <field name="product_qty">750</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="type">normal</field>
+        <field name="ug_stage">shred</field>
+        <field name="ug_max_loss_pct">12.0</field>
+        <field name="allow_operation_dependencies" eval="False"/>
+        <field name="battery_chemistry_id" ref="chemistry_nmc"/>
+    </record>
+    <record id="op_shred" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_shred_nmc"/>
+        <field name="name">Shred</field>
+        <field name="workcenter_id" ref="wc_shredder"/>
+        <field name="sequence">10</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">120</field>
+    </record>
+    <record id="bom_shred_nmc_line_cells" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_shred_nmc"/>
+        <field name="product_id" ref="product_cells_nmc"/>
+        <field name="product_qty">1000</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_is_primary_input" eval="True"/>
+    </record>
+    <record id="bom_shred_nmc_bp_cu" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_shred_nmc"/>
+        <field name="product_id" ref="product_cu_foil"/>
+        <field name="product_qty">90</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">6</field>
+    </record>
+    <record id="bom_shred_nmc_bp_al" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_shred_nmc"/>
+        <field name="product_id" ref="product_al_foil"/>
+        <field name="product_qty">60</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">4</field>
+    </record>
+    <record id="bom_shred_nmc" model="mrp.bom">
+        <field name="ug_is_recycling" eval="True"/>
+    </record>
+    <!-- Recover (hydromet), NMC -->
+    <record id="bom_recover_nmc" model="mrp.bom">
+        <field name="product_tmpl_id" ref="product_niso4_product_template"/>
+        <field name="product_qty">850</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="type">normal</field>
+        <field name="ug_stage">recover</field>
+        <field name="ug_max_loss_pct">5.0</field>
+        <field name="allow_operation_dependencies" eval="False"/>
+        <field name="battery_chemistry_id" ref="chemistry_nmc"/>
+    </record>
+    <record id="op_rec_leach" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="name">Leaching</field>
+        <field name="workcenter_id" ref="wc_leach"/>
+        <field name="sequence">10</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">240</field>
+    </record>
+    <record id="op_rec_filter" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="name">Filtration</field>
+        <field name="workcenter_id" ref="wc_filter"/>
+        <field name="sequence">20</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">60</field>
+    </record>
+    <record id="op_rec_purif" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="name">Purification</field>
+        <field name="workcenter_id" ref="wc_purification"/>
+        <field name="sequence">30</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">120</field>
+    </record>
+    <record id="op_rec_sx" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="name">Solvent extraction</field>
+        <field name="workcenter_id" ref="wc_sx"/>
+        <field name="sequence">40</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">240</field>
+    </record>
+    <record id="op_rec_cryst" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="name">Crystallization</field>
+        <field name="workcenter_id" ref="wc_crystallizer"/>
+        <field name="sequence">50</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">180</field>
+    </record>
+    <record id="op_rec_liprec" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="name">Lithium precipitation</field>
+        <field name="workcenter_id" ref="wc_precipitation"/>
+        <field name="sequence">60</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">120</field>
+    </record>
+    <record id="op_rec_dry" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="name">Drying and packing</field>
+        <field name="workcenter_id" ref="wc_dryer"/>
+        <field name="sequence">70</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">60</field>
+    </record>
+    <record id="bom_recover_nmc_line_bm" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="product_id" ref="product_bm_nmc"/>
+        <field name="product_qty">1000</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_is_primary_input" eval="True"/>
+        <field name="operation_id" ref="op_rec_leach"/>
+    </record>
+    <record id="bom_recover_nmc_line_h2so4" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="product_id" ref="product_h2so4"/>
+        <field name="product_qty">1500</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_is_primary_input" eval="False"/>
+        <field name="operation_id" ref="op_rec_leach"/>
+    </record>
+    <record id="bom_recover_nmc_line_h2o2" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="product_id" ref="product_h2o2"/>
+        <field name="product_qty">200</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_is_primary_input" eval="False"/>
+        <field name="operation_id" ref="op_rec_leach"/>
+    </record>
+    <record id="bom_recover_nmc_line_naoh" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="product_id" ref="product_naoh"/>
+        <field name="product_qty">400</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_is_primary_input" eval="False"/>
+        <field name="operation_id" ref="op_rec_purif"/>
+    </record>
+    <record id="bom_recover_nmc_line_sx" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="product_id" ref="product_sx"/>
+        <field name="product_qty">5</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_is_primary_input" eval="False"/>
+        <field name="operation_id" ref="op_rec_sx"/>
+    </record>
+    <record id="bom_recover_nmc_line_na2co3" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="product_id" ref="product_na2co3"/>
+        <field name="product_qty">300</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_is_primary_input" eval="False"/>
+        <field name="operation_id" ref="op_rec_liprec"/>
+    </record>
+    <record id="bom_recover_nmc_bp_coso4" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="product_id" ref="product_coso4"/>
+        <field name="product_qty">315</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">25</field>
+    </record>
+    <record id="bom_recover_nmc_bp_li2co3" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="product_id" ref="product_li2co3"/>
+        <field name="product_qty">165</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">30</field>
+    </record>
+    <record id="bom_recover_nmc_bp_mnso4" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="product_id" ref="product_mnso4"/>
+        <field name="product_qty">175</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">3</field>
+    </record>
+    <record id="bom_recover_nmc_bp_graphite" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="product_id" ref="product_graphite"/>
+        <field name="product_qty">315</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">2</field>
+    </record>
+    <record id="bom_recover_nmc_bp_na2so4" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_recover_nmc"/>
+        <field name="product_id" ref="product_na2so4"/>
+        <field name="product_qty">1</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">1</field>
+    </record>
+    <record id="bom_recover_nmc" model="mrp.bom">
+        <field name="ug_is_recycling" eval="True"/>
+    </record>
+    <!-- Shred, LFP (by-design loss 10%, allowed 12%) -->
+    <record id="bom_shred_lfp" model="mrp.bom">
+        <field name="product_tmpl_id" ref="product_bm_lfp_product_template"/>
+        <field name="product_qty">750</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="type">normal</field>
+        <field name="ug_stage">shred</field>
+        <field name="ug_max_loss_pct">12.0</field>
+        <field name="battery_chemistry_id" ref="chemistry_lfp"/>
+    </record>
+    <record id="op_shred_lfp" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_shred_lfp"/>
+        <field name="name">Shred</field>
+        <field name="workcenter_id" ref="wc_shredder"/>
+        <field name="sequence">10</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">120</field>
+    </record>
+    <record id="bom_shred_lfp_line_cells" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_shred_lfp"/>
+        <field name="product_id" ref="product_cells_lfp"/>
+        <field name="product_qty">1000</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_is_primary_input" eval="True"/>
+        <field name="operation_id" ref="op_shred_lfp"/>
+    </record>
+    <record id="bom_shred_lfp_bp_cu" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_shred_lfp"/>
+        <field name="product_id" ref="product_cu_foil"/>
+        <field name="product_qty">90</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">6</field>
+    </record>
+    <record id="bom_shred_lfp_bp_al" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_shred_lfp"/>
+        <field name="product_id" ref="product_al_foil"/>
+        <field name="product_qty">60</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">4</field>
+    </record>
+    <record id="bom_shred_lfp" model="mrp.bom">
+        <field name="ug_is_recycling" eval="True"/>
+    </record>
+    <!-- Recover (hydromet), LFP: lithium carbonate main, iron phosphate and graphite by-products -->
+    <record id="bom_recover_lfp" model="mrp.bom">
+        <field name="product_tmpl_id" ref="product_li2co3_product_template"/>
+        <field name="product_qty">130</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="type">normal</field>
+        <field name="ug_stage">recover</field>
+        <field name="ug_max_loss_pct">5.0</field>
+        <field name="battery_chemistry_id" ref="chemistry_lfp"/>
+    </record>
+    <record id="op_rec_lfp_leach" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_recover_lfp"/>
+        <field name="name">Leaching</field>
+        <field name="workcenter_id" ref="wc_leach"/>
+        <field name="sequence">10</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">240</field>
+    </record>
+    <record id="op_rec_lfp_filter" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_recover_lfp"/>
+        <field name="name">Filtration</field>
+        <field name="workcenter_id" ref="wc_filter"/>
+        <field name="sequence">20</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">60</field>
+    </record>
+    <record id="op_rec_lfp_purif" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_recover_lfp"/>
+        <field name="name">Purification</field>
+        <field name="workcenter_id" ref="wc_purification"/>
+        <field name="sequence">30</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">120</field>
+    </record>
+    <record id="op_rec_lfp_liprec" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_recover_lfp"/>
+        <field name="name">Lithium precipitation</field>
+        <field name="workcenter_id" ref="wc_precipitation"/>
+        <field name="sequence">40</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">120</field>
+    </record>
+    <record id="op_rec_lfp_dry" model="mrp.routing.workcenter">
+        <field name="bom_id" ref="bom_recover_lfp"/>
+        <field name="name">Drying and packing</field>
+        <field name="workcenter_id" ref="wc_dryer"/>
+        <field name="sequence">50</field>
+        <field name="time_mode">manual</field>
+        <field name="time_cycle_manual">60</field>
+    </record>
+    <record id="bom_recover_lfp_line_bm" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_recover_lfp"/>
+        <field name="product_id" ref="product_bm_lfp"/>
+        <field name="product_qty">1000</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_is_primary_input" eval="True"/>
+        <field name="operation_id" ref="op_rec_lfp_leach"/>
+    </record>
+    <record id="bom_recover_lfp_line_h2so4" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_recover_lfp"/>
+        <field name="product_id" ref="product_h2so4"/>
+        <field name="product_qty">800</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_is_primary_input" eval="False"/>
+        <field name="operation_id" ref="op_rec_lfp_leach"/>
+    </record>
+    <record id="bom_recover_lfp_line_h2o2" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_recover_lfp"/>
+        <field name="product_id" ref="product_h2o2"/>
+        <field name="product_qty">150</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_is_primary_input" eval="False"/>
+        <field name="operation_id" ref="op_rec_lfp_leach"/>
+    </record>
+    <record id="bom_recover_lfp_line_na2co3" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_recover_lfp"/>
+        <field name="product_id" ref="product_na2co3"/>
+        <field name="product_qty">250</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_is_primary_input" eval="False"/>
+        <field name="operation_id" ref="op_rec_lfp_liprec"/>
+    </record>
+    <record id="bom_recover_lfp_bp_fepo4" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_recover_lfp"/>
+        <field name="product_id" ref="product_fepo4"/>
+        <field name="product_qty">535</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">20</field>
+    </record>
+    <record id="bom_recover_lfp_bp_graphite" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_recover_lfp"/>
+        <field name="product_id" ref="product_graphite"/>
+        <field name="product_qty">313</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">5</field>
+    </record>
+    <record id="bom_recover_lfp_bp_na2so4" model="mrp.bom.byproduct">
+        <field name="bom_id" ref="bom_recover_lfp"/>
+        <field name="product_id" ref="product_na2so4"/>
+        <field name="product_qty">1</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        <field name="cost_share">1</field>
+    </record>
+    <record id="bom_recover_lfp" model="mrp.bom">
+        <field name="ug_is_recycling" eval="True"/>
+    </record>
+</odoo>

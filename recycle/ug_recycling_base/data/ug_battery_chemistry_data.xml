@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="chemistry_lfp" model="ug.battery.chemistry">
+        <field name="name">LFP</field>
+        <field name="code">LFP</field>
+    </record>
+    <record id="chemistry_nmc" model="ug.battery.chemistry">
+        <field name="name">NMC</field>
+        <field name="code">NMC</field>
+    </record>
+    <record id="chemistry_lco" model="ug.battery.chemistry">
+        <field name="name">LCO</field>
+        <field name="code">LCO</field>
+    </record>
+    <record id="chemistry_nca" model="ug.battery.chemistry">
+        <field name="name">NCA</field>
+        <field name="code">NCA</field>
+    </record>
+    <record id="chemistry_lmo" model="ug.battery.chemistry">
+        <field name="name">LMO</field>
+        <field name="code">LMO</field>
+    </record>
+    <record id="chemistry_mixed" model="ug.battery.chemistry">
+        <field name="name">Mixed</field>
+        <field name="code">MIX</field>
+    </record>
+</odoo>

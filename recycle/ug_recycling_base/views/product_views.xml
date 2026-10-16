@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_template_form_view_ug" model="ir.ui.view">
+        <field name="name">product.template.form.ug.recycling</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Recycling" name="ug_recycling" groups="ug_recycling_base.group_ug_user">
+                    <group>
+                        <group name="ug_classification" string="Classification">
+                            <field name="ug_material_type"/>
+                            <field name="battery_chemistry_id"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_template_search_view_ug" model="ir.ui.view">
+        <field name="name">product.template.search.ug.recycling</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="battery_chemistry_id"/>
+                <separator/>
+                <filter name="ug_scrap_battery" string="Scrap Batteries" domain="[('ug_material_type', '=', 'scrap_battery')]"/>
+                <filter name="ug_intermediate" string="Intermediates" domain="[('ug_material_type', '=', 'intermediate')]"/>
+                <filter name="ug_recovered" string="Recovered Materials" domain="[('ug_material_type', '=', 'recovered_material')]"/>
+                <filter name="ug_scrap_byproduct" string="Scrap By-products" domain="[('ug_material_type', '=', 'scrap_byproduct')]"/>
+                <filter name="ug_chemical" string="Chemicals" domain="[('ug_material_type', '=', 'chemical')]"/>
+                <separator/>
+                <filter name="groupby_ug_material_type" string="Material Type" context="{'group_by': 'ug_material_type'}"/>
+                <filter name="groupby_battery_chemistry" string="Battery Chemistry" context="{'group_by': 'battery_chemistry_id'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
