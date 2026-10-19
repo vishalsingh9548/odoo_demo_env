@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Pipeline stage 2: Site Survey -->
+        <menuitem id="menu_epc_site_survey"
+                  name="Site Surveys"
+                  web_icon="csl_epc_site_survey,static/description/icon.png"
+                  groups="csl_epc_core.group_epc_user"
+                  sequence="46"/>
+        <menuitem id="menu_epc_site_survey_list"
+                  name="Site Surveys"
+                  parent="menu_epc_site_survey"
+                  action="epc_site_survey_action"
+                  sequence="10"/>
+    </data>
+</odoo>

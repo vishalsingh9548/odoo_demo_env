@@ -61,7 +61,7 @@ class EpcDashboard(models.AbstractModel):
         # whether to even show the link), then reads everything as an
         # aggregate summary — no individual record's sensitive detail is
         # exposed by a count or a sum.
-        if not self.env.user.has_group('csl_solar_epc.group_epc_user'):
+        if not self.env.user.has_group('csl_epc_core.group_epc_user'):
             raise AccessError("You need Solar EPC access to view this dashboard.")
         self = self.sudo()
 

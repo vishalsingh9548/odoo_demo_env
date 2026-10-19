@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Gives every Feasibility Study a reference like TF/2026/00001 -->
+        <record id="seq_epc_feasibility" model="ir.sequence">
+            <field name="name">Technical Feasibility Sequence</field>
+            <field name="code">epc.feasibility</field>
+            <field name="prefix">TF/%(range_year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

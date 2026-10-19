@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Pipeline stage 3: Feasibility -->
+        <menuitem id="menu_epc_feasibility"
+                  name="Feasibility"
+                  web_icon="csl_epc_feasibility,static/description/icon.png"
+                  groups="csl_epc_core.group_epc_user"
+                  sequence="46"/>
+        <menuitem id="menu_epc_feasibility_list"
+                  name="Feasibility"
+                  parent="menu_epc_feasibility"
+                  action="epc_feasibility_action"
+                  sequence="10"/>
+    </data>
+</odoo>

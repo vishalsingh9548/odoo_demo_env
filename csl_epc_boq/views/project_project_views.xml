@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="project_view_form_epc_boq" model="ir.ui.view">
+            <field name="name">project.view.form.epc.boq</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="csl_epc_core.project_view_form_epc"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='epc_solar']/field[@name='lead_id']" position="after">
+                    <field name="boq_id"/>
+                </xpath>
+                <xpath expr="//group[@name='epc_solar']/field[@name='epc_sale_order_id']" position="after">
+                    <field name="capacity_kw"/>
+                    <!-- Hidden for now: these mirror the BOQ's Total Cost/Sell Price,
+                         which read 0 until BOQ lines have a Unit Cost entered. See
+                         LOG.md for the plan to fix this. -->
+                    <field name="boq_total_cost" invisible="1"/>
+                    <field name="boq_total_sell_price" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

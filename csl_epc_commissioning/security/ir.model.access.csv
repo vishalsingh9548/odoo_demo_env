@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_epc_commissioning_user,epc.commissioning.user,model_epc_commissioning,csl_epc_core.group_epc_user,1,1,1,0
+access_epc_commissioning_manager,epc.commissioning.manager,model_epc_commissioning,csl_epc_core.group_epc_manager,1,1,1,1

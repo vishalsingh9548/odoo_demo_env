@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Stage 14: Handover & Closure -->
+        <menuitem id="menu_epc_handover"
+                  name="Handover &amp; Closure"
+                  web_icon="csl_epc_handover,static/description/icon.png"
+                  groups="csl_epc_core.group_epc_user"
+                  sequence="46"/>
+        <menuitem id="menu_epc_handover_list"
+                  name="Handover &amp; Closure"
+                  parent="menu_epc_handover"
+                  action="epc_handover_action"
+                  sequence="10"/>
+    </data>
+</odoo>

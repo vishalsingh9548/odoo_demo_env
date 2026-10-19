@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Stage 17: O&M / AMC -->
+        <menuitem id="menu_epc_amc_contract"
+                  name="AMC Contracts"
+                  web_icon="csl_epc_amc,static/description/icon.png"
+                  groups="csl_epc_core.group_epc_manager"
+                  sequence="46"/>
+        <menuitem id="menu_epc_amc_contract_list"
+                  name="AMC Contracts"
+                  parent="menu_epc_amc_contract"
+                  action="epc_amc_contract_action"
+                  sequence="10"/>
+        <menuitem id="menu_epc_config_helpdesk_team"
+                  name="AMC Support Teams"
+                  parent="csl_epc_core.menu_epc_configuration"
+                  action="helpdesk.helpdesk_team_action"
+                  sequence="10"/>
+    </data>
+</odoo>

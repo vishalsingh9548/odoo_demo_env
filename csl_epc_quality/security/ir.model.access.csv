@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_epc_dpr_user,epc.dpr.user,model_epc_dpr,csl_epc_core.group_epc_user,1,1,1,0
+access_epc_dpr_manager,epc.dpr.manager,model_epc_dpr,csl_epc_core.group_epc_manager,1,1,1,1
+access_epc_quality_check_user,epc.quality.check.user,model_epc_quality_check,csl_epc_core.group_epc_user,1,1,1,0
+access_epc_quality_check_manager,epc.quality.check.manager,model_epc_quality_check,csl_epc_core.group_epc_manager,1,1,1,1
+access_epc_quality_check_line_user,epc.quality.check.line.user,model_epc_quality_check_line,csl_epc_core.group_epc_user,1,1,1,1
+access_epc_quality_check_line_manager,epc.quality.check.line.manager,model_epc_quality_check_line,csl_epc_core.group_epc_manager,1,1,1,1
+access_epc_quality_checkpoint_user,epc.quality.checkpoint.user,model_epc_quality_checkpoint,csl_epc_core.group_epc_user,1,0,0,0
+access_epc_quality_checkpoint_manager,epc.quality.checkpoint.manager,model_epc_quality_checkpoint,csl_epc_core.group_epc_manager,1,1,1,1
