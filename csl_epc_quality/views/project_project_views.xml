@@ -8,13 +8,11 @@
             <field name="arch" type="xml">
                 <xpath expr="//div[@name='button_box']" position="inside">
                     <button name="action_view_dprs" type="object"
-                            class="oe_stat_button" icon="fa-clipboard"
-                            invisible="dpr_count == 0">
+                            class="oe_stat_button" icon="fa-clipboard">
                         <field name="dpr_count" widget="statinfo" string="Daily Progress Reports"/>
                     </button>
                     <button name="action_view_quality_checks" type="object"
-                            class="oe_stat_button" icon="fa-check-square-o"
-                            invisible="quality_check_count == 0">
+                            class="oe_stat_button" icon="fa-check-square-o">
                         <field name="quality_check_count" widget="statinfo" string="Quality Checks"/>
                     </button>
                 </xpath>

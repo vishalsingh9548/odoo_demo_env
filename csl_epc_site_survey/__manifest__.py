@@ -16,6 +16,7 @@
         'views/epc_site_survey_views.xml',
         'views/crm_lead_views.xml',
         'views/epc_menus.xml',
+        'views/epc_dashboard_views.xml',
     ],
     'application': True,
     'installable': True,

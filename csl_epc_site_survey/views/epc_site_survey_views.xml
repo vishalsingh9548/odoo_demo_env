@@ -11,6 +11,8 @@
                     <field name="partner_id"/>
                     <field name="survey_date"/>
                     <field name="engineer_id"/>
+                    <field name="available_area_sqft" avg="Average" string="Usable Area (sq ft)"/>
+                    <field name="sanctioned_load_kw" sum="Total" string="Sanctioned Load (kW)"/>
                     <field name="is_feasible"/>
                     <field name="approval_state" widget="badge"
                            decoration-success="approval_state == 'approved'"
@@ -62,6 +64,9 @@
                                 <field name="sanctioned_load_kw"/>
                                 <field name="has_existing_transformer"/>
                                 <field name="grid_access_available"/>
+                                <field name="is_feasible"/>
+                                <field name="epc_proceed_anyway" groups="csl_epc_core.group_epc_manager"
+                                       invisible="is_feasible != 'no'"/>
                             </group>
                         </group>
                         <group string="Location">
@@ -78,10 +83,7 @@
                                 </group>
                             </page>
                             <page string="Survey Report" name="report">
-                                <field name="survey_report"/>
-                                <field name="is_feasible"/>
-                                <field name="epc_proceed_anyway" groups="csl_epc_core.group_epc_manager"
-                                       invisible="is_feasible != 'no'"/>
+                                <field name="survey_report" placeholder="Write the survey report here: what was found on site, measurements, concerns..."/>
                             </page>
                             <page string="Approval" name="approval">
                                 <group>

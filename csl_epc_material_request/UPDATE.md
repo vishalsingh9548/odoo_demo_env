@@ -62,3 +62,28 @@ Upgrade the module (`-u <module>`); new fields have safe defaults, no data migra
 
 ### Update 3
 - **"Issue Material to Site" button on the Project form** (header, highlighted): shown while an approved material request of the project still has stock that has not been issued to the site. One click issues every such request (one internal transfer per request) and opens the transfer; the button disappears once everything has been issued. This way the step is no longer forgotten on the request itself. New project field: *Material To Issue*.
+
+### Update 5 (2026-10-19) — Material Requests dashboard
+**What was added:** a **Dashboard** menu entry (first entry of the app, so the app now opens on it) with live KPI tiles, charts and a table that are specific to this stage and do not repeat what the main Solar Dashboard already shows.
+
+- KPIs: lines short on stock, fulfilment rate (issued / required), request approval time, quantity still to order, quantity issued to site.
+- Charts: required vs in stock vs ordered vs issued (top 6 products), issue status, vendors by quantity ordered, requests per month, fulfilment by project.
+- Table: items short on stock.
+- The quantity columns on request lines are computed fields, so these figures are summed in Python from the live records.
+
+**Files:** `models/epc_stage_dashboard.py` (builds the numbers, method `_dashboard_material`), `views/epc_dashboard_views.xml` (client action + menu), `__manifest__.py` (loads the view). The screen itself (OWL component, template, styles) is shared and lives in `csl_epc_core`.
+
+### How it behaves
+- **Live**: every number is read from the database each time the screen opens, on **Refresh**, and automatically every 2 minutes. Nothing is stored or cached.
+- **Click-through**: each tile, chart bar/slice and table row opens the exact records that were counted (the list uses the same domain that produced the number). Scatter dots and table rows open the single record.
+- **Access**: numbers are read with the logged-in user's own rights (no sudo), so a Field User only sees counts and lists of their own records (rule F22), and the count always matches the list that opens. A section the user cannot read is left out instead of breaking the page.
+- **Screen sizes**: sizes are in `em` and the base font scales with the screen (13px phone to 22px projector); layout follows the width of the dashboard itself (container queries): 5-6 columns on a wide screen, 2 on a tablet, 1 on a phone; tables scroll sideways inside their own card.
+- **Install / upgrade**: `-u csl_epc_core,<this module>` (new files only; no data migration, no new database fields).
+
+### Update 6 (2026-10-19) — drill-down lists for the dashboard
+**Problem:** clicking a dashboard tile or bar for lines short on stock, products, vendors, project fulfilment opened a list showing only the record ID, because `epc.material.request.line` had no list view of its own.
+**Fix:** added list, form (read-only) and search views for `epc.material.request.line` in `views/epc_dashboard_views.xml` (no new menu, nothing else changes). The list is read-only (no create/delete), can be grouped, and shows the useful columns.
+**Upgrade:** `-u csl_epc_material_request`.
+
+### Update 7 (2026-10-19) — dashboard colour
+The dashboard's accent colour in `models/epc_stage_dashboard.py` is now a light pastel to match the new shared look (see `csl_epc_core/UPDATE.md`, Update 7). No functional change.

@@ -85,3 +85,36 @@ Upgrade the module (`-u <module>`); new fields have safe defaults, no data migra
 
 ### Update 4
 - **Approval to-dos no longer pile up:** the *Approval requested* (and *Rejected - please fix and resubmit*) to-dos of a document are removed when it is approved, rejected, reset to draft or submitted again, so each document has at most one current set. Old leftovers disappear the next time that document is approved, rejected or reset.
+
+---
+
+## Update 5 (2026-10-19) — shared stage dashboard screen
+**What was added:** the one generic screen used by every stage dashboard, so no stage module ships its own JavaScript.
+- `models/epc_stage_dashboard.py`: abstract model `epc.stage.dashboard`. `get_data(stage)` checks the caller is an EPC user, then calls `_dashboard_<stage>()` defined by the stage module. Helpers shared by all stages: `_kpi`, `_card`, `_tbl`, month/week buckets, grouped counts (with the matching click-through domain), money/energy/power formatting, approval turnaround.
+- `static/src/js/epc_stage_dashboard.js`, `static/src/xml/epc_stage_dashboard.xml`, `static/src/scss/epc_stage_dashboard.scss`: client action `epc_stage_dashboard` (OWL + Chart.js from Odoo's own bundle). Renders KPI tiles, bar / horizontal bar / line / doughnut / scatter charts, a checklist matrix and a table from the JSON the backend returns.
+- Each stage module adds a `Dashboard` menu that opens this screen with its stage name (`params = {'stage': ...}`).
+
+### How it behaves
+- **Live**: every number is read from the database each time the screen opens, on **Refresh**, and automatically every 2 minutes. Nothing is stored or cached.
+- **Click-through**: each tile, chart bar/slice and table row opens the exact records that were counted (the list uses the same domain that produced the number). Scatter dots and table rows open the single record.
+- **Access**: numbers are read with the logged-in user's own rights (no sudo), so a Field User only sees counts and lists of their own records (rule F22), and the count always matches the list that opens. A section the user cannot read is left out instead of breaking the page.
+- **Screen sizes**: sizes are in `em` and the base font scales with the screen (13px phone to 22px projector); layout follows the width of the dashboard itself (container queries): 5-6 columns on a wide screen, 2 on a tablet, 1 on a phone; tables scroll sideways inside their own card.
+- **Install / upgrade**: `-u csl_epc_core,<this module>` (new files only; no data migration, no new database fields).
+
+**Adding a dashboard for a new stage:** inherit `epc.stage.dashboard`, add `_dashboard_<name>()` returning `title`, `accent`, `intro`, `kpis`, `cards`, `table`; add a client action with `tag = epc_stage_dashboard` and `params = {'stage': '<name>'}`; add a menu. No JavaScript needed.
+
+### Update 7 (2026-10-19) — new look for the stage dashboards
+- **Look:** white page with faint pastel glows, frosted-glass cards and tab area, tinted KPI tiles with rounded icons, softer tables and pills. One cool pastel palette (sky blue, periwinkle, lavender); no green/red/amber. Status is carried by shade and by the text label (Overdue, Failed, ...).
+- **Files:** `static/src/scss/epc_stage_dashboard.scss` (rewritten), `static/src/js/epc_stage_dashboard.js` (chart colour palette only). Each stage module's `accent` colour in `models/epc_stage_dashboard.py` was changed to a pastel.
+- **Unchanged:** all numbers, click-through, refresh, access rules and the responsive layout (phone to projector). The page is light-only on purpose.
+- **Upgrade:** `-u csl_epc_core` then hard-refresh the browser (Ctrl+Shift+R).
+
+### Update 8 (2026-10-19) — stronger glass effect
+The frosted-glass look was too faint on a white page (nothing behind the cards to blur). Added soft colour blobs behind the content (they scroll with it) and made cards, KPI tiles and the Refresh button more translucent with stronger blur (`backdrop-filter: blur(20-22px) saturate(1.7)`), a bright inner edge and a soft shadow. Only `static/src/scss/epc_stage_dashboard.scss` changed. Upgrade: `-u csl_epc_core`, hard-refresh.
+
+### Update 9 (2026-10-19) — no empty gaps in the card grid
+**Problem:** when the last row of charts was not full (for example Quality ended with one small chart), the space beside it stayed empty and the table sat far below.
+**Fix:** the screen now packs the cards into rows of 6 columns. A short row has its last card stretched; the free space in the final row (3 or more columns) goes to the table, which now sits inside the grid beside the last chart. A table too wide for its space scrolls sideways inside its own card. Files: `static/src/js/epc_stage_dashboard.js` (`applyLayout`), `static/src/xml/epc_stage_dashboard.xml`, `static/src/scss/epc_stage_dashboard.scss`. Upgrade: `-u csl_epc_core`, hard-refresh.
+
+### Update 10 (2026-10-19) — dark mode
+The stage dashboards now follow Odoo's own light/dark switch (user menu → *Dark mode*, stored in the `color_scheme` cookie). In dark mode the same pastel colours are used on dark frosted glass: navy page with soft blue/lavender glows, translucent dark cards, off-white text, and brighter chart colours. Light mode is unchanged. Implementation: colours became CSS variables in `static/src/scss/epc_stage_dashboard.scss` with a `.o_epc_sd_dark` override; `static/src/js/epc_stage_dashboard.js` reads the cookie, picks the dark chart palette and brightens the stage colour; the template adds the `o_epc_sd_dark` class. Upgrade: `-u csl_epc_core`, hard-refresh. To switch, use Odoo's user menu (the page reloads in the other mode).

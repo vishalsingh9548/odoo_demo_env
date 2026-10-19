@@ -30,6 +30,14 @@
         'views/project_project_views.xml',
         'views/project_task_views.xml',
     ],
+    # Generic screen used by every stage dashboard (Site Survey ... AMC)
+    'assets': {
+        'web.assets_backend': [
+            'csl_epc_core/static/src/js/epc_stage_dashboard.js',
+            'csl_epc_core/static/src/xml/epc_stage_dashboard.xml',
+            'csl_epc_core/static/src/scss/epc_stage_dashboard.scss',
+        ],
+    },
     'application': False,
     'installable': True,
 }

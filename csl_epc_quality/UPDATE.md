@@ -80,3 +80,35 @@ Upgrade the module (`-u <module>`); new fields have safe defaults, no data migra
 - **Chatter formatting fix:** the failed-check and consume messages (and the material-request over-BOQ warning) showed raw `<b>`/`<ul>` tags; they now render as proper bold text and lists.
 - **Failed Incoming QC shown on the receipt and the purchase order:** when an Incoming Material check fails, the failure (check link, failed items, reason) is also written in the chatter of the receipt it was done against and of that receipt's purchase order (as an internal note, no emails), so warehouse and buyer see it.
 - The "also write it elsewhere" step is now a hook (`_epc_failure_documents`) so other modules can add places; Commissioning uses it for Final QC.
+
+### Update 5 (2026-10-19) — Quality dashboard
+**What was added:** a **Dashboard** menu entry (first entry of the app, so the app now opens on it) with live KPI tiles, charts and a table that are specific to this stage and do not repeat what the main Solar Dashboard already shows.
+
+- KPIs: first-pass yield, failed this month, failures not yet re-inspected, days from fail to pass, site issues reported in daily progress reports (last 30 days).
+- Charts: passed/failed per week (8 weeks), pass rate by stage, most failed checkpoints, workers on site per daily report, weather on site.
+- Table: recent failures with the reason given and whether they were re-inspected.
+- Daily progress reports live in this module, so their charts are here too.
+
+**Files:** `models/epc_stage_dashboard.py` (builds the numbers, method `_dashboard_quality`), `views/epc_dashboard_views.xml` (client action + menu), `__manifest__.py` (loads the view). The screen itself (OWL component, template, styles) is shared and lives in `csl_epc_core`.
+
+### How it behaves
+- **Live**: every number is read from the database each time the screen opens, on **Refresh**, and automatically every 2 minutes. Nothing is stored or cached.
+- **Click-through**: each tile, chart bar/slice and table row opens the exact records that were counted (the list uses the same domain that produced the number). Scatter dots and table rows open the single record.
+- **Access**: numbers are read with the logged-in user's own rights (no sudo), so a Field User only sees counts and lists of their own records (rule F22), and the count always matches the list that opens. A section the user cannot read is left out instead of breaking the page.
+- **Screen sizes**: sizes are in `em` and the base font scales with the screen (13px phone to 22px projector); layout follows the width of the dashboard itself (container queries): 5-6 columns on a wide screen, 2 on a tablet, 1 on a phone; tables scroll sideways inside their own card.
+- **Install / upgrade**: `-u csl_epc_core,<this module>` (new files only; no data migration, no new database fields).
+
+### Update 6 (2026-10-19) — drill-down lists for the dashboard
+**Problem:** clicking a dashboard tile or bar for most failed checkpoints opened a list showing only the record ID, because `epc.quality.check.line` had no list view of its own.
+**Fix:** added list, form (read-only) and search views for `epc.quality.check.line` in `views/epc_dashboard_views.xml` (no new menu, nothing else changes). The list is read-only (no create/delete), can be grouped, and shows the useful columns.
+**Upgrade:** `-u csl_epc_quality`.
+
+### Update 7 (2026-10-19) — dashboard colour
+The dashboard's accent colour in `models/epc_stage_dashboard.py` is now a light pastel to match the new shared look (see `csl_epc_core/UPDATE.md`, Update 7). No functional change.
+
+### Update 7 (2026-10-19) — Daily Progress Reports can be created from the project
+**Problem:** there was no way to write the first Daily Progress Report. The *Daily Progress Reports* smart button on the Project form was hidden while the project had none, and the Quality app had no menu for them, so managers could not fill them in (the dashboard's "Site issues reported" and "Workers on site" read from them).
+**Fix:** the *Daily Progress Reports* and *Quality Checks* smart buttons on the Project form are now always visible (showing 0 until there are records); clicking opens the list with the project already filled in for a new report. A **Daily Progress Reports** menu was also added under the Quality app. Files: `views/project_project_views.xml`, `views/epc_menus.xml`. Upgrade: `-u csl_epc_quality`.
+
+### Update 8 (2026-10-19) — workers on site chart totals per day
+The *Workers on site* chart on the Quality dashboard plotted one dot per daily report, so two reports on the same day (different projects) showed as two separate, lower dots with the same date. It now adds up the workers of all reports on a day, over the last 14 days that have reports, and clicking a point opens that day's reports. File: `models/epc_stage_dashboard.py`. Restart the server (Python change) — no module upgrade needed.

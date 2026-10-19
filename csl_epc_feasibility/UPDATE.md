@@ -57,3 +57,22 @@ Same as Site Survey: server-side gating and a way to stop work on a not-feasible
 Upgrade the module (`-u <module>`); new fields have safe defaults, no data migration is needed. Users who approve documents must be in the *Project Manager* group.
 
 - **Reject pop-up:** the *Reject* button now opens a dialog that asks for the reason (provided by `csl_epc_core`).
+
+### Update 5 (2026-10-19) — Feasibility dashboard
+**What was added:** a **Dashboard** menu entry (first entry of the app, so the app now opens on it) with live KPI tiles, charts and a table that are specific to this stage and do not repeat what the main Solar Dashboard already shows.
+
+- KPIs: capacity under study (kWp/MWp), average performance ratio vs the 80% target (`PR_TARGET` in the Python file), expected yearly generation, specific yield (kWh per kWp), survey to feasibility conversion.
+- Charts: system type, proposal size bands, module orientation, capacity vs yearly generation (scatter, click a dot to open the proposal), performance-ratio spread.
+- Table: best-yield proposals.
+
+**Files:** `models/epc_stage_dashboard.py` (builds the numbers, method `_dashboard_feasibility`), `views/epc_dashboard_views.xml` (client action + menu), `__manifest__.py` (loads the view). The screen itself (OWL component, template, styles) is shared and lives in `csl_epc_core`.
+
+### How it behaves
+- **Live**: every number is read from the database each time the screen opens, on **Refresh**, and automatically every 2 minutes. Nothing is stored or cached.
+- **Click-through**: each tile, chart bar/slice and table row opens the exact records that were counted (the list uses the same domain that produced the number). Scatter dots and table rows open the single record.
+- **Access**: numbers are read with the logged-in user's own rights (no sudo), so a Field User only sees counts and lists of their own records (rule F22), and the count always matches the list that opens. A section the user cannot read is left out instead of breaking the page.
+- **Screen sizes**: sizes are in `em` and the base font scales with the screen (13px phone to 22px projector); layout follows the width of the dashboard itself (container queries): 5-6 columns on a wide screen, 2 on a tablet, 1 on a phone; tables scroll sideways inside their own card.
+- **Install / upgrade**: `-u csl_epc_core,<this module>` (new files only; no data migration, no new database fields).
+
+### Update 7 (2026-10-19) — dashboard colour
+The dashboard's accent colour in `models/epc_stage_dashboard.py` is now a light pastel to match the new shared look (see `csl_epc_core/UPDATE.md`, Update 7). No functional change.

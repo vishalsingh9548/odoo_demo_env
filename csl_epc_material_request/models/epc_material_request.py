@@ -299,7 +299,7 @@ class EpcMaterialRequestLine(models.Model):
     @api.depends('product_id', 'quantity_required')
     def _compute_quantity_on_hand(self):
         for line in self:
-            line.quantity_on_hand = line.product_id.free_qty if line.product_id else 0.0
+            line.quantity_on_hand = line.product_id.sudo().free_qty if line.product_id else 0.0
             line.quantity_to_purchase = max(line.quantity_required - line.quantity_on_hand, 0.0)
 
     # How much is already on this request's purchase orders, and so how much
@@ -310,11 +310,11 @@ class EpcMaterialRequestLine(models.Model):
         for line in self:
             ordered = 0.0
             if line.product_id:
-                order_lines = line.request_id.purchase_order_ids.filtered(
+                order_lines = line.request_id.sudo().purchase_order_ids.filtered(
                     lambda order: order.state != 'cancel').mapped('order_line')
                 ordered = sum(order_lines.filtered(
                     lambda order_line: order_line.product_id == line.product_id).mapped('product_qty'))
-            shortfall = max(line.quantity_required - (line.product_id.free_qty if line.product_id else 0.0), 0.0)
+            shortfall = max(line.quantity_required - (line.product_id.sudo().free_qty if line.product_id else 0.0), 0.0)
             line.quantity_ordered = ordered
             line.quantity_remaining_to_order = max(shortfall - ordered, 0.0)
 
@@ -325,13 +325,13 @@ class EpcMaterialRequestLine(models.Model):
         for line in self:
             issued = 0.0
             if line.product_id and line.request_id.name:
-                moves = self.env['stock.move'].search([
+                moves = self.env['stock.move'].sudo().search([
                     ('picking_id.origin', '=', line.request_id.name),
                     ('picking_id.project_id', '=', line.request_id.project_id.id),
                     ('product_id', '=', line.product_id.id),
                     ('state', '!=', 'cancel'),
                 ])
                 issued = sum(moves.mapped('product_uom_qty'))
-            free = line.product_id.free_qty if line.product_id else 0.0
+            free = line.product_id.sudo().free_qty if line.product_id else 0.0
             line.quantity_issued = issued
             line.quantity_issuable = max(min(line.quantity_required - issued, free), 0.0)

@@ -87,3 +87,23 @@ Upgrade the module (`-u <module>`); new fields have safe defaults, no data migra
 
 ### Update 3
 Tests now total 27 (added: failed check logged with reason, EPC order has no delivery while a plain order keeps its delivery, failed check saved by a real user). All pass.
+
+---
+
+## Update 5 (2026-10-19) — stage dashboards and tests
+- Each stage app now has its own **Dashboard** (Site Survey, Feasibility, BOQ, Material Request, Quality, Commissioning, Handover, AMC). See the `UPDATE.md` of each module for what it shows; the shared screen is described in `csl_epc_core/UPDATE.md`.
+- The main **Solar Dashboard** of this module is unchanged. The stage dashboards were designed to show different numbers from it (it keeps portfolio phase, pipeline counts, AMC status, procurement status, upcoming AMC visits).
+- New tests in `tests/test_epc_dashboards.py`: every stage returns a complete JSON-safe payload for a manager and a field user; every count tile and count chart equals the size of the list it opens; the dashboard follows live data (creating a survey raises the count); users without EPC access are refused; an unknown stage is refused.
+- Run: `odoo-bin -d <db> -u csl_solar_epc --test-enable --test-tags=/csl_solar_epc --stop-after-init`
+
+---
+
+## Update 6 (2026-10-19) — main Solar Dashboard: new look and dark mode
+The main **Solar Dashboard** (tiles, Portfolio by Phase, Pipeline Activity, AMC Contract Health, Procurement Status, upcoming AMC visits) now matches the stage dashboards.
+- **Look:** white page with soft colour blobs behind frosted-glass tiles and cards; one cool pastel palette (sky blue, periwinkle, lavender) instead of green/red/amber. Meaning is carried by shade and by the label.
+- **Dark mode:** follows Odoo's own light/dark switch (user menu). Dark glass on a navy page, brighter chart colours; tables are transparent so the dark theme no longer shows white/black stripes.
+- **Files:** `static/src/scss/epc_dashboard.scss` (colours became variables, `.o_epc_dark` override), `static/src/js/epc_dashboard.js` (light/dark chart palettes, reads the `color_scheme` cookie), `static/src/xml/epc_dashboard.xml` (adds the dark class). No change to the numbers, click-through or layout.
+- **Upgrade:** `-u csl_solar_epc`, then hard-refresh (Ctrl+Shift+R).
+
+### Update 7 (2026-10-19) — legend text colour
+The AMC Contract Health legend (and the Portfolio legend) showed black text on the dark background because the legend colour was not set. It now uses the theme's text colour in both light and dark mode. File: `static/src/js/epc_dashboard.js`. Upgrade: `-u csl_solar_epc`, hard-refresh.

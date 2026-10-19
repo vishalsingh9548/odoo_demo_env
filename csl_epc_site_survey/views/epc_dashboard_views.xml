@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Live dashboard of this stage, rendered by the generic screen in csl_epc_core.
+             It is the first menu entry, so the app opens on it. -->
+        <record id="epc_dashboard_survey_action" model="ir.actions.client">
+            <field name="name">Site Survey Dashboard</field>
+            <field name="tag">epc_stage_dashboard</field>
+            <field name="target">current</field>
+            <field name="params" eval="{'stage': 'survey'}"/>
+        </record>
+        <menuitem id="menu_epc_dashboard_survey"
+                  name="Dashboard"
+                  parent="menu_epc_site_survey"
+                  action="epc_dashboard_survey_action"
+                  sequence="1"/>
+    </data>
+</odoo>

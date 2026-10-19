@@ -12,6 +12,11 @@
                   parent="menu_epc_quality_check"
                   action="epc_quality_check_action"
                   sequence="10"/>
+        <menuitem id="menu_epc_dpr_list"
+                  name="Daily Progress Reports"
+                  parent="menu_epc_quality_check"
+                  action="epc_dpr_action"
+                  sequence="20"/>
         <menuitem id="menu_epc_config_quality_checkpoint"
                   name="QC Checkpoints"
                   parent="csl_epc_core.menu_epc_configuration"

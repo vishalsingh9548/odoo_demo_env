@@ -18,6 +18,7 @@
         'views/epc_commissioning_views.xml',
         'views/project_project_views.xml',
         'views/epc_menus.xml',
+        'views/epc_dashboard_views.xml',
     ],
     'application': True,
     'installable': True,

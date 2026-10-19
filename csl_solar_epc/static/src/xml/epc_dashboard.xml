@@ -2,7 +2,7 @@
 <templates xml:space="preserve">
 
     <t t-name="csl_solar_epc.EpcDashboard">
-        <div class="o_epc_dashboard">
+        <div t-attf-class="o_epc_dashboard #{dark ? 'o_epc_dark' : ''}">
 
             <div t-if="state.loading" class="text-center p-5">
                 <i class="fa fa-spin fa-spinner fa-2x"/>

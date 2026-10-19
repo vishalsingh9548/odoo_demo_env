@@ -4,6 +4,7 @@ import { Component, onWillStart, onWillUnmount, useEffect, useRef, useState } fr
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { loadBundle } from "@web/core/assets";
+import { cookie } from "@web/core/browser/cookie";
 import { _t } from "@web/core/l10n/translation";
 import { formatMonetary } from "@web/views/fields/formatters";
 import { standardActionServiceProps } from "@web/webclient/actions/action_service";
@@ -12,17 +13,29 @@ import { standardActionServiceProps } from "@web/webclient/actions/action_servic
 // the accent (instead of a generic brand colour), plus one clear colour each
 // for the three Quality Check results so Pass/Fail/Pending always read the
 // same way across every chart on the page.
-const CHART_COLORS = {
-    pass: "#46b980",
-    fail: "#e0684f",
-    pending: "#eba93f",
-    accent: "#2f7fb6",
-    grid: "#eaecf1",
-    // A light sky blue for "RFQ Sent" on the Procurement Status chart —
-    // there was no "warn" key in this palette, so that bar was quietly
-    // falling back to Chart.js's default black.
-    sentLight: "#7ec8e3",
-    categorical: ["#2f7fb6", "#eba93f", "#46b980", "#8b8fd6", "#e0684f", "#6fc48a"],
+// Cool pastel palette shared with the stage dashboards (no green/red/amber):
+// "pass" / "fail" / "pending" are shades, the text label carries the meaning.
+const CHART_COLORS_LIGHT = {
+    pass: "#7fb6ee",
+    fail: "#9a8be3",
+    pending: "#bcaef0",
+    accent: "#8b95f0",
+    grid: "rgba(120, 130, 175, 0.16)",
+    edge: "#ffffff",
+    text: "#7b829f",
+    sentLight: "#8ad8e6",
+    categorical: ["#8b95f0", "#b4a7f0", "#8dbdf2", "#c9d3f5", "#86d0e0", "#a3b5f7"],
+};
+const CHART_COLORS_DARK = {
+    pass: "#8cc2f5",
+    fail: "#ae9ff0",
+    pending: "#c9bdf5",
+    accent: "#9aa5f5",
+    grid: "rgba(170, 180, 230, 0.14)",
+    edge: "#232949",
+    text: "#a2a9c8",
+    sentLight: "#8ad8e6",
+    categorical: ["#9aa5f5", "#b9aef5", "#8cc2f5", "#cdd6f8", "#8ad8e6", "#a9bcf8"],
 };
 
 const CHART_ANIMATION = { duration: 700, easing: "easeOutQuart" };
@@ -33,6 +46,9 @@ export class EpcDashboard extends Component {
     static props = { ...standardActionServiceProps };
 
     setup() {
+        // Follows Odoo's own light/dark switch (user menu), stored in this cookie
+        this.dark = cookie.get("color_scheme") === "dark";
+        this.colors = this.dark ? CHART_COLORS_DARK : CHART_COLORS_LIGHT;
         this.orm = useService("orm");
         this.action = useService("action");
         this.charts = {};
@@ -47,6 +63,7 @@ export class EpcDashboard extends Component {
 
         onWillStart(async () => {
             await loadBundle("web.chartjs_lib");
+            window.Chart.defaults.color = this.colors.text;
             await this.loadDashboardData();
         });
 
@@ -140,15 +157,15 @@ export class EpcDashboard extends Component {
                 labels: phase.labels,
                 datasets: [{
                     data: phase.counts,
-                    backgroundColor: CHART_COLORS.categorical,
-                    borderColor: "#fff",
+                    backgroundColor: this.colors.categorical,
+                    borderColor: this.colors.edge,
                     borderWidth: 2,
                     hoverOffset: 10,
                 }],
             },
             options: {
                 animation: CHART_ANIMATION,
-                plugins: { legend: { position: "bottom", onClick: NO_TOGGLE_LEGEND_CLICK } },
+                plugins: { legend: { position: "bottom", onClick: NO_TOGGLE_LEGEND_CLICK, labels: { color: this.colors.text } } },
                 maintainAspectRatio: false,
                 onClick: (_ev, elements) => {
                     if (!elements.length) return;
@@ -173,7 +190,7 @@ export class EpcDashboard extends Component {
             data: {
                 labels: pipeline.labels,
                 datasets: [{
-                    label: _t("Open Items"), data: pipeline.counts, backgroundColor: CHART_COLORS.accent,
+                    label: _t("Open Items"), data: pipeline.counts, backgroundColor: this.colors.accent,
                     borderRadius: 6, borderSkipped: false, maxBarThickness: 28,
                 }],
             },
@@ -183,7 +200,7 @@ export class EpcDashboard extends Component {
                 plugins: { legend: { display: false } },
                 maintainAspectRatio: false,
                 scales: {
-                    x: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: CHART_COLORS.grid } },
+                    x: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: this.colors.grid } },
                     y: { grid: { display: false } },
                 },
                 onClick: (_ev, elements) => {
@@ -214,7 +231,7 @@ export class EpcDashboard extends Component {
         // Same fix as the Procurement Status chart below: there was no
         // "warn" key in the palette, so "Expired" would render as an
         // undefined-color (black) bar the moment its count went above 0.
-        const rawColors = [CHART_COLORS.pass, CHART_COLORS.accent, CHART_COLORS.pending, CHART_COLORS.fail];
+        const rawColors = [this.colors.pass, this.colors.accent, this.colors.pending, this.colors.fail];
         // A funnel only reads as a funnel if the bars actually narrow going
         // down the page. The backend always returns Draft/Active/Expired/
         // Terminated in that fixed order, which is rarely in descending
@@ -258,10 +275,12 @@ export class EpcDashboard extends Component {
                         // hand instead, the same way the doughnut charts' legend
                         // already reads one entry per slice.
                         labels: {
+                            color: this.colors.text,
                             generateLabels: () => labels.map((label, i) => ({
                                 text: `${label} (${counts[i]})`,
                                 fillStyle: colors[i],
                                 strokeStyle: colors[i],
+                                fontColor: this.colors.text,
                                 index: i,
                             })),
                         },
@@ -301,8 +320,8 @@ export class EpcDashboard extends Component {
                 datasets: [{
                     label: _t("Purchase Orders"), data: proc.counts,
                     backgroundColor: [
-                        CHART_COLORS.pending, CHART_COLORS.sentLight, CHART_COLORS.categorical[3],
-                        CHART_COLORS.accent, CHART_COLORS.pass,
+                        this.colors.pending, this.colors.sentLight, this.colors.categorical[3],
+                        this.colors.accent, this.colors.pass,
                     ],
                     borderRadius: 6, borderSkipped: false, maxBarThickness: 46,
                 }],
@@ -312,7 +331,7 @@ export class EpcDashboard extends Component {
                 plugins: { legend: { display: false } },
                 maintainAspectRatio: false,
                 scales: {
-                    y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: CHART_COLORS.grid } },
+                    y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: this.colors.grid } },
                     x: { grid: { display: false } },
                 },
                 onClick: (_ev, elements) => {

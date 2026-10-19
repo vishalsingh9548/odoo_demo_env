@@ -15,6 +15,7 @@
         'data/handover_sequence_data.xml',
         'views/epc_handover_views.xml',
         'views/epc_menus.xml',
+        'views/epc_dashboard_views.xml',
     ],
     'application': True,
     'installable': True,

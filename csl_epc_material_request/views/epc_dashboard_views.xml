@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Live dashboard of this stage, rendered by the generic screen in csl_epc_core.
+             It is the first menu entry, so the app opens on it. -->
+        <record id="epc_dashboard_material_action" model="ir.actions.client">
+            <field name="name">Material Request Dashboard</field>
+            <field name="tag">epc_stage_dashboard</field>
+            <field name="target">current</field>
+            <field name="params" eval="{'stage': 'material'}"/>
+        </record>
+        <menuitem id="menu_epc_dashboard_material"
+                  name="Dashboard"
+                  parent="menu_epc_material_request"
+                  action="epc_dashboard_material_action"
+                  sequence="1"/>
+
+        <!-- Drill-down lists opened from the dashboard. The line models had no
+             views of their own, so Odoo showed only the record ID. -->
+        <record id="epc_material_request_line_view_list" model="ir.ui.view">
+            <field name="name">epc.material.request.line.list</field>
+            <field name="model">epc.material.request.line</field>
+            <field name="arch" type="xml">
+                <list create="0" delete="0" decoration-danger="quantity_to_purchase &gt; 0">
+                    <field name="request_id"/>
+                    <field name="product_id"/>
+                    <field name="vendor_id" optional="show"/>
+                    <field name="quantity_required" sum="Total"/>
+                    <field name="quantity_on_hand"/>
+                    <field name="quantity_to_purchase"/>
+                    <field name="quantity_ordered"/>
+                    <field name="quantity_remaining_to_order"/>
+                    <field name="quantity_issued"/>
+                </list>
+            </field>
+        </record>
+        <record id="epc_material_request_line_view_form" model="ir.ui.view">
+            <field name="name">epc.material.request.line.form</field>
+            <field name="model">epc.material.request.line</field>
+            <field name="arch" type="xml">
+                <form create="0" edit="0" delete="0">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="request_id"/>
+                                <field name="product_id"/>
+                                <field name="description"/>
+                                <field name="vendor_id"/>
+                            </group>
+                            <group>
+                                <field name="quantity_required"/>
+                                <field name="quantity_on_hand"/>
+                                <field name="quantity_to_purchase"/>
+                                <field name="quantity_ordered"/>
+                                <field name="quantity_remaining_to_order"/>
+                                <field name="quantity_issued"/>
+                                <field name="quantity_issuable"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="epc_material_request_line_view_search" model="ir.ui.view">
+            <field name="name">epc.material.request.line.search</field>
+            <field name="model">epc.material.request.line</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="product_id"/>
+                    <field name="request_id"/>
+                    <field name="vendor_id"/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                        <filter name="group_vendor" string="Vendor" context="{'group_by': 'vendor_id'}"/>
+                        <filter name="group_request" string="Request" context="{'group_by': 'request_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+    </data>
+</odoo>
