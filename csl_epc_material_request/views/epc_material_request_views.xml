@@ -29,16 +29,18 @@
                         <button name="action_approve" string="Approve" type="object"
                                 class="oe_highlight" groups="csl_epc_core.group_epc_manager"
                                 invisible="approval_state != 'submitted'"/>
-                        <button name="action_reject" string="Reject" type="object"
+                        <button name="action_open_reject_wizard" string="Reject" type="object"
                                 groups="csl_epc_core.group_epc_manager"
                                 invisible="approval_state != 'submitted'"/>
                         <button name="action_reset_to_submit" string="Reset to Draft" type="object"
                                 invisible="approval_state not in ('submitted', 'rejected')"/>
+                        <button name="action_reset_to_submit" string="Reopen (Reset to Draft)" type="object"
+                                groups="csl_epc_core.group_epc_manager" invisible="approval_state != 'approved'"/>
                         <button name="action_create_purchase_orders" string="Create Purchase Orders" type="object"
                                 class="oe_highlight"
-                                invisible="approval_state != 'approved' or purchase_order_count &gt; 0"/>
+                                invisible="approval_state != 'approved' or not epc_has_shortfall"/>
                         <button name="action_issue_to_project" string="Issue to Project" type="object"
-                                invisible="approval_state != 'approved'"/>
+                                invisible="approval_state != 'approved' or issue_status == 'full'"/>
                         <field name="approval_state" widget="statusbar"
                                statusbar_visible="to_submit,submitted,approved"/>
                     </header>
@@ -57,6 +59,8 @@
                             <field name="project_id"/>
                             <field name="requested_by"/>
                             <field name="request_date"/>
+                            <field name="issue_status"/>
+                            <field name="epc_has_shortfall" invisible="1"/>
                         </group>
                         <field name="line_ids">
                             <list editable="bottom">
@@ -66,6 +70,8 @@
                                 <field name="uom_id"/>
                                 <field name="quantity_on_hand" readonly="1"/>
                                 <field name="quantity_to_purchase" readonly="1"/>
+                                <field name="quantity_ordered" readonly="1" optional="show"/>
+                                <field name="quantity_issued" readonly="1" optional="show"/>
                                 <field name="vendor_id"/>
                             </list>
                         </field>

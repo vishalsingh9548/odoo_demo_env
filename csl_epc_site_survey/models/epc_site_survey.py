@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 
 class EpcSiteSurvey(models.Model):
@@ -86,6 +87,12 @@ class EpcSiteSurvey(models.Model):
              "for solar. A detailed Technical Feasibility study happens next.",
     )
 
+    epc_proceed_anyway = fields.Boolean(
+        string='Proceed Anyway', copy=False, tracking=True,
+        help="A manager ticks this to let work continue although the engineer's verdict "
+             "is 'not feasible' (only matters when 'Stop Work on Not Feasible' is switched on).",
+    )
+
     # Fills in the sequence-based reference number the first time a survey is saved
     @api.model_create_multi
     def create(self, vals_list):
@@ -93,3 +100,28 @@ class EpcSiteSurvey(models.Model):
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('epc.site.survey') or 'New'
         return super().create(vals_list)
+
+    # Raises when the engineer says "not feasible" and the company switch asks to stop work
+    def _epc_check_feasible(self):
+        for survey in self:
+            if (survey.is_feasible == 'no' and not survey.epc_proceed_anyway
+                    and self.env['epc.config'].flag('block_not_feasible')):
+                raise UserError(
+                    "The site survey says this site is not feasible. Mark the lead as lost, "
+                    "or ask a Project Manager to tick 'Proceed anyway' on the survey.")
+
+    # Only an approved survey can lead on to a Feasibility Study
+    def _epc_check_ready_for_next_stage(self):
+        for survey in self:
+            if survey.approval_state != 'approved':
+                raise UserError("Approve the site survey before creating a feasibility study.")
+        self._epc_check_feasible()
+
+    # Opens the standard "Lost" reason wizard for this survey's lead / opportunity
+    def action_mark_lead_lost(self):
+        self.ensure_one()
+        if not self.lead_id:
+            raise UserError("This survey is not linked to a lead.")
+        action = self.env['ir.actions.actions']._for_xml_id('crm.crm_lead_lost_action')
+        action['context'] = {'default_lead_ids': self.lead_id.ids, 'active_ids': self.lead_id.ids}
+        return action

@@ -10,6 +10,13 @@
                     <button name="action_create_commissioning" string="Proceed to Commissioning" type="object"
                             class="oe_highlight" invisible="not epc_all_tasks_done or commissioning_count != 0"/>
                 </xpath>
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_commissionings" type="object"
+                            class="oe_stat_button" icon="fa-bolt"
+                            invisible="commissioning_count == 0">
+                        <field name="commissioning_count" widget="statinfo" string="Commissioning"/>
+                    </button>
+                </xpath>
             </field>
         </record>
     </data>

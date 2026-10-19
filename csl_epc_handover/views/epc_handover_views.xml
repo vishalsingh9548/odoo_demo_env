@@ -30,11 +30,13 @@
                         <button name="action_approve" string="Approve" type="object"
                                 class="oe_highlight" groups="csl_epc_core.group_epc_manager"
                                 invisible="approval_state != 'submitted'"/>
-                        <button name="action_reject" string="Reject" type="object"
+                        <button name="action_open_reject_wizard" string="Reject" type="object"
                                 groups="csl_epc_core.group_epc_manager"
                                 invisible="approval_state != 'submitted'"/>
                         <button name="action_reset_to_submit" string="Reset to Draft" type="object"
                                 invisible="approval_state not in ('submitted', 'rejected')"/>
+                        <button name="action_reset_to_submit" string="Reopen (Reset to Draft)" type="object"
+                                groups="csl_epc_core.group_epc_manager" invisible="approval_state != 'approved'"/>
                         <field name="approval_state" widget="statusbar"
                                statusbar_visible="to_submit,submitted,approved"/>
                     </header>

@@ -12,6 +12,7 @@
     ],
     'data': [
         'security/ir.model.access.csv',
+        'security/epc_rules.xml',
         'data/commissioning_sequence_data.xml',
         'report/epc_commissioning_report.xml',
         'views/epc_commissioning_views.xml',

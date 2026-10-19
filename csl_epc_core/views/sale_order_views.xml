@@ -16,6 +16,9 @@
                 <xpath expr="//notebook" position="inside">
                     <page name="epc_terms" string="Solar EPC Terms">
                         <group>
+                            <field name="is_epc_order"/>
+                        </group>
+                        <group>
                             <group string="Commercial Terms">
                                 <field name="warranty_type"/>
                                 <field name="delivery_type"/>

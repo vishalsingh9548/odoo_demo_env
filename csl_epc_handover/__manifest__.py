@@ -11,6 +11,7 @@
     ],
     'data': [
         'security/ir.model.access.csv',
+        'security/epc_rules.xml',
         'data/handover_sequence_data.xml',
         'views/epc_handover_views.xml',
         'views/epc_menus.xml',

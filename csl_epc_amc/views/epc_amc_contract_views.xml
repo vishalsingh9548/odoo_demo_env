@@ -30,6 +30,8 @@
                                 class="oe_highlight" invisible="state != 'draft'"/>
                         <button name="action_terminate" string="Terminate" type="object"
                                 invisible="state != 'active'"/>
+                        <button name="action_renew" string="Renew" type="object"
+                                invisible="state not in ('active', 'expired')"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,active"/>
                     </header>
                     <sheet>

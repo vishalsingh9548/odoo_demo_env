@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 
 class EpcBoq(models.Model):
@@ -61,6 +62,27 @@ class EpcBoq(models.Model):
         help="The Sales Quotation generated from this BOQ, once approved.",
     )
 
+    revision_number = fields.Integer(
+        string='Revision', default=1, copy=False,
+        help="1 for the first version of this BOQ; each time it is revised after approval the new copy gets the next number.",
+    )
+    revision_of_id = fields.Many2one(
+        'epc.boq', string='Revision Of', copy=False, readonly=True,
+        help="The earlier version of the BOQ this one was revised from.",
+    )
+    superseded = fields.Boolean(
+        string='Superseded', copy=False, readonly=True,
+        help="Ticked automatically on the old version once a newer revision exists; "
+             "no new quotation can be created from it.",
+    )
+    quotation_state = fields.Selection(
+        related='sale_order_id.state', string='Quotation Status',
+        help="Status of the linked quotation / sales order.",
+    )
+
+    # These stay editable on an approved BOQ even when approved documents are locked
+    _epc_lock_whitelist = ('sale_order_id', 'superseded')
+
     # Fills in the sequence-based reference number the first time a BOQ is saved
     @api.model_create_multi
     def create(self, vals_list):
@@ -76,9 +98,31 @@ class EpcBoq(models.Model):
             boq.total_cost = sum(boq.line_ids.mapped('subtotal'))
             boq.total_sell_price = boq.total_cost * (1 + (boq.margin_percent or 0.0) / 100.0)
 
-    # Turns this approved BOQ into a real Sales Quotation, copying every BOQ line
-    # into a sale order line so the customer-facing price matches the costing sheet
-    def action_create_quotation(self):
+    # Checks the BOQ is fit to be quoted: approved, not replaced by a newer
+    # revision, has lines and (when the Strict BOQ Check switch is on) every
+    # line has a product and a unit cost
+    def _epc_check_quotation_ready(self):
+        self.ensure_one()
+        if self.approval_state != 'approved':
+            raise UserError("Approve the BOQ before creating a quotation.")
+        if self.superseded:
+            raise UserError("A newer revision of this BOQ exists - create the quotation from that one.")
+        if not self.line_ids:
+            raise UserError("This BOQ has no lines yet, so there is nothing to quote.")
+        if self.env['epc.config'].flag('strict_boq'):
+            service_categories = ('civil_work', 'manpower', 'logistics', 'overheads', 'other')
+            problems = []
+            for line in self.line_ids:
+                name = line.description or line.category
+                if not line.product_id and line.category not in service_categories:
+                    problems.append("%s: no product" % name)
+                if not line.unit_cost and not line.zero_cost_ok:
+                    problems.append("%s: no unit cost (tick 'Zero cost is correct' if that is right)" % name)
+            if problems:
+                raise UserError("Fix these BOQ lines before creating a quotation:\n- " + "\n- ".join(problems))
+
+    # Builds the sale order lines for this BOQ (cost plus margin)
+    def _epc_quotation_lines(self):
         self.ensure_one()
         order_lines = []
         for line in self.line_ids:
@@ -87,14 +131,27 @@ class EpcBoq(models.Model):
                 'product_id': line.product_id.id if line.product_id else False,
                 'name': line.description or (line.product_id.display_name if line.product_id else ''),
                 'product_uom_qty': line.quantity,
-                'product_uom': line.uom_id.id if line.uom_id else False,
+                # a line without its own unit takes the product's unit, so the order line is complete
+                'product_uom': (line.uom_id or line.product_id.uom_id).id or False,
                 'price_unit': unit_sell_price,
+                # Odoo treats a price that differs from "technical_price_unit" as typed by
+                # hand and keeps it; without this, changing the unit of measure or the
+                # quantity would reset the BOQ price to the product's list price
+                'technical_price_unit': -1.0,
             }))
+        return order_lines
+
+    # Turns this approved BOQ into a real Sales Quotation, copying every BOQ line
+    # into a sale order line so the customer-facing price matches the costing sheet
+    def action_create_quotation(self):
+        self.ensure_one()
+        self._epc_check_quotation_ready()
         order = self.env['sale.order'].create({
             'partner_id': self.partner_id.id,
             'boq_id': self.id,
             'opportunity_id': self.lead_id.id,
-            'order_line': order_lines,
+            'is_epc_order': True,
+            'order_line': self._epc_quotation_lines(),
         })
         self.sale_order_id = order.id
         return {
@@ -102,6 +159,46 @@ class EpcBoq(models.Model):
             'res_model': 'sale.order',
             'view_mode': 'form',
             'res_id': order.id,
+            'target': 'current',
+        }
+
+    # While the quotation is still a draft, refreshes its lines from the BOQ
+    # (after the BOQ was corrected) instead of having to start a new quotation
+    def action_sync_quotation(self):
+        self.ensure_one()
+        order = self.sale_order_id
+        if not order or order.state not in ('draft', 'sent'):
+            raise UserError("Only a quotation that is still a draft can be refreshed from the BOQ.")
+        order.order_line.unlink()
+        order.write({'order_line': self._epc_quotation_lines()})
+        self.message_post(body="Quotation %s refreshed from this BOQ." % order.name)
+
+    # Makes a new, editable copy of this approved BOQ (revision N+1) and marks
+    # this one as superseded, keeping the old version as history
+    def action_revise(self):
+        self.ensure_one()
+        self._epc_check_manager()
+        if self.approval_state != 'approved':
+            raise UserError("Only an approved BOQ can be revised. Edit it directly while it is still a draft.")
+        if self.sale_order_id and self.sale_order_id.state not in ('draft', 'sent', 'cancel'):
+            raise UserError("The quotation of this BOQ is already confirmed, so it cannot be revised.")
+        new = self.copy({
+            'revision_of_id': self.id,
+            'revision_number': self.revision_number + 1,
+            'line_ids': [(0, 0, {
+                'sequence': line.sequence, 'category': line.category,
+                'product_id': line.product_id.id, 'description': line.description,
+                'quantity': line.quantity, 'uom_id': line.uom_id.id,
+                'unit_cost': line.unit_cost, 'zero_cost_ok': line.zero_cost_ok,
+            }) for line in self.line_ids],
+        })
+        self.superseded = True
+        self.message_post(body="Revised: new version %s created." % new.name)
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'epc.boq',
+            'view_mode': 'form',
+            'res_id': new.id,
             'target': 'current',
         }
 
@@ -178,6 +275,44 @@ class EpcBoqLine(models.Model):
         string='Subtotal', compute='_compute_subtotal', store=True,
         help="Quantity multiplied by unit cost — this line's total cost.",
     )
+
+    zero_cost_ok = fields.Boolean(
+        string='Zero Cost Is Correct',
+        help="Tick this when a line really has no cost (e.g. supplied free), so the "
+             "Strict BOQ Check does not complain about the missing unit cost.",
+    )
+
+    # Stops line changes on an approved BOQ when "Lock Approved Documents" is on
+    def _epc_check_boq_unlocked(self):
+        if not self.env.su and self.env['epc.config'].flag('lock_approved'):
+            if any(line.boq_id.approval_state == 'approved' for line in self):
+                raise UserError("This BOQ is approved and locked. Use Reopen (Reset to Draft) first.")
+
+    # Picking a product fills the unit cost from the product's own cost
+    @api.onchange('product_id')
+    def _onchange_product_id_set_cost(self):
+        if self.product_id:
+            self.unit_cost = self.product_id.standard_price
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        # A line created with a product but no cost takes the product's cost
+        for vals in vals_list:
+            if vals.get('product_id') and 'unit_cost' not in vals:
+                vals['unit_cost'] = self.env['product.product'].browse(vals['product_id']).standard_price
+        if not self.env.su and self.env['epc.config'].flag('lock_approved'):
+            boq_ids = [vals.get('boq_id') for vals in vals_list if vals.get('boq_id')]
+            if boq_ids and self.env['epc.boq'].browse(boq_ids).filtered(lambda b: b.approval_state == 'approved'):
+                raise UserError("This BOQ is approved and locked. Use Reopen (Reset to Draft) first.")
+        return super().create(vals_list)
+
+    def write(self, vals):
+        self._epc_check_boq_unlocked()
+        return super().write(vals)
+
+    def unlink(self):
+        self._epc_check_boq_unlocked()
+        return super().unlink()
 
     # Multiplies quantity by unit cost to get this line's total cost
     @api.depends('quantity', 'unit_cost')

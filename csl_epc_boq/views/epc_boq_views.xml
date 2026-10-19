@@ -34,19 +34,27 @@
                         <button name="action_approve" string="Approve" type="object"
                                 class="oe_highlight" groups="csl_epc_core.group_epc_manager"
                                 invisible="approval_state != 'submitted'"/>
-                        <button name="action_reject" string="Reject" type="object"
+                        <button name="action_open_reject_wizard" string="Reject" type="object"
                                 groups="csl_epc_core.group_epc_manager"
                                 invisible="approval_state != 'submitted'"/>
                         <button name="action_reset_to_submit" string="Reset to Draft" type="object"
                                 invisible="approval_state not in ('submitted', 'rejected')"/>
+                        <button name="action_reset_to_submit" string="Reopen (Reset to Draft)" type="object"
+                                groups="csl_epc_core.group_epc_manager" invisible="approval_state != 'approved'"/>
                         <button name="action_create_quotation" string="Create Quotation" type="object"
-                                class="oe_highlight" invisible="approval_state != 'approved' or sale_order_id"/>
+                                class="oe_highlight" invisible="approval_state != 'approved' or sale_order_id or superseded"/>
+                        <button name="action_sync_quotation" string="Refresh Quotation from BOQ" type="object"
+                                invisible="not sale_order_id or quotation_state not in ('draft', 'sent')"/>
+                        <button name="action_revise" string="Revise BOQ" type="object"
+                                groups="csl_epc_core.group_epc_manager"
+                                invisible="approval_state != 'approved' or superseded"/>
                         <button name="action_view_quotation" string="View Quotation" type="object"
                                 invisible="not sale_order_id"/>
                         <field name="approval_state" widget="statusbar"
                                statusbar_visible="to_submit,submitted,approved"/>
                     </header>
                     <sheet>
+                        <widget name="web_ribbon" title="Superseded" bg_color="text-bg-secondary" invisible="not superseded"/>
                         <div class="oe_title">
                             <h1><field name="name" readonly="1"/></h1>
                         </div>
@@ -56,6 +64,10 @@
                                 <field name="lead_id"/>
                                 <field name="partner_id"/>
                                 <field name="currency_id" groups="base.group_multi_currency"/>
+                                <field name="revision_number"/>
+                                <field name="revision_of_id" invisible="not revision_of_id"/>
+                                <field name="superseded" invisible="1"/>
+                                <field name="quotation_state" invisible="1"/>
                             </group>
                             <group string="Summary">
                                 <field name="capacity_kw"/>
@@ -76,8 +88,9 @@
                                         <field name="description"/>
                                         <field name="quantity"/>
                                         <field name="uom_id" optional="hide"/>
-                                        <field name="unit_cost" optional="hide"/>
-                                        <field name="subtotal" sum="Total" optional="hide"/>
+                                        <field name="unit_cost"/>
+                                        <field name="zero_cost_ok" optional="hide"/>
+                                        <field name="subtotal" sum="Total"/>
                                     </list>
                                 </field>
                             </page>

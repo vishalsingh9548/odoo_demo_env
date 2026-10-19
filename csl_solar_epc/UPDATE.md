@@ -66,3 +66,24 @@ The repo root is `odoo_demo_env/`. Stage the whole set with:
 - Odoo only scans one folder level below each `addons_path` entry, so all modules sit side by side in `odoo_demo_env/` (not nested inside `csl_solar_epc/`).
 - Moving records between modules changes their external IDs (`<module>.<xml_id>`). **Do not upgrade a database that already had the old single `csl_solar_epc` installed** — install on a fresh database.
 - Fields, model names (`epc.*`) and database tables are unchanged from the original module, so data layout is the same.
+
+---
+
+## Update 2 (2026-10-19) — gap fixes
+Follow-up round from `SOLAR_EPC_GAPS_AND_FIX_PLAN.md`. Existing behaviour is unchanged unless stated; every stricter rule is behind a switch in *Solar Dashboard → Configuration → Settings* (all OFF by default) except the two decided as ON: server-side approval permission (B6) and Field User own-records visibility (F22).
+
+### What changed
+- **Automated tests (F23):** `tests/test_epc_flow.py` — 23 tests walking the pipeline and every fix above (full lead→project flow, approval guards, switches, quotation checks, revisions, per-vendor POs, double-issue guard, commissioning switches, AMC job, Field User visibility, Consume Site Stock cases). They live in the parent because it depends on every stage. Run with `--test-enable --test-tags=/csl_solar_epc`.
+- No functional change to the dashboard or reports.
+
+### Settings
+All switches are in *Solar Dashboard → Configuration → Settings* (core module). Defaults: everything stricter is OFF; notifications are ON; approval permission checks and Field User own-records visibility are always ON.
+
+### Not done in this round (still in the plan)
+A2 phase 2 (accepted/rejected quantity and return-to-vendor on incoming QC), C14 (auto-marking milestones, billing link), C15 (site checklist linked to tasks), F24 (DPR approval/reminder/multi-photo), E21 SLA link and default warranty date, a lot/serial pre-check on *Issue to Project*, multi-company, AMC invoicing.
+
+### Upgrade note
+Upgrade the module (`-u <module>`); new fields have safe defaults, no data migration is needed. Users who approve documents must be in the *Project Manager* group.
+
+### Update 3
+Tests now total 27 (added: failed check logged with reason, EPC order has no delivery while a plain order keeps its delivery, failed check saved by a real user). All pass.

@@ -46,3 +46,21 @@ class ProjectProject(models.Model):
             'context': {'default_project_id': self.id},
             'target': 'current',
         }
+
+    # Opens the Commissioning record(s) of this project, called from the smart
+    # button: straight into the record when there is only one
+    def action_view_commissionings(self):
+        self.ensure_one()
+        records = self.env['epc.commissioning'].search([('project_id', '=', self.id)])
+        action = {
+            'type': 'ir.actions.act_window',
+            'name': 'Commissioning',
+            'res_model': 'epc.commissioning',
+            'context': {'default_project_id': self.id},
+        }
+        if len(records) == 1:
+            action.update({'view_mode': 'form', 'res_id': records.id})
+        else:
+            action.update({'view_mode': 'list,form', 'domain': [('project_id', '=', self.id)]})
+        return action
+

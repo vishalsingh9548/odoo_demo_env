@@ -34,3 +34,22 @@ No code edits other than the group references (`csl_epc_core.group_epc_*`).
 - Odoo only scans one folder level below each `addons_path` entry, so all modules sit side by side in `odoo_demo_env/` (not nested inside `csl_solar_epc/`).
 - Moving records between modules changes their external IDs (`<module>.<xml_id>`). **Do not upgrade a database that already had the old single `csl_solar_epc` installed** — install on a fresh database.
 - Fields, model names (`epc.*`) and database tables are unchanged from the original module, so data layout is the same.
+
+---
+
+## Update 2 (2026-10-19) — gap fixes
+Follow-up round from `SOLAR_EPC_GAPS_AND_FIX_PLAN.md`. Existing behaviour is unchanged unless stated; every stricter rule is behind a switch in *Solar Dashboard → Configuration → Settings* (all OFF by default) except the two decided as ON: server-side approval permission (B6) and Field User own-records visibility (F22).
+
+### What changed
+- Optional switch **Handover Needs Documents**: the four documents and *Customer Training Done* must be present before a handover can be approved (OFF by default).
+- Approval now goes through the shared approval checks (Project Manager only, correct state).
+- **Visibility (F22):** Field Users see handovers they created; managers see all.
+- **Not changed (decision):** approving a handover simply means *Completed* — no archiving, no project closure or stage change, and the Handover screen is unchanged.
+
+### Impact
+No behaviour change unless the switch is turned on.
+
+### Upgrade note
+Upgrade the module (`-u <module>`); new fields have safe defaults, no data migration is needed. Users who approve documents must be in the *Project Manager* group.
+
+- **Reject pop-up:** the *Reject* button now opens a dialog that asks for the reason (provided by `csl_epc_core`).

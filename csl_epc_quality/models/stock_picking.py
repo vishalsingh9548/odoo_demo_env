@@ -31,12 +31,11 @@ class StockPicking(models.Model):
                     and picking.state not in ('done', 'cancel')):
                 picking.epc_needs_incoming_qc = False
                 continue
-            passed_check = self.env['epc.quality.check'].search_count([
+            latest = self.env['epc.quality.check'].sudo().search([
                 ('picking_id', '=', picking.id),
                 ('category', '=', 'incoming_material'),
-                ('overall_result', '=', 'pass'),
-            ])
-            picking.epc_needs_incoming_qc = not passed_check
+            ], limit=1)
+            picking.epc_needs_incoming_qc = not (latest and latest.overall_result == 'pass')
 
     # Opens a blank, pre-filled Incoming Material Quality Check form as a
     # wizard-style dialog right on top of this receipt (target 'new', not a
@@ -61,10 +60,10 @@ class StockPicking(models.Model):
     def button_validate(self):
         for picking in self:
             if picking.project_id and picking.picking_type_id.code == 'incoming':
-                checks = self.env['epc.quality.check'].search([
+                checks = self.env['epc.quality.check'].sudo().search([
                     ('picking_id', '=', picking.id),
                     ('category', '=', 'incoming_material'),
-                ])
+                ])  # newest first
                 if not checks:
                     raise UserError(
                         "This receipt has no Incoming Material Quality Check logged "
@@ -72,10 +71,12 @@ class StockPicking(models.Model):
                         "for this delivery (Related Delivery/Receipt = %s), and pass "
                         "it before receiving this material into stock." % picking.name
                     )
-                if not any(check.overall_result == 'pass' for check in checks):
+                # The newest check is the one that counts (an older failed one can be
+                # superseded by a re-inspection that passes)
+                if checks[0].overall_result != 'pass':
                     raise UserError(
-                        "The Incoming Material Quality Check for this receipt has not "
-                        "passed yet (it's still Pending or has Failed). Resolve it "
-                        "before receiving this material into stock."
+                        "The latest Incoming Material Quality Check for this receipt has not "
+                        "passed yet (it's still Pending or has Failed). Pass it, or use Re-inspect "
+                        "on the failed check, before receiving this material into stock."
                     )
         return super().button_validate()

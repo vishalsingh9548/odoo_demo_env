@@ -9,6 +9,9 @@
                 <xpath expr="//button[@name='action_open_share_project_wizard']" position="after">
                     <button name="action_create_material_request" string="New Material Request" type="object"
                             class="oe_highlight" invisible="not boq_id or material_request_count != 0"/>
+                    <button name="action_issue_material_to_site" string="Issue Material to Site" type="object"
+                            class="oe_highlight" groups="csl_epc_core.group_epc_user"
+                            invisible="not epc_material_to_issue"/>
                 </xpath>
                 <xpath expr="//div[@name='button_box']" position="inside">
                     <button name="action_view_material_requests" type="object"

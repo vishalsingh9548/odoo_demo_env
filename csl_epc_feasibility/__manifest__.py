@@ -11,6 +11,7 @@
     ],
     'data': [
         'security/ir.model.access.csv',
+        'security/epc_rules.xml',
         'data/feasibility_sequence_data.xml',
         'views/epc_feasibility_views.xml',
         'views/epc_site_survey_views.xml',

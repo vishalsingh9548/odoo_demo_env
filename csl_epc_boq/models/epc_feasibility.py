@@ -25,6 +25,7 @@ class EpcFeasibility(models.Model):
     # called from the "Create BOQ" button
     def action_create_boq(self):
         self.ensure_one()
+        self._epc_check_ready_for_next_stage()
         boq = self.env['epc.boq'].create({
             'feasibility_id': self.id,
             'lead_id': self.lead_id.id,

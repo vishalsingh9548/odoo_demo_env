@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 
 class EpcHandover(models.Model):
@@ -65,3 +66,23 @@ class EpcHandover(models.Model):
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('epc.handover') or 'New'
         return super().create(vals_list)
+
+    # When the "Handover Needs Documents" switch is on, the four hand-over
+    # documents and the customer training must be in place before approval
+    def action_approve(self):
+        if self.env['epc.config'].flag('handover_require_docs'):
+            for handover in self:
+                missing = []
+                if not handover.as_built_drawing:
+                    missing.append("As-Built Drawings")
+                if not handover.test_reports:
+                    missing.append("Test Reports")
+                if not handover.om_manual:
+                    missing.append("O&M Manual")
+                if not handover.warranty_certificate:
+                    missing.append("Warranty Certificate")
+                if not handover.customer_training_done:
+                    missing.append("Customer Training Done")
+                if missing:
+                    raise UserError("Before approving the handover, complete: " + ", ".join(missing) + ".")
+        return super().action_approve()

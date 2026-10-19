@@ -31,6 +31,8 @@
                              this form is opened as a wizard from there. The action itself
                              (action_consume_site_stock, below) is unchanged and is what
                              Commissioning's own button calls into. -->
+                        <button name="action_reinspect" string="Re-inspect" type="object"
+                                invisible="overall_result != 'fail'"/>
                         <field name="overall_result" widget="statusbar" statusbar_visible="pending,pass,fail"/>
                     </header>
                     <sheet>
@@ -47,6 +49,7 @@
                             <group>
                                 <field name="inspector_id"/>
                                 <field name="check_date"/>
+                                <field name="previous_check_id" invisible="not previous_check_id"/>
                             </group>
                         </group>
                         <field name="line_ids">
@@ -57,6 +60,8 @@
                             </list>
                         </field>
                         <group>
+                            <field name="fail_reason" placeholder="Why did this check fail?"
+                                   invisible="overall_result != 'fail'" required="overall_result == 'fail'"/>
                             <field name="remarks"/>
                         </group>
                     </sheet>

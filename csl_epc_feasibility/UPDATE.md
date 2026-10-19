@@ -39,3 +39,21 @@ Moved from the old module: `epc_feasibility.py`, its views and sequence.
 - Odoo only scans one folder level below each `addons_path` entry, so all modules sit side by side in `odoo_demo_env/` (not nested inside `csl_solar_epc/`).
 - Moving records between modules changes their external IDs (`<module>.<xml_id>`). **Do not upgrade a database that already had the old single `csl_solar_epc` installed** — install on a fresh database.
 - Fields, model names (`epc.*`) and database tables are unchanged from the original module, so data layout is the same.
+
+---
+
+## Update 2 (2026-10-19) — gap fixes
+Follow-up round from `SOLAR_EPC_GAPS_AND_FIX_PLAN.md`. Existing behaviour is unchanged unless stated; every stricter rule is behind a switch in *Solar Dashboard → Configuration → Settings* (all OFF by default) except the two decided as ON: server-side approval permission (B6) and Field User own-records visibility (F22).
+
+### What changed
+- **Stage check (B9):** a BOQ can only be created from an approved study.
+- **Not feasible (B10):** *Mark Lead Lost* button; optional **Proceed Anyway** override with the *Stop Work on "Not Feasible"* switch (same behaviour as the survey).
+- **Visibility (F22):** Field Users see studies they created or whose survey they are the engineer on; managers see all.
+
+### Why / Impact
+Same as Site Survey: server-side gating and a way to stop work on a not-feasible project. No change unless the switch is on.
+
+### Upgrade note
+Upgrade the module (`-u <module>`); new fields have safe defaults, no data migration is needed. Users who approve documents must be in the *Project Manager* group.
+
+- **Reject pop-up:** the *Reject* button now opens a dialog that asks for the reason (provided by `csl_epc_core`).

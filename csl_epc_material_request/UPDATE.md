@@ -40,3 +40,25 @@ Moved from the old module: `epc_material_request.py`, `purchase_order.py`, their
 - Odoo only scans one folder level below each `addons_path` entry, so all modules sit side by side in `odoo_demo_env/` (not nested inside `csl_solar_epc/`).
 - Moving records between modules changes their external IDs (`<module>.<xml_id>`). **Do not upgrade a database that already had the old single `csl_solar_epc` installed** — install on a fresh database.
 - Fields, model names (`epc.*`) and database tables are unchanged from the original module, so data layout is the same.
+
+---
+
+## Update 2 (2026-10-19) — gap fixes
+Follow-up round from `SOLAR_EPC_GAPS_AND_FIX_PLAN.md`. Existing behaviour is unchanged unless stated; every stricter rule is behind a switch in *Solar Dashboard → Configuration → Settings* (all OFF by default) except the two decided as ON: server-side approval permission (B6) and Field User own-records visibility (F22).
+
+### What changed
+- **Purchase orders (D16):** *Create Purchase Orders* now creates one draft RFQ per preferred vendor directly and links each to the request; it can be pressed again while shortfall remains. Lines without a preferred vendor still open as a pre-filled new RFQ (a vendor is mandatory on a PO). The button hides when nothing is left to buy.
+- **Issue to project (D17):** new line fields *Quantity Ordered*, *Still To Order*, *Quantity Issued*, *Can Issue Now* and request field **Issue Status** (Nothing / Partly / Fully Issued). Issuing moves only what is not yet issued; pressing it twice no longer sends material twice; the button hides when fully issued.
+- **Stock figure (D18):** *Quantity On Hand* is now free stock (on hand minus reserved). On submit, a request that goes beyond the project's BOQ gets a warning in the chatter; optional switch **Block Over-BOQ Requests** makes it a hard stop.
+- **Visibility (F22):** Field Users see requests they created or requested; managers see all.
+
+### Why / Impact
+Removes duplicate issuing and the one-PO limit. The on-hand number can be lower than before where stock is reserved elsewhere (that is the correct free quantity).
+
+### Upgrade note
+Upgrade the module (`-u <module>`); new fields have safe defaults, no data migration is needed. Users who approve documents must be in the *Project Manager* group.
+
+- **Reject pop-up:** the *Reject* button now opens a dialog that asks for the reason (provided by `csl_epc_core`).
+
+### Update 3
+- **"Issue Material to Site" button on the Project form** (header, highlighted): shown while an approved material request of the project still has stock that has not been issued to the site. One click issues every such request (one internal transfer per request) and opens the transfer; the button disappears once everything has been issued. This way the step is no longer forgotten on the request itself. New project field: *Material To Issue*.

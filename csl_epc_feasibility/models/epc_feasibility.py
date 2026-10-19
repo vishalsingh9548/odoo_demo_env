@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 
 class EpcFeasibility(models.Model):
@@ -86,6 +87,12 @@ class EpcFeasibility(models.Model):
              "forward to costing and quotation.",
     )
 
+    epc_proceed_anyway = fields.Boolean(
+        string='Proceed Anyway', copy=False, tracking=True,
+        help="A manager ticks this to let work continue although the verdict is "
+             "'not feasible' (only matters when 'Stop Work on Not Feasible' is switched on).",
+    )
+
     # Fills in the sequence-based reference number the first time a study is saved
     @api.model_create_multi
     def create(self, vals_list):
@@ -93,3 +100,23 @@ class EpcFeasibility(models.Model):
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('epc.feasibility') or 'New'
         return super().create(vals_list)
+
+    # Only an approved, feasible study can lead on to a BOQ
+    def _epc_check_ready_for_next_stage(self):
+        for study in self:
+            if study.approval_state != 'approved':
+                raise UserError("Approve the feasibility study before creating a BOQ.")
+            if (study.feasibility_result == 'no' and not study.epc_proceed_anyway
+                    and self.env['epc.config'].flag('block_not_feasible')):
+                raise UserError(
+                    "This study says the project is not feasible. Mark the lead as lost, "
+                    "or ask a Project Manager to tick 'Proceed anyway' on the study.")
+
+    # Opens the standard "Lost" reason wizard for this study's lead / opportunity
+    def action_mark_lead_lost(self):
+        self.ensure_one()
+        if not self.lead_id:
+            raise UserError("This study is not linked to a lead.")
+        action = self.env['ir.actions.actions']._for_xml_id('crm.crm_lead_lost_action')
+        action['context'] = {'default_lead_ids': self.lead_id.ids, 'active_ids': self.lead_id.ids}
+        return action

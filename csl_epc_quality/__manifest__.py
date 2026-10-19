@@ -11,6 +11,7 @@
     ],
     'data': [
         'security/ir.model.access.csv',
+        'security/epc_rules.xml',
         'data/quality_sequence_data.xml',
         'data/epc_quality_checkpoint_data.xml',
         'data/epc_inventory_data.xml',

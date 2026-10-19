@@ -46,6 +46,13 @@ class SaleOrder(models.Model):
         help="The manufacturing tolerance allowed on the rated wattage of the modules supplied.",
     )
 
+    is_epc_order = fields.Boolean(
+        string='Solar EPC Order', copy=False,
+        help="Tick this for a solar EPC order. Confirming such an order creates its "
+             "EPC Project automatically. Orders created from a BOQ are ticked for you; "
+             "ordinary sales orders are left alone.",
+    )
+
     epc_project_id = fields.Many2one(
         'project.project', string='EPC Project', copy=False, readonly=True,
         help="The installation Project created from this order once it is confirmed.",
@@ -66,9 +73,14 @@ class SaleOrder(models.Model):
     def action_confirm(self):
         result = super().action_confirm()
         for order in self:
-            if not order.epc_project_id:
+            if not order.epc_project_id and order._epc_should_create_project():
                 order._epc_create_project()
         return result
+
+    # Only solar EPC orders get an EPC Project; other modules (BOQ) widen this
+    def _epc_should_create_project(self):
+        self.ensure_one()
+        return self.is_epc_order
 
     # Creates the EPC Project for this order, copying over the customer, capacity
     # and BOQ reference so the project starts with the right context already filled in

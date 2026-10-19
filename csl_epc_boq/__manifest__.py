@@ -11,6 +11,7 @@
     ],
     'data': [
         'security/ir.model.access.csv',
+        'security/epc_rules.xml',
         'data/boq_sequence_data.xml',
         'views/epc_boq_views.xml',
         'views/epc_feasibility_views.xml',

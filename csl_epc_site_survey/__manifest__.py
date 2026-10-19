@@ -11,6 +11,7 @@
     ],
     'data': [
         'security/ir.model.access.csv',
+        'security/epc_rules.xml',
         'data/site_survey_sequence_data.xml',
         'views/epc_site_survey_views.xml',
         'views/crm_lead_views.xml',

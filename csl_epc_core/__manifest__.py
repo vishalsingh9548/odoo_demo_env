@@ -11,6 +11,7 @@
         'hr_timesheet',
         'crm',
         'sale_management',
+        'sale_stock',
         'sale_project',
         'stock',
         'project_stock',
@@ -20,7 +21,10 @@
     ],
     'data': [
         'security/epc_security.xml',
+        'security/ir.model.access.csv',
         'views/epc_menus.xml',
+        'views/res_config_settings_views.xml',
+        'views/epc_reject_wizard_views.xml',
         'views/crm_lead_views.xml',
         'views/sale_order_views.xml',
         'views/project_project_views.xml',

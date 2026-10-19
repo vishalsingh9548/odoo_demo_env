@@ -48,3 +48,40 @@ Moved here unchanged from the old module: `epc_approval_mixin.py`, `project_task
 - Odoo only scans one folder level below each `addons_path` entry, so all modules sit side by side in `odoo_demo_env/` (not nested inside `csl_solar_epc/`).
 - Moving records between modules changes their external IDs (`<module>.<xml_id>`). **Do not upgrade a database that already had the old single `csl_solar_epc` installed** — install on a fresh database.
 - Fields, model names (`epc.*`) and database tables are unchanged from the original module, so data layout is the same.
+
+---
+
+## Update 2 (2026-10-19) — gap fixes
+Follow-up round from `SOLAR_EPC_GAPS_AND_FIX_PLAN.md`. Existing behaviour is unchanged unless stated; every stricter rule is behind a switch in *Solar Dashboard → Configuration → Settings* (all OFF by default) except the two decided as ON: server-side approval permission (B6) and Field User own-records visibility (F22).
+
+### What changed
+- **Settings screen** (new): *Configuration → Settings* shows a **Solar EPC** section with every switch below. Helper model `epc.config` reads them. Switches: Block Self-Approval, Lock Approved Documents, Turn Off Notifications, Stop Work on "Not Feasible", Strict BOQ Check, Failed Items Need a Remark, Lock Finished Quality Checks, Block Over-BOQ Requests, the Commissioning requirements, One Commissioning per Project, the Handover requirements, Create AMC Service Visits Automatically.
+- **Approval workflow (`epc.approval.mixin`)** — used by survey, feasibility, BOQ, material request, commissioning, handover:
+  - *B6* Approve / Reject now check in Python that the user is a Project Manager or Administrator (not just hidden buttons) and that the document is in the right state (submit from To Submit/Rejected, approve/reject from Submitted). Re-opening an approved document is manager-only.
+  - *B6* optional switch **Block Self-Approval**.
+  - *B7* optional switch **Lock Approved Documents** (writes to an approved document are refused; approval fields, chatter and a per-model whitelist stay editable; superuser scripts are not affected).
+  - *B8* **Notifications**: submitting creates a to-do for the approvers; approving/rejecting messages the submitter (rejection includes the reason and a to-do). Can be switched off.
+  - New **Reopen (Reset to Draft)** button (managers) on approved documents.
+- **Sale Order**: new **Solar EPC Order** tick (*C11*). Confirming an order creates an EPC Project only for EPC orders (ticked, or created from a BOQ). Ordinary sales orders are left alone. The project values come from `_epc_project_vals()`, the decision from `_epc_should_create_project()`.
+- **Menu**: *Configuration → Settings*.
+
+### Why
+Close the gaps B6, B7, B8, C11 (and the Reopen path) from the plan, without changing behaviour for anyone who does not switch the new options on.
+
+### Impact
+- Approving/rejecting now requires the Project Manager group (intended, B6).
+- Sale orders that are neither ticked nor created from a BOQ no longer create a project on confirmation (intended, C11).
+
+### Upgrade note
+Upgrade the module (`-u <module>`); new fields have safe defaults, no data migration is needed. Users who approve documents must be in the *Project Manager* group.
+
+- **Reject pop-up:** the *Reject* button on every approval form now opens a small dialog (`epc.reject.wizard`) asking for the rejection reason, then rejects with it. `action_reject` itself still requires a reason, so scripts/API behave as before.
+
+### Update 3 — no delivery for solar EPC orders
+- `sale_order_line.py` (new): for an EPC order (BOQ order or ticked *Solar EPC Order*) confirming the order creates the **EPC Project but no customer delivery** (`_action_launch_stock_rule` is skipped for its lines). Material reaches the customer through Material Request → issue to site → consumed at site, so a separate warehouse delivery used to take the same stock out twice (Forecasted showed 12 lower than On Hand).
+- Ordinary sales orders are untouched: they still create their normal delivery.
+- `sale_stock` added to the dependencies (it was already installed automatically).
+- Existing EPC orders confirmed earlier keep the delivery they already have; cancel it by hand if it is not needed. Products invoiced on *Delivered quantities* will show nothing delivered on EPC orders; use *Ordered quantities* for solar items.
+
+### Update 4
+- **Approval to-dos no longer pile up:** the *Approval requested* (and *Rejected - please fix and resubmit*) to-dos of a document are removed when it is approved, rejected, reset to draft or submitted again, so each document has at most one current set. Old leftovers disappear the next time that document is approved, rejected or reset.

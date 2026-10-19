@@ -13,6 +13,7 @@
     ],
     'data': [
         'security/ir.model.access.csv',
+        'security/epc_rules.xml',
         'data/material_request_sequence_data.xml',
         'views/epc_material_request_views.xml',
         'views/purchase_order_views.xml',

@@ -44,3 +44,39 @@ Moved from the old module: `epc_quality_check.py`, `epc_quality_checkpoint.py`, 
 - Odoo only scans one folder level below each `addons_path` entry, so all modules sit side by side in `odoo_demo_env/` (not nested inside `csl_solar_epc/`).
 - Moving records between modules changes their external IDs (`<module>.<xml_id>`). **Do not upgrade a database that already had the old single `csl_solar_epc` installed** — install on a fresh database.
 - Fields, model names (`epc.*`) and database tables are unchanged from the original module, so data layout is the same.
+
+---
+
+## Update 2 (2026-10-19) — gap fixes
+Follow-up round from `SOLAR_EPC_GAPS_AND_FIX_PLAN.md`. Existing behaviour is unchanged unless stated; every stricter rule is behind a switch in *Solar Dashboard → Configuration → Settings* (all OFF by default) except the two decided as ON: server-side approval permission (B6) and Field User own-records visibility (F22).
+
+### What changed
+- **A1 (bug):** "Not Applicable" lines are ignored when working out the result. Pass + N/A = Pass; only-N/A stays Pending.
+- **A2 (fail path):**
+  - A failed check sends a to-do to the project manager (or approvers) and writes a chatter note, once.
+  - **Re-inspect** button on a failed check: creates a new check of the same kind/receipt carrying only the failed items, linked to the old one (*Re-inspection Of*).
+  - Optional switch **Failed Items Need a Remark**.
+- **A3 (receipt guard):** a project's incoming receipt validates only if the **newest** Incoming QC on it has passed (an older fail followed by a passing re-inspection is fine).
+- **A4:** optional switch **Lock Finished Quality Checks** (only managers can change items of a Pass/Fail check).
+- **A5:** Commissioning uses the **latest** Final QC (see Commissioning). Consuming site stock is refused while a newer Final QC has not passed.
+- **G26 (Consume Site Stock):** rewritten so it no longer fails with "supply a Lot/Serial number":
+  - consumes only free stock (not what is reserved for other transfers) and keeps the lot/serial and package of each quantity;
+  - works per product: what can be consumed is consumed, anything else (no lot recorded, reserved elsewhere, fractional serial stock) is left at site and listed in the chatter;
+  - if nothing can be consumed, a clear message names the product and the reason.
+- **Visibility (F22):** Field Users see checks they created or inspected, and DPRs they created or reported.
+
+### Why / Impact
+Fixes the QC logic bug and gives a real path after a Fail. The receipt guard is stricter on one case: a receipt whose newest check is not Pass is blocked even if an older check passed.
+
+### Upgrade note
+Upgrade the module (`-u <module>`); new fields have safe defaults, no data migration is needed. Users who approve documents must be in the *Project Manager* group.
+
+### Update 3 — every failed check is logged, with the reason
+- New field **Reason for Failure** on the quality check. It appears (and is **required in the form**) whenever the overall result is Fail, and is tracked in the chatter.
+- Every time a check fails, the chatter gets a message: *Quality check failed*, the failed items (with their remarks) and the reason. If no reason was given, the message says so, and the inspector gets a to-do "Write why quality check … failed". The project manager / approvers still get the to-do.
+- A check that is fixed and then fails again is logged again.
+- The notification now runs once after all changes of one save are written, and not while the check is being created (that caused the "a partner cannot follow twice the same object" error).
+
+- **Chatter formatting fix:** the failed-check and consume messages (and the material-request over-BOQ warning) showed raw `<b>`/`<ul>` tags; they now render as proper bold text and lists.
+- **Failed Incoming QC shown on the receipt and the purchase order:** when an Incoming Material check fails, the failure (check link, failed items, reason) is also written in the chatter of the receipt it was done against and of that receipt's purchase order (as an internal note, no emails), so warehouse and buyer see it.
+- The "also write it elsewhere" step is now a hook (`_epc_failure_documents`) so other modules can add places; Commissioning uses it for Final QC.

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="rule_epc_quality_check_user" model="ir.rule">
+            <field name="name">Quality Check: field users see their own</field>
+            <field name="model_id" ref="model_epc_quality_check"/>
+            <field name="domain_force">['|', ('create_uid', '=', user.id), ('inspector_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('csl_epc_core.group_epc_user'))]"/>
+        </record>
+        <record id="rule_epc_quality_check_manager" model="ir.rule">
+            <field name="name">Quality Check: managers see all</field>
+            <field name="model_id" ref="model_epc_quality_check"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('csl_epc_core.group_epc_manager'))]"/>
+        </record>
+        <record id="rule_epc_quality_check_line_user" model="ir.rule">
+            <field name="name">Quality Check line: field users see their own</field>
+            <field name="model_id" ref="model_epc_quality_check_line"/>
+            <field name="domain_force">['|', ('check_id.create_uid', '=', user.id), ('check_id.inspector_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('csl_epc_core.group_epc_user'))]"/>
+        </record>
+        <record id="rule_epc_quality_check_line_manager" model="ir.rule">
+            <field name="name">Quality Check line: managers see all</field>
+            <field name="model_id" ref="model_epc_quality_check_line"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('csl_epc_core.group_epc_manager'))]"/>
+        </record>
+        <record id="rule_epc_dpr_user" model="ir.rule">
+            <field name="name">Daily Progress Report: field users see their own</field>
+            <field name="model_id" ref="model_epc_dpr"/>
+            <field name="domain_force">['|', ('create_uid', '=', user.id), ('reported_by', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('csl_epc_core.group_epc_user'))]"/>
+        </record>
+        <record id="rule_epc_dpr_manager" model="ir.rule">
+            <field name="name">Daily Progress Report: managers see all</field>
+            <field name="model_id" ref="model_epc_dpr"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('csl_epc_core.group_epc_manager'))]"/>
+        </record>
+    </data>
+</odoo>

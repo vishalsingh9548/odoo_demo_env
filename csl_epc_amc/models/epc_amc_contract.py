@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from dateutil.relativedelta import relativedelta
+
 from odoo import api, fields, models
 
 
@@ -86,6 +88,11 @@ class EpcAmcContract(models.Model):
         help="How many complaint tickets have been raised under this contract.",
     )
 
+    reminder_sent = fields.Boolean(
+        string='Expiry Reminder Sent', copy=False,
+        help="Set once the 'contract ending soon' reminder has been sent, so it is sent only once.",
+    )
+
     # Fills in the sequence-based reference number the first time a contract is saved
     @api.model_create_multi
     def create(self, vals_list):
@@ -136,4 +143,85 @@ class EpcAmcContract(models.Model):
             'view_mode': 'list,form',
             'domain': [('amc_contract_id', '=', self.id)],
             'context': {'default_amc_contract_id': self.id, 'default_partner_id': self.partner_id.id},
+        }
+
+    # Months between two preventive services for each frequency
+    _EPC_FREQUENCY_MONTHS = {'monthly': 1, 'quarterly': 3, 'half_yearly': 6, 'yearly': 12}
+
+    # Runs every day: marks finished contracts as Expired, reminds the team a
+    # month before a contract ends and (when switched on) creates the field
+    # service visits that have fallen due
+    @api.model
+    def _cron_epc_amc_maintenance(self):
+        today = fields.Date.context_today(self)
+        config = self.env['epc.config']
+
+        expired = self.search([('state', '=', 'active'), ('end_date', '!=', False), ('end_date', '<', today)])
+        for contract in expired:
+            contract.state = 'expired'
+            contract.message_post(body="Contract end date passed - marked as Expired.")
+
+        if not config.flag('disable_notifications'):
+            soon = self.search([
+                ('state', '=', 'active'), ('reminder_sent', '=', False),
+                ('end_date', '!=', False), ('end_date', '>=', today),
+                ('end_date', '<=', today + relativedelta(days=30)),
+            ])
+            for contract in soon:
+                users = contract.project_id.user_id or self.env['epc.approval.mixin']._epc_approvers()
+                for user in users:
+                    contract.activity_schedule(
+                        'mail.mail_activity_data_todo', user_id=user.id,
+                        summary="AMC %s ends on %s - renew?" % (contract.name, contract.end_date))
+                contract.reminder_sent = True
+
+        if config.flag('amc_generate_services'):
+            self._epc_generate_due_services(today)
+
+    # Creates one Field Service task per contract whose preventive service is
+    # due, then moves the next due date forward by the contract's frequency
+    @api.model
+    def _epc_generate_due_services(self, today):
+        fsm_project = self.env.ref('csl_epc_amc.epc_fsm_project', raise_if_not_found=False)
+        if not fsm_project:
+            return
+        due = self.search([
+            ('state', '=', 'active'), ('service_frequency', '!=', False),
+            ('next_service_date', '!=', False), ('next_service_date', '<=', today),
+        ])
+        for contract in due:
+            self.env['project.task'].create({
+                'name': "Preventive service - %s (%s)" % (contract.name, contract.partner_id.name or ''),
+                'project_id': fsm_project.id,
+                'partner_id': contract.partner_id.id,
+                'date_deadline': contract.next_service_date,
+            })
+            months = self._EPC_FREQUENCY_MONTHS[contract.service_frequency]
+            next_date = contract.next_service_date
+            while next_date <= today:
+                next_date = next_date + relativedelta(months=months)
+            contract.next_service_date = next_date
+            contract.message_post(body="Preventive service task created; next service due %s." % next_date)
+
+    # Makes a new draft contract that starts the day after this one ends and
+    # runs for the same length of time
+    def action_renew(self):
+        self.ensure_one()
+        start = (self.end_date or fields.Date.context_today(self)) + relativedelta(days=1)
+        length = (self.end_date - self.start_date) if self.end_date and self.start_date else relativedelta(years=1)
+        end = start + (length if isinstance(length, relativedelta) else length)
+        months = self._EPC_FREQUENCY_MONTHS.get(self.service_frequency)
+        new = self.copy({
+            'start_date': start,
+            'end_date': end,
+            'state': 'draft',
+            'next_service_date': start + relativedelta(months=months) if months else False,
+        })
+        self.message_post(body="Renewed as %s." % new.name)
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'epc.amc.contract',
+            'view_mode': 'form',
+            'res_id': new.id,
+            'target': 'current',
         }

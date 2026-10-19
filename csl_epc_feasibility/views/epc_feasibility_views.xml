@@ -31,11 +31,15 @@
                         <button name="action_approve" string="Approve" type="object"
                                 class="oe_highlight" groups="csl_epc_core.group_epc_manager"
                                 invisible="approval_state != 'submitted'"/>
-                        <button name="action_reject" string="Reject" type="object"
+                        <button name="action_open_reject_wizard" string="Reject" type="object"
                                 groups="csl_epc_core.group_epc_manager"
                                 invisible="approval_state != 'submitted'"/>
                         <button name="action_reset_to_submit" string="Reset to Draft" type="object"
                                 invisible="approval_state not in ('submitted', 'rejected')"/>
+                        <button name="action_reset_to_submit" string="Reopen (Reset to Draft)" type="object"
+                                groups="csl_epc_core.group_epc_manager" invisible="approval_state != 'approved'"/>
+                        <button name="action_mark_lead_lost" string="Mark Lead Lost" type="object"
+                                invisible="feasibility_result != 'no' or not lead_id"/>
                         <field name="approval_state" widget="statusbar"
                                statusbar_visible="to_submit,submitted,approved"/>
                     </header>
@@ -73,6 +77,8 @@
                             <page string="Report &amp; Result" name="report">
                                 <field name="feasibility_report"/>
                                 <field name="feasibility_result"/>
+                                <field name="epc_proceed_anyway" groups="csl_epc_core.group_epc_manager"
+                                       invisible="feasibility_result != 'no'"/>
                             </page>
                             <page string="Approval" name="approval">
                                 <group>

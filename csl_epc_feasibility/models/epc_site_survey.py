@@ -25,6 +25,7 @@ class EpcSiteSurvey(models.Model):
     # from the "Create Feasibility Study" button
     def action_create_feasibility(self):
         self.ensure_one()
+        self._epc_check_ready_for_next_stage()
         feasibility = self.env['epc.feasibility'].create({
             'site_survey_id': self.id,
             'lead_id': self.lead_id.id,

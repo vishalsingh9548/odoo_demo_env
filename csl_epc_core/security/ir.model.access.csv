@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_epc_reject_wizard_manager,epc.reject.wizard.manager,model_epc_reject_wizard,csl_epc_core.group_epc_manager,1,1,1,1
