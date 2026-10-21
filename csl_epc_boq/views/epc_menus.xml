@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Pipeline stage 4: BOQ -->
+        <menuitem id="menu_epc_boq"
+                  name="BOQ &amp; Costing"
+                  web_icon="csl_epc_boq,static/description/icon.png"
+                  groups="csl_epc_core.group_epc_user"
+                  sequence="46"/>
+        <menuitem id="menu_epc_boq_list"
+                  name="BOQ &amp; Costing"
+                  parent="menu_epc_boq"
+                  action="epc_boq_action"
+                  sequence="10"/>
+    </data>
+</odoo>

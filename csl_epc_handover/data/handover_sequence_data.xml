@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Gives every Handover record a reference like HO/2026/00001 -->
+        <record id="seq_epc_handover" model="ir.sequence">
+            <field name="name">Handover Sequence</field>
+            <field name="code">epc.handover</field>
+            <field name="prefix">HO/%(range_year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

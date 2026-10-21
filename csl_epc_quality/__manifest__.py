@@ -1,0 +1,28 @@
+{
+    'name': 'CSL Solar EPC - Quality & DPR',
+    'version': '18.0.1.0.0',
+    'category': 'Industries',
+    'summary': 'Quality Checks, QC Checkpoints, incoming-material QC gate on receipts, and Daily Progress Reports.',
+    'author': 'Cloud Science Labs',
+    'website': 'https://cloudsciencelabs.com',
+    'license': 'LGPL-3',
+    'depends': [
+        'csl_epc_core',
+    ],
+    'data': [
+        'security/ir.model.access.csv',
+        'security/epc_rules.xml',
+        'data/quality_sequence_data.xml',
+        'data/epc_quality_checkpoint_data.xml',
+        'data/epc_inventory_data.xml',
+        'views/epc_dpr_views.xml',
+        'views/epc_quality_checkpoint_views.xml',
+        'views/epc_quality_check_views.xml',
+        'views/stock_picking_views.xml',
+        'views/project_project_views.xml',
+        'views/epc_menus.xml',
+        'views/epc_dashboard_views.xml',
+    ],
+    'application': True,
+    'installable': True,
+}

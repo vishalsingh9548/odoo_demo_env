@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="project_view_form_epc" model="ir.ui.view">
+            <field name="name">project.project.form.epc</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.edit_project"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_epc_sale_order" type="object"
+                            class="oe_stat_button" icon="fa-file-text-o"
+                            invisible="not epc_sale_order_id">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Sales Order</span>
+                        </div>
+                    </button>
+                </xpath>
+                <xpath expr="//field[@name='partner_id'][1]/.." position="after">
+                    <group name="epc_solar" string="Solar EPC">
+                        <field name="lead_id"/>
+                        <field name="epc_sale_order_id"/>
+                    </group>
+                </xpath>
+                <xpath expr="//sheet" position="inside">
+                    <group string="Site &amp; Scope" invisible="not site_address and not scope_of_work">
+                        <field name="site_address"/>
+                        <field name="scope_of_work"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

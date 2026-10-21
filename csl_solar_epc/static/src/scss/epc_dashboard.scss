@@ -2,30 +2,48 @@
 // trio (green/red/amber) reserved specifically for Quality Check Pass/Fail/Pending,
 // so quality problems always read the same colour everywhere on the page.
 .o_epc_dashboard {
-    --epc-bg: #f7f8fa;
+    --epc-bg: #f7f8ff;
     --epc-surface: #ffffff;
-    --epc-surface-2: #f7f8fb;
-    --epc-border: #eaecf1;
-    --epc-text: #33394a;
-    --epc-text-muted: #7c8296;
-    --epc-text-faint: #a6acbd;
+    --epc-surface-2: rgba(240, 243, 252, 0.7);
+    --epc-border: rgba(120, 130, 175, 0.18);
+    --epc-text: #33395a;
+    --epc-text-muted: #7b829f;
+    --epc-text-faint: #8e95b0;
 
-    --epc-accent: #2f7fb6;
-    --epc-accent-soft: #e7f1f9;
-    --epc-accent-strong: #1f5c86;
+    --epc-accent: #8b95f0;
+    --epc-accent-soft: rgba(139, 149, 240, 0.16);
+    --epc-accent-strong: #5f6bd0;
 
-    --epc-pass: #46b980;
-    --epc-pass-soft: #e9f9f0;
-    --epc-fail: #e0684f;
-    --epc-fail-soft: #fbe9e6;
-    --epc-warn: #eba93f;
-    --epc-warn-soft: #fdf3e2;
-    --epc-pending: #b9bccf;
-    --epc-pending-soft: #f3f4f8;
+    // Cool pastel family only: no green / red / amber. Status is carried by
+    // shade and by the text label, not by traffic-light colours.
+    --epc-pass: #7fb6ee;
+    --epc-pass-soft: rgba(127, 182, 238, 0.20);
+    --epc-fail: #9a8be3;
+    --epc-fail-soft: rgba(154, 139, 227, 0.20);
+    --epc-warn: #bcaef0;
+    --epc-warn-soft: rgba(188, 174, 240, 0.24);
+    --epc-pending: #dbe1f2;
+    --epc-pending-soft: rgba(219, 225, 242, 0.5);
 
-    --epc-shadow: 0 1px 2px rgba(51, 57, 74, 0.04), 0 1px 1px rgba(51, 57, 74, 0.03);
-    --epc-shadow-hover: 0 8px 20px rgba(51, 57, 74, 0.08), 0 2px 6px rgba(51, 57, 74, 0.05);
-    --epc-radius: 10px;
+    --epc-pass-text: #4a8fd4;
+    --epc-fail-text: #7566d4;
+
+    --epc-glass: rgba(255, 255, 255, 0.46);
+    --epc-glass-border: rgba(255, 255, 255, 0.85);
+    --epc-glass-tile: rgba(255, 255, 255, 0.5);
+    --epc-edge: #ffffff;
+    --epc-grid: rgba(120, 130, 175, 0.16);
+    --epc-blob1: rgba(140, 158, 255, 0.50);
+    --epc-blob2: rgba(200, 160, 250, 0.42);
+    --epc-blob3: rgba(130, 205, 245, 0.38);
+    --epc-blob4: rgba(170, 190, 255, 0.40);
+    --epc-blob5: rgba(215, 170, 245, 0.36);
+    --epc-blob6: rgba(135, 215, 235, 0.40);
+
+    --epc-shadow: 0 8px 32px rgba(90, 105, 190, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(255, 255, 255, 0.35);
+    --epc-shadow-hover: 0 12px 34px rgba(90, 105, 190, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    --epc-radius: 16px;
+    color-scheme: light;
 
     // Scrolls both ways on its own, regardless of how tall/wide the actual
     // content ends up being — so nothing gets clipped by the surrounding
@@ -34,11 +52,16 @@
     min-height: 100%;
     overflow: auto;
     box-sizing: border-box;
+    // Colour blobs behind the cards (scrolling with the content) give the frosted glass something to blur
     background:
-        radial-gradient(750px circle at 10% 0%, rgba(47, 127, 182, 0.10), transparent 55%),
-        radial-gradient(750px circle at 90% 10%, rgba(235, 169, 63, 0.10), transparent 55%),
-        radial-gradient(900px circle at 50% 100%, rgba(47, 127, 182, 0.09), transparent 60%),
+        radial-gradient(520px 420px at 8% 0%, var(--epc-blob1), transparent 70%),
+        radial-gradient(480px 400px at 96% 6%, var(--epc-blob2), transparent 70%),
+        radial-gradient(460px 380px at 70% 30%, var(--epc-blob3), transparent 70%),
+        radial-gradient(520px 420px at 4% 48%, var(--epc-blob4), transparent 70%),
+        radial-gradient(480px 400px at 92% 62%, var(--epc-blob5), transparent 70%),
+        radial-gradient(520px 420px at 30% 100%, var(--epc-blob6), transparent 70%),
         var(--epc-bg);
+    background-attachment: local;
     color: var(--epc-text);
     padding: 20px 4px 40px;
 
@@ -71,13 +94,13 @@
         align-items: flex-start;
         gap: 14px;
         min-width: 0;
-        background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.72));
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        border: 1px solid rgba(255, 255, 255, 0.6);
+        background: linear-gradient(135deg, color-mix(in srgb, var(--tile-accent) 22%, var(--epc-glass-tile)), var(--epc-glass) 75%);
+        backdrop-filter: blur(20px) saturate(1.7);
+        -webkit-backdrop-filter: blur(20px) saturate(1.7);
+        border: 1px solid var(--epc-glass-border);
         border-radius: var(--epc-radius);
         padding: 18px 16px 18px 18px;
-        box-shadow: var(--epc-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        box-shadow: var(--epc-shadow);
         overflow: hidden;
         --tile-accent: var(--epc-pending);
         --tile-accent-soft: var(--epc-pending-soft);
@@ -85,8 +108,9 @@
         &::before {
             content: "";
             position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 4px;
+            left: 0; top: 14px; bottom: 14px;
+            width: 3px;
+            border-radius: 0 3px 3px 0;
             background: var(--tile-accent);
             z-index: 1;
         }
@@ -99,9 +123,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(150deg, var(--tile-accent-soft), rgba(255, 255, 255, 0.4));
+            background: color-mix(in srgb, var(--tile-accent) 20%, transparent);
             color: var(--tile-accent);
-            box-shadow: 0 2px 8px -2px var(--tile-accent);
+            border: 1px solid color-mix(in srgb, var(--tile-accent) 25%, transparent);
             font-size: 16px;
             position: relative;
             z-index: 1;
@@ -172,11 +196,11 @@
         }
         border-radius: var(--epc-radius);
         overflow: hidden;
-        background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.72));
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        border: 1px solid rgba(255, 255, 255, 0.6);
-        box-shadow: var(--epc-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        background: var(--epc-glass);
+        backdrop-filter: blur(22px) saturate(1.7);
+        -webkit-backdrop-filter: blur(22px) saturate(1.7);
+        border: 1px solid var(--epc-glass-border);
+        box-shadow: var(--epc-shadow);
         transition: box-shadow 0.25s ease;
 
         &:hover {
@@ -223,6 +247,10 @@
     }
 
     table.table {
+        --bs-table-bg: transparent;
+        --bs-table-color: var(--epc-text);
+        --bs-table-striped-bg: transparent;
+        --bs-table-hover-bg: transparent;
         margin-bottom: 0;
         font-size: 0.9rem;
 
@@ -235,10 +263,13 @@
             border-bottom: 2px solid var(--epc-accent-soft);
             border-top: none;
             padding-bottom: 12px;
+            background: var(--epc-surface-2);
+            color: var(--epc-text-muted);
         }
         tbody td {
             border-color: var(--epc-border);
             color: var(--epc-text);
+            background: transparent;
             vertical-align: middle;
             padding-top: 16px;
             padding-bottom: 16px;
@@ -267,6 +298,44 @@
         font-size: 0.75rem;
         font-variant-numeric: tabular-nums;
     }
-    .o_epc_pct_high { background: var(--epc-pass-soft); color: var(--epc-pass); }
-    .o_epc_pct_low { background: var(--epc-fail-soft); color: var(--epc-fail); }
+    .o_epc_pct_high { background: var(--epc-pass-soft); color: var(--epc-pass-text); }
+    .o_epc_pct_low { background: var(--epc-fail-soft); color: var(--epc-fail-text); }
+
+    // ---- dark mode: follows Odoo's own light/dark switch (user menu) ----
+    &.o_epc_dark {
+        --epc-bg: #121528;
+        --epc-surface: #1b2040;
+        --epc-surface-2: rgba(255, 255, 255, 0.06);
+        --epc-border: rgba(170, 180, 230, 0.16);
+        --epc-text: #e8ebfa;
+        --epc-text-muted: #a2a9c8;
+        --epc-text-faint: #8d94b6;
+        --epc-accent: #9aa5f5;
+        --epc-accent-soft: rgba(154, 165, 245, 0.22);
+        --epc-accent-strong: #b3bcff;
+        --epc-pass: #8cc2f5;
+        --epc-pass-soft: rgba(140, 194, 245, 0.22);
+        --epc-fail: #ae9ff0;
+        --epc-fail-soft: rgba(174, 159, 240, 0.24);
+        --epc-warn: #c9bdf5;
+        --epc-warn-soft: rgba(201, 189, 245, 0.24);
+        --epc-pending: #4a5278;
+        --epc-pending-soft: rgba(74, 82, 120, 0.5);
+        --epc-pass-text: #8cc2f5;
+        --epc-fail-text: #b3a6f4;
+        --epc-glass: rgba(38, 44, 76, 0.52);
+        --epc-glass-border: rgba(255, 255, 255, 0.12);
+        --epc-glass-tile: rgba(40, 46, 80, 0.5);
+        --epc-edge: #232949;
+        --epc-grid: rgba(170, 180, 230, 0.14);
+        --epc-blob1: rgba(110, 125, 240, 0.34);
+        --epc-blob2: rgba(170, 130, 235, 0.26);
+        --epc-blob3: rgba(90, 175, 225, 0.24);
+        --epc-blob4: rgba(110, 125, 240, 0.26);
+        --epc-blob5: rgba(170, 130, 235, 0.22);
+        --epc-blob6: rgba(90, 175, 225, 0.24);
+        --epc-shadow: 0 10px 34px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+        --epc-shadow-hover: 0 14px 38px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+        color-scheme: dark;
+    }
 }

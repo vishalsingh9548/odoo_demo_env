@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- AMC contracts smart button on the Project form -->
+        <record id="project_view_form_epc_amc" model="ir.ui.view">
+            <field name="name">project.project.form.epc.amc</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="csl_epc_core.project_view_form_epc"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_amc_contracts" type="object"
+                            class="oe_stat_button" icon="fa-wrench"
+                            invisible="amc_count == 0">
+                        <field name="amc_count" widget="statinfo" string="AMC"/>
+                    </button>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

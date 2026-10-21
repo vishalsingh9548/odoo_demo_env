@@ -1,0 +1,26 @@
+{
+    'name': 'CSL Solar EPC - Material Request',
+    'version': '18.0.1.0.0',
+    'category': 'Industries',
+    'summary': 'Material Requests and Purchase Order traceability for a project.',
+    'author': 'Cloud Science Labs',
+    'website': 'https://cloudsciencelabs.com',
+    'license': 'LGPL-3',
+    'depends': [
+        'csl_epc_boq',
+        'purchase',
+        'project_purchase',
+    ],
+    'data': [
+        'security/ir.model.access.csv',
+        'security/epc_rules.xml',
+        'data/material_request_sequence_data.xml',
+        'views/epc_material_request_views.xml',
+        'views/purchase_order_views.xml',
+        'views/project_project_views.xml',
+        'views/epc_menus.xml',
+        'views/epc_dashboard_views.xml',
+    ],
+    'application': True,
+    'installable': True,
+}

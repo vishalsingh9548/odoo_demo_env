@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Solar EPC switches. Every other EPC module adds its own block to this
+             same "Solar EPC" app section, so everything is in one place. -->
+        <record id="res_config_settings_view_form_epc" model="ir.ui.view">
+            <field name="name">res.config.settings.form.epc</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="90"/>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="inside">
+                    <app string="Solar EPC" name="csl_epc_core" groups="csl_epc_core.group_epc_admin">
+                        <block title="Approvals" name="epc_approvals_block">
+                            <setting string="Block Self-Approval"
+                                     help="The person who submitted a document cannot approve or reject it themselves.">
+                                <field name="epc_block_self_approval"/>
+                            </setting>
+                            <setting string="Lock Approved Documents"
+                                     help="Once approved, a document can no longer be edited until a manager resets it to draft.">
+                                <field name="epc_lock_approved"/>
+                            </setting>
+                            <setting string="Turn Off Notifications"
+                                     help="Stop the automatic to-dos and messages for approvals, rejections, failed quality checks and AMC reminders.">
+                                <field name="epc_disable_notifications"/>
+                            </setting>
+                            <setting string='Stop Work on "Not Feasible"'
+                                     help="A survey or feasibility study with the verdict 'no' cannot move to the next stage unless a manager ticks 'Proceed anyway'.">
+                                <field name="epc_block_not_feasible"/>
+                            </setting>
+                        </block>
+                        <block title="BOQ &amp; Quotation" name="epc_boq_block">
+                            <setting string="Strict BOQ Check"
+                                     help="Before a quotation is created, every BOQ line needs a product (service lines excepted) and a unit cost, or must be ticked 'Zero cost is correct'.">
+                                <field name="epc_strict_boq"/>
+                            </setting>
+                        </block>
+                        <block title="Quality &amp; Material Requests" name="epc_quality_block">
+                            <setting string="Failed Items Need a Remark"
+                                     help="Every failed quality-check item must say why.">
+                                <field name="epc_qc_require_fail_remark"/>
+                            </setting>
+                            <setting string="Lock Finished Quality Checks"
+                                     help="Once a check is Pass or Fail only a Project Manager can change its items.">
+                                <field name="epc_qc_lock_results"/>
+                            </setting>
+                            <setting string="Block Over-BOQ Requests"
+                                     help="A material request cannot be submitted for more than the BOQ allows (otherwise only a warning is written).">
+                                <field name="epc_mr_block_over_boq"/>
+                            </setting>
+                        </block>
+                        <block title="Commissioning &amp; Handover" name="epc_comm_block">
+                            <setting string="Commissioning: Testing Done"
+                                     help="System Testing Done must be ticked before commissioning is submitted.">
+                                <field name="epc_comm_require_testing"/>
+                            </setting>
+                            <setting string="Commissioning: Customer Walkthrough"
+                                     help="Customer Walkthrough Done must be ticked before commissioning is submitted.">
+                                <field name="epc_comm_require_walkthrough"/>
+                            </setting>
+                            <setting string="Commissioning: Verified Generation"
+                                     help="A verified generation figure (kWh) is needed before commissioning is submitted.">
+                                <field name="epc_comm_require_generation"/>
+                            </setting>
+                            <setting string="Commissioning: Customer Approved"
+                                     help="Customer Approved must be ticked before commissioning can be approved.">
+                                <field name="epc_comm_require_customer_approval"/>
+                            </setting>
+                            <setting string="Commissioning: Certificate Uploaded"
+                                     help="The certificate must be uploaded before commissioning can be approved.">
+                                <field name="epc_comm_require_certificate"/>
+                            </setting>
+                            <setting string="One Commissioning per Project"
+                                     help="A project can only have one commissioning record (a rejected one does not count).">
+                                <field name="epc_comm_single_per_project"/>
+                            </setting>
+                            <setting string="Handover Needs Approved Commissioning"
+                                     help="A handover can only be approved once commissioning is approved.">
+                                <field name="epc_handover_require_commissioning"/>
+                            </setting>
+                            <setting string="Handover Needs Documents"
+                                     help="The four handover documents and customer training must be in place before approval.">
+                                <field name="epc_handover_require_docs"/>
+                            </setting>
+                        </block>
+                        <block title="AMC" name="epc_amc_block">
+                            <setting string="Create AMC Service Visits Automatically"
+                                     help="Each day, create a Field Service task for every active AMC contract whose preventive service is due.">
+                                <field name="epc_amc_generate_services"/>
+                            </setting>
+                        </block>
+                    </app>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="epc_config_settings_action" model="ir.actions.act_window">
+            <field name="name">Settings</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module': 'csl_epc_core', 'bin_size': False}</field>
+        </record>
+
+        <menuitem id="menu_epc_config_settings"
+                  name="Settings"
+                  parent="menu_epc_configuration"
+                  action="epc_config_settings_action"
+                  sequence="5"/>
+    </data>
+</odoo>

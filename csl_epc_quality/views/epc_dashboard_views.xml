@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Live dashboard of this stage, rendered by the generic screen in csl_epc_core.
+             It is the first menu entry, so the app opens on it. -->
+        <record id="epc_dashboard_quality_action" model="ir.actions.client">
+            <field name="name">Quality Dashboard</field>
+            <field name="tag">epc_stage_dashboard</field>
+            <field name="target">current</field>
+            <field name="params" eval="{'stage': 'quality'}"/>
+        </record>
+        <menuitem id="menu_epc_dashboard_quality"
+                  name="Dashboard"
+                  parent="menu_epc_quality_check"
+                  action="epc_dashboard_quality_action"
+                  sequence="1"/>
+
+        <!-- Drill-down list opened from the dashboard (failed checkpoints) -->
+        <record id="epc_quality_check_line_view_list" model="ir.ui.view">
+            <field name="name">epc.quality.check.line.list</field>
+            <field name="model">epc.quality.check.line</field>
+            <field name="arch" type="xml">
+                <list create="0" delete="0" decoration-danger="result == 'fail'" decoration-success="result == 'pass'">
+                    <field name="check_id"/>
+                    <field name="name"/>
+                    <field name="result" widget="badge" decoration-danger="result == 'fail'" decoration-success="result == 'pass'"/>
+                    <field name="remarks"/>
+                </list>
+            </field>
+        </record>
+        <record id="epc_quality_check_line_view_form" model="ir.ui.view">
+            <field name="name">epc.quality.check.line.form</field>
+            <field name="model">epc.quality.check.line</field>
+            <field name="arch" type="xml">
+                <form create="0" edit="0" delete="0">
+                    <sheet>
+                        <group>
+                            <field name="check_id"/>
+                            <field name="name"/>
+                            <field name="result"/>
+                            <field name="remarks"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="epc_quality_check_line_view_search" model="ir.ui.view">
+            <field name="name">epc.quality.check.line.search</field>
+            <field name="model">epc.quality.check.line</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="check_id"/>
+                    <filter name="failed" string="Failed" domain="[('result', '=', 'fail')]"/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_item" string="Checkpoint" context="{'group_by': 'name'}"/>
+                        <filter name="group_result" string="Result" context="{'group_by': 'result'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+    </data>
+</odoo>

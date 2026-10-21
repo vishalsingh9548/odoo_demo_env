@@ -1,0 +1,43 @@
+{
+    'name': 'CSL Solar EPC - Core',
+    'version': '18.0.1.0.0',
+    'category': 'Industries',
+    'summary': 'Shared foundation: access groups, approval workflow, Solar EPC root menu, CRM lead solar qualification, Sales Order terms, Project and Task extensions.',
+    'author': 'Cloud Science Labs',
+    'website': 'https://cloudsciencelabs.com',
+    'license': 'LGPL-3',
+    'depends': [
+        'mail',
+        'hr_timesheet',
+        'crm',
+        'sale_management',
+        'sale_stock',
+        'sale_project',
+        'stock',
+        'project_stock',
+        'project_enterprise',
+        'planning',
+        'account',
+    ],
+    'data': [
+        'security/epc_security.xml',
+        'security/ir.model.access.csv',
+        'views/epc_menus.xml',
+        'views/res_config_settings_views.xml',
+        'views/epc_reject_wizard_views.xml',
+        'views/crm_lead_views.xml',
+        'views/sale_order_views.xml',
+        'views/project_project_views.xml',
+        'views/project_task_views.xml',
+    ],
+    # Generic screen used by every stage dashboard (Site Survey ... AMC)
+    'assets': {
+        'web.assets_backend': [
+            'csl_epc_core/static/src/js/epc_stage_dashboard.js',
+            'csl_epc_core/static/src/xml/epc_stage_dashboard.xml',
+            'csl_epc_core/static/src/scss/epc_stage_dashboard.scss',
+        ],
+    },
+    'application': False,
+    'installable': True,
+}

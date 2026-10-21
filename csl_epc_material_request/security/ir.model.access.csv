@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_epc_material_request_user,epc.material.request.user,model_epc_material_request,csl_epc_core.group_epc_user,1,1,1,0
+access_epc_material_request_manager,epc.material.request.manager,model_epc_material_request,csl_epc_core.group_epc_manager,1,1,1,1
+access_epc_material_request_line_user,epc.material.request.line.user,model_epc_material_request_line,csl_epc_core.group_epc_user,1,1,1,1
+access_epc_material_request_line_manager,epc.material.request.line.manager,model_epc_material_request_line,csl_epc_core.group_epc_manager,1,1,1,1

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Gives every Daily Progress Report a reference like DPR/2026/00001 -->
+        <record id="seq_epc_dpr" model="ir.sequence">
+            <field name="name">Daily Progress Report Sequence</field>
+            <field name="code">epc.dpr</field>
+            <field name="prefix">DPR/%(range_year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Gives every Quality Check a reference like QC/2026/00001 -->
+        <record id="seq_epc_quality_check" model="ir.sequence">
+            <field name="name">Quality Check Sequence</field>
+            <field name="code">epc.quality.check</field>
+            <field name="prefix">QC/%(range_year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

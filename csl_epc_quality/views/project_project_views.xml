@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="project_view_form_epc_quality" model="ir.ui.view">
+            <field name="name">project.view.form.epc.quality</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="csl_epc_core.project_view_form_epc"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_dprs" type="object"
+                            class="oe_stat_button" icon="fa-clipboard">
+                        <field name="dpr_count" widget="statinfo" string="Daily Progress Reports"/>
+                    </button>
+                    <button name="action_view_quality_checks" type="object"
+                            class="oe_stat_button" icon="fa-check-square-o">
+                        <field name="quality_check_count" widget="statinfo" string="Quality Checks"/>
+                    </button>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

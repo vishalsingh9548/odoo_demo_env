@@ -2,7 +2,7 @@
 <templates xml:space="preserve">
 
     <t t-name="csl_solar_epc.EpcDashboard">
-        <div class="o_epc_dashboard">
+        <div t-attf-class="o_epc_dashboard #{dark ? 'o_epc_dark' : ''}">
 
             <div t-if="state.loading" class="text-center p-5">
                 <i class="fa fa-spin fa-spinner fa-2x"/>
@@ -19,7 +19,8 @@
                             <div class="o_epc_tile_value" t-esc="state.data.kpis.active_projects.count"/>
                         </div>
                     </div>
-                    <div class="o_epc_tile o_epc_tile_pass">
+                    <div class="o_epc_tile o_epc_tile_pass o_epc_clickable" tabindex="0"
+                         t-on-click="() => this.openList(state.data.kpis.contract_value.domain, 'Contract Value', 'project.project')">
                         <div class="o_epc_tile_icon"><i class="fa fa-money"/></div>
                         <div class="o_epc_tile_body">
                             <div class="o_epc_tile_label">Contract Value</div>

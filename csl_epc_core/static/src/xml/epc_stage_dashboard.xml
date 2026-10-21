@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    <t t-name="csl_epc_core.StageDashboard">
+        <div t-attf-class="o_epc_sd #{dark ? 'o_epc_sd_dark' : ''}" t-ref="root" t-att-style="state.data ? '--epc-sd-accent:' + accentColor() : ''">
+
+            <div t-if="state.loading and !state.data" class="o_epc_sd_center">
+                <i class="fa fa-spin fa-spinner fa-2x"/>
+            </div>
+            <div t-elif="state.error and !state.data" class="o_epc_sd_center text-muted">
+                <i class="fa fa-exclamation-triangle fa-2x mb-2"/>
+                <div t-esc="state.error"/>
+                <button class="btn btn-secondary mt-3" t-on-click="() => this.load()">Try again</button>
+            </div>
+
+            <t t-if="state.data">
+                <header class="o_epc_sd_head">
+                    <div class="o_epc_sd_title">
+                        <h2 t-esc="state.data.title"/>
+                        <p t-esc="state.data.intro"/>
+                    </div>
+                </header>
+
+                <section class="o_epc_sd_kpis">
+                    <div t-foreach="state.data.kpis" t-as="kpi" t-key="kpi_index"
+                         t-attf-class="o_epc_sd_kpi o_epc_sd_tone_#{kpi.tone || 'none'} #{kpi.model ? 'o_epc_sd_click' : ''}"
+                         t-att-tabindex="kpi.model ? 0 : -1" t-att-style="'--i:' + kpi_index"
+                         t-on-click="() => this.openList(kpi.model, kpi.domain, kpi.label)"
+                         t-on-keydown="(ev) => ev.key === 'Enter' &amp;&amp; this.openList(kpi.model, kpi.domain, kpi.label)">
+                        <div class="o_epc_sd_kpi_icon"><i t-attf-class="fa #{kpi.icon}"/></div>
+                        <div class="o_epc_sd_kpi_body">
+                            <div class="o_epc_sd_kpi_label" t-esc="kpi.label"/>
+                            <div class="o_epc_sd_kpi_value">
+                                <t t-esc="formatKpi(kpi, kpi_index)"/><small t-if="kpi.unit" t-esc="kpi.unit"/>
+                            </div>
+                            <div t-if="kpi.sub" t-attf-class="o_epc_sd_kpi_sub o_epc_sd_trend_#{kpi.trend || 'none'}" t-esc="kpi.sub"/>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="o_epc_sd_grid">
+                    <article t-foreach="state.data.cards" t-as="card" t-key="card.key"
+                             t-attf-class="o_epc_sd_card o_epc_sd_span#{card._span}" t-att-style="'--i:' + (state.data.kpis.length + card_index)">
+                        <h3 t-esc="card.title"/>
+                        <p class="o_epc_sd_sub" t-esc="card.sub"/>
+                        <t t-if="hasData(card)">
+                            <div t-if="card.kind === 'matrix'" class="o_epc_sd_scroll">
+                                <table class="o_epc_sd_table o_epc_sd_matrix">
+                                    <thead>
+                                        <tr>
+                                            <th>Project</th>
+                                            <th t-foreach="card.cols" t-as="col" t-key="col_index" t-esc="col"/>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="card.rows" t-as="row" t-key="row_index" class="o_epc_sd_click"
+                                            t-on-click="() => this.openRecord(card.model, row.id)">
+                                            <td t-esc="row.label"/>
+                                            <td t-foreach="row.cells" t-as="ok" t-key="ok_index">
+                                                <span t-attf-class="o_epc_sd_cell #{ok ? 'o_epc_sd_cell_yes' : 'o_epc_sd_cell_no'}"
+                                                      t-esc="ok ? '✓' : '✕'"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div t-else="" class="o_epc_sd_chart"><canvas t-att-data-key="card.key"/></div>
+                        </t>
+                        <div t-else="" class="o_epc_sd_empty">No data yet</div>
+                    </article>
+                <article t-if="state.data.table" t-attf-class="o_epc_sd_card o_epc_sd_table_card o_epc_sd_span#{state.data._tableSpan}"
+                         t-att-style="'--i:' + (state.data.kpis.length + state.data.cards.length)">
+                    <h3 t-esc="state.data.table.title"/>
+                    <div class="o_epc_sd_scroll">
+                        <table t-if="state.data.table.rows.length" class="o_epc_sd_table">
+                            <thead>
+                                <tr>
+                                    <th t-foreach="state.data.table.cols" t-as="col" t-key="col_index"
+                                        t-attf-class="o_epc_sd_#{col.align}" t-esc="col.label"/>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="state.data.table.rows" t-as="row" t-key="row_index" class="o_epc_sd_click"
+                                    t-on-click="() => this.openRecord(state.data.table.model, row.id)">
+                                    <td t-foreach="row.cells" t-as="cell" t-key="cell_index"
+                                        t-attf-class="o_epc_sd_#{state.data.table.cols[cell_index].align}">
+                                        <span t-att-class="cellClass(cell)" t-esc="cellText(cell)"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div t-else="" class="o_epc_sd_empty" t-esc="state.data.table.empty"/>
+                    </div>
+                </article>
+                </section>
+            </t>
+        </div>
+    </t>
+
+</templates>

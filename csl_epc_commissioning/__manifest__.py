@@ -1,0 +1,25 @@
+{
+    'name': 'CSL Solar EPC - Commissioning',
+    'version': '18.0.1.0.0',
+    'category': 'Industries',
+    'summary': 'Commissioning records and certificate.',
+    'author': 'Cloud Science Labs',
+    'website': 'https://cloudsciencelabs.com',
+    'license': 'LGPL-3',
+    'depends': [
+        'csl_epc_quality',
+        'csl_epc_handover',
+    ],
+    'data': [
+        'security/ir.model.access.csv',
+        'security/epc_rules.xml',
+        'data/commissioning_sequence_data.xml',
+        'report/epc_commissioning_report.xml',
+        'views/epc_commissioning_views.xml',
+        'views/project_project_views.xml',
+        'views/epc_menus.xml',
+        'views/epc_dashboard_views.xml',
+    ],
+    'application': True,
+    'installable': True,
+}

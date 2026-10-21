@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Top-level app menu ("Solar EPC" in the main app switcher). Each EPC
+             module adds its own screen(s) underneath this one root. -->
+        <menuitem id="menu_epc_root"
+                  name="Solar Dashboard"
+                  sequence="45"
+                  groups="group_epc_user"
+                  web_icon="csl_epc_core,static/description/icon.png"/>
+
+        <menuitem id="menu_epc_configuration"
+                  name="Configuration"
+                  parent="menu_epc_root"
+                  groups="csl_epc_core.group_epc_admin"
+                  sequence="110"/>
+    </data>
+</odoo>

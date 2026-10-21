@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="rule_epc_handover_user" model="ir.rule">
+            <field name="name">Handover: field users see their own</field>
+            <field name="model_id" ref="model_epc_handover"/>
+            <field name="domain_force">[('create_uid', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('csl_epc_core.group_epc_user'))]"/>
+        </record>
+        <record id="rule_epc_handover_manager" model="ir.rule">
+            <field name="name">Handover: managers see all</field>
+            <field name="model_id" ref="model_epc_handover"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('csl_epc_core.group_epc_manager'))]"/>
+        </record>
+    </data>
+</odoo>

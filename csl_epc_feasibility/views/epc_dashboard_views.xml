@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Live dashboard of this stage, rendered by the generic screen in csl_epc_core.
+             It is the first menu entry, so the app opens on it. -->
+        <record id="epc_dashboard_feasibility_action" model="ir.actions.client">
+            <field name="name">Feasibility Dashboard</field>
+            <field name="tag">epc_stage_dashboard</field>
+            <field name="target">current</field>
+            <field name="params" eval="{'stage': 'feasibility'}"/>
+        </record>
+        <menuitem id="menu_epc_dashboard_feasibility"
+                  name="Dashboard"
+                  parent="menu_epc_feasibility"
+                  action="epc_dashboard_feasibility_action"
+                  sequence="1"/>
+    </data>
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Stage 8A: Procurement -->
+        <menuitem id="menu_epc_material_request"
+                  name="Material Requests"
+                  web_icon="csl_epc_material_request,static/description/icon.png"
+                  groups="csl_epc_core.group_epc_user"
+                  sequence="46"/>
+        <menuitem id="menu_epc_material_request_list"
+                  name="Material Requests"
+                  parent="menu_epc_material_request"
+                  action="epc_material_request_action"
+                  sequence="10"/>
+    </data>
+</odoo>

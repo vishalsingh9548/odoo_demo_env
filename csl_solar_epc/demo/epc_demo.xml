@@ -293,13 +293,13 @@
             <field name="next_service_date" eval="(DateTime.today() + timedelta(days=90)).strftime('%Y-%m-%d')"/>
             <field name="sla_response_hours">24</field>
             <field name="preventive_maintenance_plan">&lt;p&gt;Module cleaning, torque check on structure bolts, inverter firmware check, thermal imaging scan of DC connectors.&lt;/p&gt;</field>
-            <field name="helpdesk_team_id" ref="epc_helpdesk_team"/>
+            <field name="helpdesk_team_id" ref="csl_epc_amc.epc_helpdesk_team"/>
             <field name="state">active</field>
         </record>
 
         <record id="epc_demo_ticket" model="helpdesk.ticket">
             <field name="name">Inverter showing fault code E04</field>
-            <field name="team_id" ref="epc_helpdesk_team"/>
+            <field name="team_id" ref="csl_epc_amc.epc_helpdesk_team"/>
             <field name="partner_id" ref="epc_demo_partner"/>
             <field name="amc_contract_id" ref="epc_demo_amc"/>
             <field name="description">&lt;p&gt;Customer reports Inverter 3 display is showing fault code E04 and has stopped generating power.&lt;/p&gt;</field>

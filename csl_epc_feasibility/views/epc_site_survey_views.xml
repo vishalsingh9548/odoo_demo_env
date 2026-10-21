@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="epc_site_survey_view_form_feasibility" model="ir.ui.view">
+            <field name="name">epc.site.survey.form.feasibility</field>
+            <field name="model">epc.site.survey</field>
+            <field name="inherit_id" ref="csl_epc_site_survey.epc_site_survey_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='approval_state']" position="before">
+                        <button name="action_create_feasibility" string="Create Feasibility Study" type="object"
+                                class="oe_highlight" invisible="approval_state != 'approved' or feasibility_count != 0"/>
+                </xpath>
+                <xpath expr="//div[@name='button_box']" position="inside">
+                            <button name="action_view_feasibility" type="object"
+                                    class="oe_stat_button" icon="fa-flask"
+                                    invisible="feasibility_count == 0">
+                                <field name="feasibility_count" widget="statinfo" string="Feasibility Studies"/>
+                            </button>
+                </xpath>
+            </field>
+        </record>
+    
+        <record id="epc_site_survey_view_list_feasibility" model="ir.ui.view">
+            <field name="name">epc.site.survey.list.feasibility</field>
+            <field name="model">epc.site.survey</field>
+            <field name="inherit_id" ref="csl_epc_site_survey.epc_site_survey_view_list"/>
+            <field name="arch" type="xml">
+                <field name="is_feasible" position="after">
+                    <field name="feasibility_count" string="Feasibility Studies" optional="show"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

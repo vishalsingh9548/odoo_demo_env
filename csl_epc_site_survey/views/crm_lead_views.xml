@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="crm_lead_view_form_epc_survey" model="ir.ui.view">
+            <field name="name">crm.lead.form.epc.survey</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_site_surveys" type="object"
+                            class="oe_stat_button" icon="fa-map-marker"
+                            invisible="site_survey_count == 0">
+                        <field name="site_survey_count" widget="statinfo" string="Surveys"/>
+                    </button>
+                </xpath>
+                <xpath expr="//header" position="inside">
+                    <button name="action_create_site_survey" string="Schedule Site Survey"
+                            type="object" class="oe_highlight" groups="csl_epc_core.group_epc_user"
+                            invisible="type == 'lead'"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

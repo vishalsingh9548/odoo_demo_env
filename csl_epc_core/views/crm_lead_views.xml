@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="crm_lead_view_form_epc" model="ir.ui.view">
+            <field name="name">crm.lead.form.epc</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page name="epc_solar_details" string="Solar Details">
+                        <group>
+                            <group string="Requirement">
+                                <field name="customer_segment"/>
+                                <field name="proposed_capacity_kw"/>
+                                <field name="monthly_electricity_bill"/>
+                                <field name="roof_or_land_type"/>
+                                <field name="expected_closure_date"/>
+                            </group>
+                            <group string="Site">
+                                <field name="site_address"/>
+                                <field name="site_latitude"/>
+                                <field name="site_longitude"/>
+                                <field name="sanctioned_load_kw"/>
+                                <field name="has_existing_transformer"/>
+                                <field name="grid_access_available"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
