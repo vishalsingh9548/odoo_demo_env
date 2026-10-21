@@ -7,11 +7,11 @@
             <form>
                 <header>
                     <button name="action_dispatch" type="object" string="Dispatch" class="oe_highlight"
-                        invisible="state != 'draft'" groups="ug_recycling_base.group_ug_epr"/>
+                        invisible="state != 'draft'" groups="ug_recycling_base.group_ug_user"/>
                     <button name="action_acknowledge" type="object" string="Acknowledged by Receiver" class="oe_highlight"
-                        invisible="state != 'dispatched'" groups="ug_recycling_base.group_ug_epr"/>
+                        invisible="state != 'dispatched'" groups="ug_recycling_base.group_ug_user"/>
                     <button name="action_reset_draft" type="object" string="Reset to Draft"
-                        invisible="state == 'draft'" groups="ug_recycling_base.group_ug_manager"/>
+                        invisible="state == 'draft'" groups="ug_recycling_base.group_ug_user"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>

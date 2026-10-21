@@ -1,14 +1,14 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_ug_epr_category_user,ug.epr.category user,model_ug_epr_category,ug_recycling_base.group_ug_user,1,0,0,0
 access_ug_epr_category_sale,ug.epr.category sale,model_ug_epr_category,sales_team.group_sale_salesman,1,0,0,0
-access_ug_epr_category_manager,ug.epr.category manager,model_ug_epr_category,ug_recycling_base.group_ug_manager,1,1,1,1
+access_ug_epr_category_manager,ug.epr.category manager,model_ug_epr_category,ug_recycling_base.group_ug_user,1,1,1,1
 access_ug_epr_certificate_user,ug.epr.certificate user,model_ug_epr_certificate,ug_recycling_base.group_ug_user,1,0,0,0
 access_ug_epr_certificate_sale,ug.epr.certificate sale,model_ug_epr_certificate,sales_team.group_sale_salesman,1,0,0,0
-access_ug_epr_certificate_officer,ug.epr.certificate officer,model_ug_epr_certificate,ug_recycling_base.group_ug_epr,1,1,1,0
-access_ug_epr_certificate_manager,ug.epr.certificate manager,model_ug_epr_certificate,ug_recycling_base.group_ug_manager,1,1,1,1
+access_ug_epr_certificate_officer,ug.epr.certificate officer,model_ug_epr_certificate,ug_recycling_base.group_ug_user,1,1,1,0
+access_ug_epr_certificate_manager,ug.epr.certificate manager,model_ug_epr_certificate,ug_recycling_base.group_ug_user,1,1,1,1
 access_ug_epr_allocation_user,ug.epr.allocation user,model_ug_epr_allocation,ug_recycling_base.group_ug_user,1,0,0,0
 access_ug_epr_allocation_mrp,ug.epr.allocation mrp,model_ug_epr_allocation,mrp.group_mrp_user,1,0,0,0
-access_ug_epr_allocation_officer,ug.epr.allocation officer,model_ug_epr_allocation,ug_recycling_base.group_ug_epr,1,1,1,1
+access_ug_epr_allocation_officer,ug.epr.allocation officer,model_ug_epr_allocation,ug_recycling_base.group_ug_user,1,1,1,1
 access_ug_waste_manifest_user,ug.waste.manifest user,model_ug_waste_manifest,ug_recycling_base.group_ug_user,1,0,0,0
-access_ug_waste_manifest_officer,ug.waste.manifest officer,model_ug_waste_manifest,ug_recycling_base.group_ug_epr,1,1,1,0
-access_ug_waste_manifest_manager,ug.waste.manifest manager,model_ug_waste_manifest,ug_recycling_base.group_ug_manager,1,1,1,1
+access_ug_waste_manifest_officer,ug.waste.manifest officer,model_ug_waste_manifest,ug_recycling_base.group_ug_user,1,1,1,0
+access_ug_waste_manifest_manager,ug.waste.manifest manager,model_ug_waste_manifest,ug_recycling_base.group_ug_user,1,1,1,1

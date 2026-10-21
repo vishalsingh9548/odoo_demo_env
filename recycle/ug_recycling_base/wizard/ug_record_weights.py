@@ -102,7 +102,7 @@ class UgRecordWeights(models.TransientModel):
             raise UserError(_("Weights cannot be negative."))
         if production.product_uom_id._ug_is_zero(production.product_uom_id._ug_from_kg(self.main_qty_kg)):
             raise UserError(_("Enter the weight of %s produced.", production.product_id.display_name))
-        if self.override_weights and not self.env.user.has_group('ug_recycling_base.group_ug_manager'):
+        if self.override_weights and not self.env.user.has_group('ug_recycling_base.group_ug_user'):
             raise UserError(_("Only a Recycling Manager can confirm weights where the output exceeds the input."))
 
         production.qty_producing = production.product_uom_id._ug_from_kg(self.main_qty_kg) + production.qty_produced

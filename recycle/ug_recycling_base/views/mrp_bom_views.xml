@@ -6,26 +6,28 @@
         <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
         <field name="arch" type="xml">
             <field name="type" position="after">
-                <field name="ug_is_recycling" groups="ug_recycling_base.group_ug_user"/>
-                <field name="ug_stage" invisible="not ug_is_recycling" required="ug_is_recycling"/>
-                <field name="battery_chemistry_id" invisible="not ug_is_recycling"/>
-                <label for="ug_max_loss_pct" invisible="not ug_is_recycling"/>
-                <div class="o_row" invisible="not ug_is_recycling">
-                    <field name="ug_max_loss_pct" class="oe_inline"/>
-                    <span>%</span>
-                </div>
-                <label for="ug_yield_tolerance_pct" invisible="not ug_is_recycling or ug_stage == 'recover'"/>
-                <div class="o_row" invisible="not ug_is_recycling or ug_stage == 'recover'">
-                    <field name="ug_yield_tolerance_pct" class="oe_inline"/> %
-                    <span class="text-muted" invisible="not ug_yield_max_pct">
-                        → standard <field name="ug_standard_yield_pct" class="oe_inline" nolabel="1"/> %,
-                        accepted <field name="ug_yield_min_pct" class="oe_inline" nolabel="1"/> –
-                        <field name="ug_yield_max_pct" class="oe_inline" nolabel="1"/> %
-                    </span>
-                </div>
+                <t groups="ug_recycling_base.group_ug_user">
+                    <field name="ug_is_recycling" groups="ug_recycling_base.group_ug_user"/>
+                    <field name="ug_stage" invisible="not ug_is_recycling" required="ug_is_recycling"/>
+                    <field name="battery_chemistry_id" invisible="not ug_is_recycling"/>
+                    <label for="ug_max_loss_pct" invisible="not ug_is_recycling"/>
+                    <div class="o_row" invisible="not ug_is_recycling">
+                        <field name="ug_max_loss_pct" class="oe_inline"/>
+                        <span>%</span>
+                    </div>
+                    <label for="ug_yield_tolerance_pct" invisible="not ug_is_recycling or ug_stage == 'recover'"/>
+                    <div class="o_row" invisible="not ug_is_recycling or ug_stage == 'recover'">
+                        <field name="ug_yield_tolerance_pct" class="oe_inline"/> %
+                        <span class="text-muted" invisible="not ug_yield_max_pct">
+                            → standard <field name="ug_standard_yield_pct" class="oe_inline" nolabel="1"/> %,
+                            accepted <field name="ug_yield_min_pct" class="oe_inline" nolabel="1"/> –
+                            <field name="ug_yield_max_pct" class="oe_inline" nolabel="1"/> %
+                        </span>
+                    </div>
+                </t>
             </field>
             <xpath expr="//field[@name='bom_line_ids']/list/field[@name='product_qty']" position="before">
-                <field name="ug_is_primary_input" column_invisible="not parent.ug_is_recycling" widget="boolean_toggle"/>
+                <field name="ug_is_primary_input" column_invisible="not parent.ug_is_recycling" widget="boolean_toggle" groups="ug_recycling_base.group_ug_user"/>
             </xpath>
             <xpath expr="//field[@name='byproduct_ids']/list/field[@name='cost_share']" position="attributes">
                 <attribute name="optional">show</attribute>
@@ -39,8 +41,8 @@
         <field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>
         <field name="arch" type="xml">
             <field name="type" position="after">
-                <field name="ug_stage" optional="show"/>
-                <field name="battery_chemistry_id" optional="show"/>
+                <field name="ug_stage" optional="show" groups="ug_recycling_base.group_ug_user"/>
+                <field name="battery_chemistry_id" optional="show" groups="ug_recycling_base.group_ug_user"/>
             </field>
         </field>
     </record>
@@ -51,8 +53,8 @@
         <field name="inherit_id" ref="mrp.view_mrp_bom_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//search" position="inside">
-                <filter name="ug_recycling" string="Recycling" domain="[('ug_is_recycling', '=', True)]"/>
-                <filter name="groupby_ug_stage" string="Recycling Stage" context="{'group_by': 'ug_stage'}"/>
+                <filter name="ug_recycling" string="Recycling" domain="[('ug_is_recycling', '=', True)]" groups="ug_recycling_base.group_ug_user"/>
+                <filter name="groupby_ug_stage" string="Recycling Stage" context="{'group_by': 'ug_stage'}" groups="ug_recycling_base.group_ug_user"/>
             </xpath>
         </field>
     </record>

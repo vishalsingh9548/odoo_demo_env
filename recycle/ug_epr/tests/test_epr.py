@@ -125,7 +125,7 @@ class TestEpr(UgRecyclingCommon):
             certificate.with_user(user).action_generate()
         officer = self.env['res.users'].create({
             'name': 'Officer', 'login': 'ug_epr_officer',
-            'groups_id': [Command.set([self.env.ref('ug_recycling_base.group_ug_epr').id])],
+            'groups_id': [Command.set([self.env.ref('ug_recycling_base.group_ug_user').id])],
         })
         certificate.with_user(officer).action_generate()
         self.assertEqual(certificate.state, 'generated')

@@ -6,15 +6,17 @@
         <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <field name="ug_next_ready" invisible="1"/>
-                <field name="ug_next_waiting_lab" invisible="1"/>
-                <button name="action_ug_create_next_mo" type="object" string="Create Next Stage MO" class="oe_highlight"
-                    invisible="state != 'done' or not ug_next_ready"/>
-                <button name="action_ug_compute_expected" type="object" string="Compute expected outputs from assay"
-                    invisible="state != 'draft' or ug_stage != 'recover' or not ug_input_lot_line_ids"/>
+                <t groups="ug_recycling_base.group_ug_user">
+                    <field name="ug_next_ready" invisible="1"/>
+                    <field name="ug_next_waiting_lab" invisible="1"/>
+                    <button name="action_ug_create_next_mo" type="object" string="Create Next Stage MO" class="oe_highlight"
+                        invisible="state != 'done' or not ug_next_ready"/>
+                    <button name="action_ug_compute_expected" type="object" string="Compute expected outputs from assay"
+                        invisible="state != 'draft' or ug_stage != 'recover' or not ug_input_lot_line_ids"/>
+                </t>
             </xpath>
             <xpath expr="//notebook" position="inside">
-                <page string="Input Lots" name="ug_recovery" invisible="not ug_is_recycling">
+                <page string="Input Lots" name="ug_recovery" invisible="not ug_is_recycling" groups="ug_recycling_base.group_ug_user">
                     <div class="text-muted" invisible="ug_stage == 'recover'">
                         Lots to consume; they are reserved when the order is confirmed and the input weight follows them.
                     </div>
@@ -49,26 +51,28 @@
                 </page>
             </xpath>
             <page name="ug_chain" position="inside">
-                <group string="Next Stage" invisible="state != 'done' or not ug_next_queue_ids">
-                    <div colspan="2" class="alert alert-warning mb-2" role="alert" invisible="not ug_next_waiting_lab">
-                        Waiting for the lab: approve the assay of the output lot (Assays button) to plan the next stage.
-                    </div>
-                    <field name="ug_next_queue_ids" nolabel="1" colspan="2" readonly="1">
-                        <list decoration-muted="not ready">
-                            <field name="ready" column_invisible="True"/>
-                            <field name="stage"/>
-                            <field name="lot_id"/>
-                            <field name="product_id"/>
-                            <field name="assay_state" widget="badge" invisible="assay_state == 'not_required'"
-                                decoration-success="assay_state == 'approved'" decoration-warning="assay_state == 'pending'"/>
-                            <field name="available_kg" sum="Total"/>
-                        </list>
-                    </field>
-                    <div colspan="2">
-                        <button name="action_ug_create_next_mo" type="object" string="Create Next Stage MO"
-                            class="btn-primary" invisible="not ug_next_ready"/>
-                    </div>
-                </group>
+                <t groups="ug_recycling_base.group_ug_user">
+                    <group string="Next Stage" invisible="state != 'done' or not ug_next_queue_ids">
+                        <div colspan="2" class="alert alert-warning mb-2" role="alert" invisible="not ug_next_waiting_lab">
+                            Waiting for the lab: approve the assay of the output lot (Assays button) to plan the next stage.
+                        </div>
+                        <field name="ug_next_queue_ids" nolabel="1" colspan="2" readonly="1">
+                            <list decoration-muted="not ready">
+                                <field name="ready" column_invisible="True"/>
+                                <field name="stage"/>
+                                <field name="lot_id"/>
+                                <field name="product_id"/>
+                                <field name="assay_state" widget="badge" invisible="assay_state == 'not_required'"
+                                    decoration-success="assay_state == 'approved'" decoration-warning="assay_state == 'pending'"/>
+                                <field name="available_kg" sum="Total"/>
+                            </list>
+                        </field>
+                        <div colspan="2">
+                            <button name="action_ug_create_next_mo" type="object" string="Create Next Stage MO"
+                                class="btn-primary" invisible="not ug_next_ready"/>
+                        </div>
+                    </group>
+                </t>
             </page>
         </field>
     </record>

@@ -44,5 +44,24 @@ Modules: `ug_recycling_base`, `ug_lot_assay`, `ug_recovery_planning`, `ug_epr`, 
 - Ported to the same renames; `tracking=False` -> `'none'`, `group_ids` -> `groups_id`, move `name` required.
 - Known: some tests not re-verified after the last change (lot-assay "block recover consumption", chain/next-stage).
 
+## Access control (single group)
+
+The whole app is switched on by **one** group: `ug_recycling_base.group_ug_user` ("Recycling Access", category *Recycling*).
+Enable it per user under Settings > Users > Access Rights > Recycling. `base.user_root` and `base.user_admin` are in it by default.
+
+- Replaces the former Recycling User / Lab Technician / EPR Officer / Recycling Manager groups; every reference
+  (menus, views, `ir.model.access.csv`, Python `has_group` / `_ug_check_group` checks, tests) now points to `group_ug_user`.
+- The group implies `mrp.group_mrp_manager`, by-products, routings, lots and quality user.
+- Users outside the group see standard Odoo: the Recycling menu is hidden and every field, tab, button, filter and
+  list column the modules add to MO, BoM, Product, Lot, Quant, Transfer and the Change Production Qty wizard is not rendered.
+  The two settings blocks (EPR basis / product, block unassayed lots) are also group-only.
+- How it is done in Odoo 18: `groups_id` is not allowed on inheriting views, so form blocks are wrapped in
+  `<t groups="ug_recycling_base.group_ug_user">`, tabs carry `groups=` themselves, and search/list views
+  (which reject `<t>`) have `groups=` on each field/filter/button.
+- Side effect of merging: there is no separation of duties any more (the same user can submit, approve and reject an assay,
+  or create EPR certificates).
+- Tests: the role-separation tests in `ug_lot_assay` (lab user cannot approve) and `ug_epr` (user without EPR group refused)
+  expect restrictions that no longer exist and will fail; they have not been updated or re-run.
+
 ## Run
 `odoo-bin -c <conf> -d <db> -i ug_mass_balance` (installs all five modules).

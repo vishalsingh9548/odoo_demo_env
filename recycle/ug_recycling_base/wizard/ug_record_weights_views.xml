@@ -64,7 +64,7 @@
                                 <field name="yield_max_pct" class="oe_inline" nolabel="1"/> %)</span>
                         </div>
                         <field name="override_weights" invisible="status != 'blocked'"
-                            groups="ug_recycling_base.group_ug_manager"/>
+                            groups="ug_recycling_base.group_ug_user"/>
                     </group>
                 </group>
                 <footer>

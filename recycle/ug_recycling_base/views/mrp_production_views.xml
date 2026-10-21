@@ -19,24 +19,28 @@
                 <attribute name="invisible" add="ug_is_recycling" separator=" or "/>
             </xpath>
             <xpath expr="//header" position="inside">
-                <button name="action_ug_record_weights" type="object" string="Record Weights" class="oe_highlight"
-                    invisible="not ug_is_recycling or state not in ('confirmed', 'progress', 'to_close')"/>
+                <t groups="ug_recycling_base.group_ug_user">
+                    <button name="action_ug_record_weights" type="object" string="Record Weights" class="oe_highlight"
+                        invisible="not ug_is_recycling or state not in ('confirmed', 'progress', 'to_close')"/>
+                </t>
             </xpath>
             <xpath expr="//label[@name='bom_label']" position="before">
-                <field name="ug_is_recycling" invisible="1"/>
-                <label for="ug_input_qty" invisible="not ug_is_recycling"/>
-                <div class="o_row" invisible="not ug_is_recycling">
-                    <field name="ug_input_qty" class="oe_inline" readonly="state != 'draft'"/>
-                    <span>kg</span>
-                    <button name="action_ug_change_input_qty" type="object" string="Change input weight"
-                        class="oe_link" icon="fa-balance-scale"
-                        invisible="state in ('draft', 'done', 'cancel')"/>
-                </div>
-                <field name="ug_stage" invisible="not ug_is_recycling"/>
-                <field name="battery_chemistry_id" invisible="not battery_chemistry_id"/>
+                <t groups="ug_recycling_base.group_ug_user">
+                    <field name="ug_is_recycling" invisible="1"/>
+                    <label for="ug_input_qty" invisible="not ug_is_recycling"/>
+                    <div class="o_row" invisible="not ug_is_recycling">
+                        <field name="ug_input_qty" class="oe_inline" readonly="state != 'draft'"/>
+                        <span>kg</span>
+                        <button name="action_ug_change_input_qty" type="object" string="Change input weight"
+                            class="oe_link" icon="fa-balance-scale"
+                            invisible="state in ('draft', 'done', 'cancel')"/>
+                    </div>
+                    <field name="ug_stage" invisible="not ug_is_recycling"/>
+                    <field name="battery_chemistry_id" invisible="not battery_chemistry_id"/>
+                </t>
             </xpath>
             <xpath expr="//notebook" position="inside">
-                <page string="Mass Balance" name="ug_mass_balance" invisible="not ug_is_recycling">
+                <page string="Mass Balance" name="ug_mass_balance" invisible="not ug_is_recycling" groups="ug_recycling_base.group_ug_user">
                     <div class="alert alert-info" role="alert" invisible="state == 'done'">
                         The mass balance is computed when the manufacturing order is marked as done.
                     </div>
@@ -78,12 +82,12 @@
         <field name="inherit_id" ref="mrp.mrp_production_tree_view"/>
         <field name="arch" type="xml">
             <field name="product_qty" position="after">
-                <field name="ug_stage" optional="hide"/>
-                <field name="ug_input_weight_kg" optional="hide" sum="Total"/>
-                <field name="ug_output_weight_kg" optional="hide" sum="Total"/>
-                <field name="ug_loss_pct" optional="hide"/>
-                <field name="ug_yield_pct" optional="hide"/>
-                <field name="ug_loss_exceeded" optional="hide"/>
+                <field name="ug_stage" optional="hide" groups="ug_recycling_base.group_ug_user"/>
+                <field name="ug_input_weight_kg" optional="hide" sum="Total" groups="ug_recycling_base.group_ug_user"/>
+                <field name="ug_output_weight_kg" optional="hide" sum="Total" groups="ug_recycling_base.group_ug_user"/>
+                <field name="ug_loss_pct" optional="hide" groups="ug_recycling_base.group_ug_user"/>
+                <field name="ug_yield_pct" optional="hide" groups="ug_recycling_base.group_ug_user"/>
+                <field name="ug_loss_exceeded" optional="hide" groups="ug_recycling_base.group_ug_user"/>
             </field>
         </field>
     </record>
@@ -94,14 +98,14 @@
         <field name="inherit_id" ref="mrp.view_mrp_production_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//search" position="inside">
-                <field name="battery_chemistry_id"/>
+                <field name="battery_chemistry_id" groups="ug_recycling_base.group_ug_user"/>
                 <separator/>
-                <filter name="ug_recycling" string="Recycling" domain="[('ug_is_recycling', '=', True)]"/>
-                <filter name="ug_loss_exceeded" string="Loss Exceeded" domain="[('ug_loss_exceeded', '=', True)]"/>
-                <filter name="ug_yield_out_of_band" string="Yield Out of Range" domain="[('ug_yield_out_of_band', '=', True)]"/>
+                <filter name="ug_recycling" string="Recycling" domain="[('ug_is_recycling', '=', True)]" groups="ug_recycling_base.group_ug_user"/>
+                <filter name="ug_loss_exceeded" string="Loss Exceeded" domain="[('ug_loss_exceeded', '=', True)]" groups="ug_recycling_base.group_ug_user"/>
+                <filter name="ug_yield_out_of_band" string="Yield Out of Range" domain="[('ug_yield_out_of_band', '=', True)]" groups="ug_recycling_base.group_ug_user"/>
                 <separator/>
-                <filter name="groupby_ug_stage" string="Recycling Stage" context="{'group_by': 'ug_stage'}"/>
-                <filter name="groupby_battery_chemistry" string="Battery Chemistry" context="{'group_by': 'battery_chemistry_id'}"/>
+                <filter name="groupby_ug_stage" string="Recycling Stage" context="{'group_by': 'ug_stage'}" groups="ug_recycling_base.group_ug_user"/>
+                <filter name="groupby_battery_chemistry" string="Battery Chemistry" context="{'group_by': 'battery_chemistry_id'}" groups="ug_recycling_base.group_ug_user"/>
             </xpath>
         </field>
     </record>

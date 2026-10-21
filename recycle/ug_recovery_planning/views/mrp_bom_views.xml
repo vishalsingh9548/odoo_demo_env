@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
-                <page string="Recovery Rates" name="ug_recovery" invisible="ug_stage != 'recover'">
+                <page string="Recovery Rates" name="ug_recovery" invisible="ug_stage != 'recover'" groups="ug_recycling_base.group_ug_user">
                     <field name="ug_recovery_line_ids">
                         <list editable="bottom">
                             <field name="sequence" widget="handle"/>

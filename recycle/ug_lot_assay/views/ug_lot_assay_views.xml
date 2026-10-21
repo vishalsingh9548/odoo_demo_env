@@ -7,13 +7,13 @@
             <form>
                 <header>
                     <button name="action_submit" type="object" string="Submit" class="oe_highlight"
-                        invisible="state != 'draft'" groups="ug_recycling_base.group_ug_lab"/>
+                        invisible="state != 'draft'" groups="ug_recycling_base.group_ug_user"/>
                     <button name="action_approve" type="object" string="Approve" class="oe_highlight"
-                        invisible="state != 'submitted'" groups="ug_recycling_base.group_ug_manager"/>
+                        invisible="state != 'submitted'" groups="ug_recycling_base.group_ug_user"/>
                     <button name="action_reject" type="object" string="Reject"
-                        invisible="state != 'submitted'" groups="ug_recycling_base.group_ug_manager"/>
+                        invisible="state != 'submitted'" groups="ug_recycling_base.group_ug_user"/>
                     <button name="action_reset_draft" type="object" string="Reset to Draft"
-                        invisible="state not in ('submitted', 'rejected')" groups="ug_recycling_base.group_ug_lab"/>
+                        invisible="state not in ('submitted', 'rejected')" groups="ug_recycling_base.group_ug_user"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
                 </header>
                 <sheet>

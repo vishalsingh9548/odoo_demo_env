@@ -189,7 +189,7 @@ class MrpProduction(models.Model):
     def _ug_check_weights(self):
         """ Dismantling and shredding cannot create mass: more output than input is a weighing error. """
         override = self.env.context.get('ug_weights_override') and \
-            self.env.user.has_group('ug_recycling_base.group_ug_manager')
+            self.env.user.has_group('ug_recycling_base.group_ug_user')
         for production in self.filtered(lambda p: p.bom_id.ug_is_recycling and p.ug_stage in ('dismantle', 'shred')):
             input_kg, output_kg = production._ug_pending_weights_kg()
             if input_kg and output_kg > input_kg + 0.01 and not override:
@@ -261,7 +261,7 @@ class MrpProduction(models.Model):
         self._ug_alert_yield()
 
     def _ug_alert_yield(self):
-        managers = self.env['res.users'].search([('groups_id', 'in', self.env.ref('ug_recycling_base.group_ug_manager').ids)]).filtered(
+        managers = self.env['res.users'].search([('groups_id', 'in', self.env.ref('ug_recycling_base.group_ug_user').ids)]).filtered(
             lambda u: not u.share and u.active)
         for production in self.filtered('ug_yield_out_of_band'):
             message = _(
@@ -279,7 +279,7 @@ class MrpProduction(models.Model):
                 )
 
     def _ug_alert_loss_exceeded(self):
-        managers = self.env['res.users'].search([('groups_id', 'in', self.env.ref('ug_recycling_base.group_ug_manager').ids)]).filtered(
+        managers = self.env['res.users'].search([('groups_id', 'in', self.env.ref('ug_recycling_base.group_ug_user').ids)]).filtered(
             lambda u: not u.share and u.active)
         for production in self.filtered('ug_loss_exceeded'):
             message = _(

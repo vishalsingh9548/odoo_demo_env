@@ -7,7 +7,7 @@
     <menuitem id="menu_ug_operations" name="Operations" parent="menu_ug_root" sequence="10"/>
     <menuitem id="menu_ug_reporting" name="Reporting" parent="menu_ug_root" sequence="50"/>
     <menuitem id="menu_ug_configuration" name="Configuration" parent="menu_ug_root" sequence="90"
-        groups="ug_recycling_base.group_ug_manager"/>
+        groups="ug_recycling_base.group_ug_user"/>
 
     <menuitem id="menu_ug_production" name="Manufacturing Orders" parent="menu_ug_operations"
         action="ug_mrp_production_action" sequence="10"/>

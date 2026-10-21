@@ -156,7 +156,7 @@ class UgEprCertificate(models.Model):
     # Workflow
     # ------------------------------------------------------------------
     def _ug_check_officer(self):
-        if not self.env.su and not self.env.user.has_group('ug_recycling_base.group_ug_epr'):
+        if not self.env.su and not self.env.user.has_group('ug_recycling_base.group_ug_user'):
             raise UserError(_("Only EPR Officers can change the status of EPR certificates."))
 
     def _ug_set_state(self, state):

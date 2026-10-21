@@ -156,7 +156,7 @@ class UgLotAssay(models.Model):
             raise UserError(_("Only members of '%(group)s' can %(action)s an assay.", group=group.name, action=action))
 
     def action_submit(self):
-        self._ug_check_group('ug_recycling_base.group_ug_lab', _('submit'))
+        self._ug_check_group('ug_recycling_base.group_ug_user', _('submit'))
         for assay in self:
             if assay.state != 'draft':
                 raise UserError(_("Only draft assays can be submitted."))
@@ -173,7 +173,7 @@ class UgLotAssay(models.Model):
                     assay.name))
 
     def action_approve(self):
-        self._ug_check_group('ug_recycling_base.group_ug_manager', _('approve'))
+        self._ug_check_group('ug_recycling_base.group_ug_user', _('approve'))
         for assay in self:
             if assay.state != 'submitted':
                 raise UserError(_("Only submitted assays can be approved."))
@@ -195,13 +195,13 @@ class UgLotAssay(models.Model):
         self.activity_feedback(['mail.mail_activity_data_todo'])
 
     def action_reject(self):
-        self._ug_check_group('ug_recycling_base.group_ug_manager', _('reject'))
+        self._ug_check_group('ug_recycling_base.group_ug_user', _('reject'))
         if any(assay.state != 'submitted' for assay in self):
             raise UserError(_("Only submitted assays can be rejected."))
         self.write({'state': 'rejected'})
 
     def action_reset_draft(self):
-        self._ug_check_group('ug_recycling_base.group_ug_lab', _('reset'))
+        self._ug_check_group('ug_recycling_base.group_ug_user', _('reset'))
         if any(assay.state not in ('submitted', 'rejected') for assay in self):
             raise UserError(_("Only submitted or rejected assays can be reset to draft."))
         self.write({'state': 'draft'})
@@ -209,7 +209,7 @@ class UgLotAssay(models.Model):
     @api.model
     def _ug_create_from_production(self, lots):
         """ Draft assays for freshly produced lots + activity for the lab. """
-        lab_users = self.env['res.users'].search([('groups_id', 'in', self.env.ref('ug_recycling_base.group_ug_lab').ids)]).filtered(
+        lab_users = self.env['res.users'].search([('groups_id', 'in', self.env.ref('ug_recycling_base.group_ug_user').ids)]).filtered(
             lambda u: not u.share and u.active)
         assays = self.browse()
         for lot in lots:

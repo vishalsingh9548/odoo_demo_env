@@ -85,7 +85,7 @@ class TestLotAssay(UgAssayCommon):
         })
         lab = self.env['res.users'].create({
             'name': 'Lab tech', 'login': 'ug_lab_user',
-            'groups_id': [Command.set([self.env.ref('ug_recycling_base.group_ug_lab').id])],
+            'groups_id': [Command.set([self.env.ref('ug_recycling_base.group_ug_user').id])],
         })
         lot = self._receive(self.bm, 10, 'BM-A6')
         assay = self.env['ug.lot.assay'].create({'lot_id': lot.id})

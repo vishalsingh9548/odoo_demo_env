@@ -6,10 +6,12 @@
         <field name="inherit_id" ref="stock.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <block id="production_lot_info" position="inside">
-                <setting id="ug_block_unassayed_lots" company_dependent="1"
-                    help="Block consumption in recover-stage MOs and customer deliveries of lots whose assay is pending">
-                    <field name="ug_block_unassayed_lots"/>
-                </setting>
+                <t groups="ug_recycling_base.group_ug_user">
+                    <setting id="ug_block_unassayed_lots" company_dependent="1"
+                        help="Block consumption in recover-stage MOs and customer deliveries of lots whose assay is pending">
+                        <field name="ug_block_unassayed_lots"/>
+                    </setting>
+                </t>
             </block>
         </field>
     </record>
