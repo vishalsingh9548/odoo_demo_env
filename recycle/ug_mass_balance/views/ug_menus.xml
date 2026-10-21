@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_ug_mass_balance_report" name="Mass Balance" parent="ug_recycling_base.menu_ug_reporting"
+        action="ug_mass_balance_report_action" sequence="10"/>
+    <menuitem id="menu_ug_element_balance_report" name="Element Recovery" parent="ug_recycling_base.menu_ug_reporting"
+        action="ug_element_balance_report_action" sequence="20"/>
+    <menuitem id="menu_ug_material_output_report" name="Material Output &amp; Cost" parent="ug_recycling_base.menu_ug_reporting"
+        action="ug_material_output_report_action" sequence="30"/>
+    <menuitem id="menu_ug_stock_by_stage" name="Stock by Stage" parent="ug_recycling_base.menu_ug_reporting"
+        action="ug_stock_by_stage_action" sequence="40"/>
+</odoo>

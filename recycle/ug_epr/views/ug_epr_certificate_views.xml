@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ug_epr_certificate_view_form" model="ir.ui.view">
+        <field name="name">ug.epr.certificate.form</field>
+        <field name="model">ug.epr.certificate</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_generate" type="object" string="Mark Generated" class="oe_highlight"
+                        invisible="state != 'draft'" groups="ug_recycling_base.group_ug_user"/>
+                    <button name="action_list" type="object" string="List for Sale" class="oe_highlight"
+                        invisible="state != 'generated'" groups="ug_recycling_base.group_ug_user"/>
+                    <button name="action_create_quotation" type="object" string="Create Quotation" class="oe_highlight"
+                        invisible="state != 'listed' or sale_order_id" groups="ug_recycling_base.group_ug_user"/>
+                    <button name="action_mark_transferred" type="object" string="Mark Transferred" class="oe_highlight"
+                        invisible="state != 'sold'" groups="ug_recycling_base.group_ug_user"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                        invisible="state in ('transferred', 'cancelled')" groups="ug_recycling_base.group_ug_user"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                        invisible="state != 'cancelled'" groups="ug_recycling_base.group_ug_user"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated,listed,sold,transferred"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_sale_order" type="object" class="oe_stat_button" icon="fa-file-text"
+                            invisible="not sale_order_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Quotation</span>
+                                <span class="o_stat_value"><field name="sale_order_id" readonly="1" options="{'no_open': True}"/></span>
+                            </div>
+                        </button>
+                        <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-file-text-o"
+                            invisible="not invoice_count">
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                        <field name="portal_certificate_no" placeholder="CPCB certificate number"
+                            required="state in ('generated', 'listed', 'sold', 'transferred')"
+                            readonly="state not in ('draft', 'generated')"/>
+                    </div>
+                    <group>
+                        <group string="Certificate">
+                            <field name="epr_category_id" readonly="state != 'draft'"/>
+                            <field name="battery_chemistry_id" readonly="state != 'draft'"/>
+                            <field name="generation_date" readonly="state not in ('draft', 'generated')"/>
+                            <field name="financial_year" readonly="state not in ('draft', 'generated')"/>
+                            <label for="quantity_kg"/>
+                            <div class="o_row">
+                                <field name="quantity_kg" readonly="state != 'draft'"/> kg
+                            </div>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Sale">
+                            <field name="partner_id" readonly="state in ('sold', 'transferred', 'cancelled')"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="price_per_kg" readonly="state in ('sold', 'transferred', 'cancelled')"/>
+                            <field name="amount"/>
+                            <field name="transfer_ref" invisible="state not in ('sold', 'transferred')"
+                                readonly="state == 'transferred'"/>
+                            <field name="transfer_date" invisible="state not in ('sold', 'transferred')"
+                                readonly="state == 'transferred'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Manufacturing Orders" name="productions">
+                            <field name="production_ids" readonly="state != 'draft'"
+                                context="{'search_default_filter_done': 1}">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="product_id"/>
+                                    <field name="ug_stage"/>
+                                    <field name="date_finished"/>
+                                    <field name="ug_epr_eligible_kg" sum="Total"/>
+                                    <field name="ug_epr_claimed_kg" sum="Total"/>
+                                    <field name="ug_epr_available_kg" sum="Total"/>
+                                </list>
+                            </field>
+                            <group>
+                                <group>
+                                    <label for="available_kg"/>
+                                    <div class="o_row">
+                                        <field name="available_kg"/> kg
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Claim Allocation" name="allocation">
+                            <field name="allocation_ids">
+                                <list>
+                                    <field name="production_id"/>
+                                    <field name="quantity_kg" sum="Total"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="ug_epr_certificate_view_list" model="ir.ui.view">
+        <field name="name">ug.epr.certificate.list</field>
+        <field name="model">ug.epr.certificate</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state == 'cancelled'" decoration-success="state == 'transferred'">
+                <field name="name"/>
+                <field name="portal_certificate_no"/>
+                <field name="financial_year"/>
+                <field name="generation_date" optional="show"/>
+                <field name="epr_category_id"/>
+                <field name="battery_chemistry_id" optional="show"/>
+                <field name="quantity_kg" sum="Total"/>
+                <field name="partner_id" optional="show"/>
+                <field name="price_per_kg" optional="hide"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="amount" sum="Total" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge" decoration-info="state in ('generated', 'listed')"
+                    decoration-success="state in ('sold', 'transferred')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="ug_epr_certificate_view_search" model="ir.ui.view">
+        <field name="name">ug.epr.certificate.search</field>
+        <field name="model">ug.epr.certificate</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="portal_certificate_no"/>
+                <field name="partner_id"/>
+                <field name="financial_year"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="listed" string="Listed" domain="[('state', '=', 'listed')]"/>
+                <filter name="sold" string="Sold / Transferred" domain="[('state', 'in', ('sold', 'transferred'))]"/>
+                <filter name="not_cancelled" string="Not Cancelled" domain="[('state', '!=', 'cancelled')]"/>
+                <separator/>
+                <filter name="groupby_fy" string="Financial Year" context="{'group_by': 'financial_year'}"/>
+                <filter name="groupby_category" string="Category" context="{'group_by': 'epr_category_id'}"/>
+                <filter name="groupby_chemistry" string="Chemistry" context="{'group_by': 'battery_chemistry_id'}"/>
+                <filter name="groupby_state" string="Status" context="{'group_by': 'state'}"/>
+                <filter name="groupby_partner" string="Buyer" context="{'group_by': 'partner_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="ug_epr_certificate_view_pivot" model="ir.ui.view">
+        <field name="name">ug.epr.certificate.pivot</field>
+        <field name="model">ug.epr.certificate</field>
+        <field name="arch" type="xml">
+            <pivot string="EPR Register" sample="1">
+                <field name="financial_year" type="row"/>
+                <field name="epr_category_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="quantity_kg" type="measure"/>
+                <field name="amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="ug_epr_certificate_view_graph" model="ir.ui.view">
+        <field name="name">ug.epr.certificate.graph</field>
+        <field name="model">ug.epr.certificate</field>
+        <field name="arch" type="xml">
+            <graph string="EPR Register" type="bar" sample="1">
+                <field name="financial_year"/>
+                <field name="epr_category_id"/>
+                <field name="quantity_kg" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="ug_epr_certificate_action" model="ir.actions.act_window">
+        <field name="name">EPR Certificates</field>
+        <field name="res_model">ug.epr.certificate</field>
+        <field name="view_mode">list,form,pivot,graph,activity</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Register an EPR certificate</p>
+            <p>Link the done recycling orders that back the certificate; a quantity can never be claimed twice.</p>
+        </field>
+    </record>
+
+    <record id="ug_epr_register_action" model="ir.actions.act_window">
+        <field name="name">EPR Register</field>
+        <field name="res_model">ug.epr.certificate</field>
+        <field name="view_mode">pivot,graph,list,form</field>
+        <field name="context">{'search_default_not_cancelled': 1}</field>
+    </record>
+</odoo>

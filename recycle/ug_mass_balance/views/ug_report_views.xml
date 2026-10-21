@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 5.1 Mass balance -->
+    <record id="ug_mass_balance_report_view_list" model="ir.ui.view">
+        <field name="name">ug.mass.balance.report.list</field>
+        <field name="model">ug.mass.balance.report</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="loss_exceeded">
+                <field name="production_id"/>
+                <field name="date_finished"/>
+                <field name="stage"/>
+                <field name="battery_chemistry_id"/>
+                <field name="bom_id" optional="hide"/>
+                <field name="product_id" optional="show"/>
+                <field name="input_kg" sum="Total"/>
+                <field name="output_kg" sum="Total"/>
+                <field name="loss_kg" sum="Total"/>
+                <field name="loss_pct"/>
+                <field name="loss_exceeded" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+    <record id="ug_mass_balance_report_view_pivot" model="ir.ui.view">
+        <field name="name">ug.mass.balance.report.pivot</field>
+        <field name="model">ug.mass.balance.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Mass Balance" sample="1">
+                <field name="stage" type="row"/>
+                <field name="battery_chemistry_id" type="row"/>
+                <field name="date_finished" interval="month" type="col"/>
+                <field name="input_kg" type="measure"/>
+                <field name="output_kg" type="measure"/>
+                <field name="loss_kg" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="ug_mass_balance_report_view_graph" model="ir.ui.view">
+        <field name="name">ug.mass.balance.report.graph</field>
+        <field name="model">ug.mass.balance.report</field>
+        <field name="arch" type="xml">
+            <graph string="Mass Balance" type="bar" sample="1">
+                <field name="stage"/>
+                <field name="input_kg" type="measure"/>
+                <field name="output_kg" type="measure"/>
+                <field name="loss_kg" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record id="ug_mass_balance_report_view_search" model="ir.ui.view">
+        <field name="name">ug.mass.balance.report.search</field>
+        <field name="model">ug.mass.balance.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="production_id"/>
+                <field name="bom_id"/>
+                <filter name="loss_exceeded" string="Loss Exceeded" domain="[('loss_exceeded', '=', True)]"/>
+                <filter name="date" string="Date" date="date_finished"/>
+                <filter name="groupby_stage" string="Stage" context="{'group_by': 'stage'}"/>
+                <filter name="groupby_chemistry" string="Chemistry" context="{'group_by': 'battery_chemistry_id'}"/>
+                <filter name="groupby_bom" string="BoM" context="{'group_by': 'bom_id'}"/>
+            </search>
+        </field>
+    </record>
+    <record id="ug_mass_balance_report_action" model="ir.actions.act_window">
+        <field name="name">Mass Balance</field>
+        <field name="res_model">ug.mass.balance.report</field>
+        <field name="view_mode">pivot,graph,list</field>
+    </record>
+
+    <!-- 5.2 Element recovery -->
+    <record id="ug_element_balance_report_view_list" model="ir.ui.view">
+        <field name="name">ug.element.balance.report.list</field>
+        <field name="model">ug.element.balance.report</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="production_id"/>
+                <field name="date_finished"/>
+                <field name="element_id"/>
+                <field name="output_product_id"/>
+                <field name="battery_chemistry_id" optional="show"/>
+                <field name="contained_kg" sum="Total"/>
+                <field name="expected_qty_kg" sum="Total" optional="show"/>
+                <field name="actual_qty_kg" sum="Total" optional="show"/>
+                <field name="actual_metal_kg" sum="Total"/>
+                <field name="efficiency_pct"/>
+            </list>
+        </field>
+    </record>
+    <record id="ug_element_balance_report_view_pivot" model="ir.ui.view">
+        <field name="name">ug.element.balance.report.pivot</field>
+        <field name="model">ug.element.balance.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Element Recovery" sample="1">
+                <field name="element_id" type="row"/>
+                <field name="date_finished" interval="month" type="col"/>
+                <field name="contained_kg" type="measure"/>
+                <field name="actual_metal_kg" type="measure"/>
+                <field name="efficiency_pct" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="ug_element_balance_report_view_graph" model="ir.ui.view">
+        <field name="name">ug.element.balance.report.graph</field>
+        <field name="model">ug.element.balance.report</field>
+        <field name="arch" type="xml">
+            <graph string="Element Recovery" type="bar" sample="1">
+                <field name="element_id"/>
+                <field name="contained_kg" type="measure"/>
+                <field name="actual_metal_kg" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record id="ug_element_balance_report_view_search" model="ir.ui.view">
+        <field name="name">ug.element.balance.report.search</field>
+        <field name="model">ug.element.balance.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="production_id"/>
+                <field name="element_id"/>
+                <filter name="date" string="Date" date="date_finished"/>
+                <filter name="groupby_element" string="Element" context="{'group_by': 'element_id'}"/>
+                <filter name="groupby_chemistry" string="Chemistry" context="{'group_by': 'battery_chemistry_id'}"/>
+            </search>
+        </field>
+    </record>
+    <record id="ug_element_balance_report_action" model="ir.actions.act_window">
+        <field name="name">Element Recovery</field>
+        <field name="res_model">ug.element.balance.report</field>
+        <field name="view_mode">pivot,graph,list</field>
+    </record>
+
+    <!-- 5.3 Material output & cost -->
+    <record id="ug_material_output_report_view_list" model="ir.ui.view">
+        <field name="name">ug.material.output.report.list</field>
+        <field name="model">ug.material.output.report</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="production_id"/>
+                <field name="date_finished"/>
+                <field name="stage"/>
+                <field name="product_id"/>
+                <field name="ug_material_type"/>
+                <field name="is_byproduct" optional="hide"/>
+                <field name="qty_kg" sum="Total"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="value" sum="Total"/>
+                <field name="cost_per_kg"/>
+            </list>
+        </field>
+    </record>
+    <record id="ug_material_output_report_view_pivot" model="ir.ui.view">
+        <field name="name">ug.material.output.report.pivot</field>
+        <field name="model">ug.material.output.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Material Output &amp; Cost" sample="1">
+                <field name="ug_material_type" type="row"/>
+                <field name="product_id" type="row"/>
+                <field name="stage" type="col"/>
+                <field name="qty_kg" type="measure"/>
+                <field name="value" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="ug_material_output_report_view_graph" model="ir.ui.view">
+        <field name="name">ug.material.output.report.graph</field>
+        <field name="model">ug.material.output.report</field>
+        <field name="arch" type="xml">
+            <graph string="Material Output" type="pie" sample="1">
+                <field name="ug_material_type"/>
+                <field name="qty_kg" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record id="ug_material_output_report_view_search" model="ir.ui.view">
+        <field name="name">ug.material.output.report.search</field>
+        <field name="model">ug.material.output.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="production_id"/>
+                <field name="product_id"/>
+                <filter name="byproducts" string="By-products" domain="[('is_byproduct', '=', True)]"/>
+                <filter name="date" string="Date" date="date_finished"/>
+                <filter name="groupby_type" string="Material Type" context="{'group_by': 'ug_material_type'}"/>
+                <filter name="groupby_stage" string="Stage" context="{'group_by': 'stage'}"/>
+                <filter name="groupby_product" string="Product" context="{'group_by': 'product_id'}"/>
+            </search>
+        </field>
+    </record>
+    <record id="ug_material_output_report_action" model="ir.actions.act_window">
+        <field name="name">Material Output &amp; Cost</field>
+        <field name="res_model">ug.material.output.report</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="help" type="html">
+            <p>Value comes from the stock valuation of the finished and by-product moves (shared by cost share).</p>
+        </field>
+    </record>
+
+    <!-- 5.4 Stock by stage -->
+    <record id="ug_stock_by_stage_action" model="ir.actions.act_window">
+        <field name="name">Stock by Stage</field>
+        <field name="res_model">stock.quant</field>
+        <field name="view_mode">pivot,list</field>
+        <field name="domain">[('location_id.usage', '=', 'internal'), ('ug_material_type', '!=', False)]</field>
+        <field name="context">{
+            'pivot_row_groupby': ['ug_material_type', 'product_id'],
+            'pivot_column_groupby': ['battery_chemistry_id'],
+            'pivot_measures': ['quantity'],
+        }</field>
+    </record>
+</odoo>

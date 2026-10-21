@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_production_lot_form_ug_assay" model="ir.ui.view">
+        <field name="name">stock.lot.form.ug.assay</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <t groups="ug_recycling_base.group_ug_user">
+                    <header>
+                        <button name="action_ug_print_coa" type="object" string="Print CoA"
+                            invisible="not ug_current_assay_id"/>
+                        <field name="ug_assay_state" widget="statusbar" invisible="ug_assay_state == 'not_required'"/>
+                    </header>
+                </t>
+            </xpath>
+            <div name="button_box" position="inside">
+                <t groups="ug_recycling_base.group_ug_user">
+                    <button name="action_ug_view_assays" type="object" class="oe_stat_button" icon="fa-flask"
+                        invisible="not ug_requires_assay and not ug_assay_count">
+                        <field name="ug_assay_count" widget="statinfo" string="Assays"/>
+                    </button>
+                </t>
+            </div>
+            <xpath expr="//notebook" position="inside">
+                <page string="Composition" name="ug_composition" groups="ug_recycling_base.group_ug_user"
+                    invisible="not ug_requires_assay and not ug_current_assay_id">
+                    <group>
+                        <group>
+                            <field name="ug_requires_assay" invisible="1"/>
+                            <field name="ug_current_assay_id"/>
+                        </group>
+                        <group>
+                            <field name="ug_currency_id" invisible="1"/>
+                            <field name="ug_estimated_metal_value"/>
+                            <div colspan="2" class="text-muted small">
+                                Estimate only – not accounting valuation.
+                            </div>
+                        </group>
+                    </group>
+                    <field name="ug_current_assay_line_ids" readonly="1">
+                        <list>
+                            <field name="element_id"/>
+                            <field name="percentage" sum="Total"/>
+                            <field name="contained_kg_basis" sum="Total" optional="hide"/>
+                            <field name="contained_kg_current" sum="Total"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_production_lot_tree_ug_assay" model="ir.ui.view">
+        <field name="name">stock.lot.list.ug.assay</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_tree"/>
+        <field name="arch" type="xml">
+            <field name="product_id" position="after">
+                <field name="ug_assay_state" optional="show" widget="badge"
+                    decoration-success="ug_assay_state == 'approved'" decoration-warning="ug_assay_state == 'pending'"
+                    invisible="ug_assay_state == 'not_required'"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="search_product_lot_filter_ug_assay" model="ir.ui.view">
+        <field name="name">stock.lot.search.ug.assay</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.search_product_lot_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter name="ug_assay_pending" string="Assay pending" domain="[('ug_assay_state', '=', 'pending')]" groups="ug_recycling_base.group_ug_user"/>
+                <filter name="ug_assay_approved" string="Assay approved" domain="[('ug_assay_state', '=', 'approved')]" groups="ug_recycling_base.group_ug_user"/>
+                <filter name="ug_ready_to_sell" string="Ready to sell"
+                    domain="[('ug_material_type', 'in', ('recovered_material', 'scrap_byproduct')), ('ug_assay_state', '!=', 'pending'), ('product_qty', '>', 0)]" groups="ug_recycling_base.group_ug_user"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

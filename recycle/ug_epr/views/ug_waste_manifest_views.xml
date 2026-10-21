@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ug_waste_manifest_view_form" model="ir.ui.view">
+        <field name="name">ug.waste.manifest.form</field>
+        <field name="model">ug.waste.manifest</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_dispatch" type="object" string="Dispatch" class="oe_highlight"
+                        invisible="state != 'draft'" groups="ug_recycling_base.group_ug_user"/>
+                    <button name="action_acknowledge" type="object" string="Acknowledged by Receiver" class="oe_highlight"
+                        invisible="state != 'dispatched'" groups="ug_recycling_base.group_ug_user"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                        invisible="state == 'draft'" groups="ug_recycling_base.group_ug_user"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="waste_description"/>
+                            <label for="quantity_kg"/>
+                            <div class="o_row"><field name="quantity_kg"/> kg</div>
+                            <field name="manifest_no"/>
+                        </group>
+                        <group>
+                            <field name="transporter_id"/>
+                            <field name="receiver_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="ug_waste_manifest_view_list" model="ir.ui.view">
+        <field name="name">ug.waste.manifest.list</field>
+        <field name="model">ug.waste.manifest</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="date"/>
+                <field name="manifest_no"/>
+                <field name="waste_description"/>
+                <field name="quantity_kg" sum="Total"/>
+                <field name="transporter_id" optional="show"/>
+                <field name="receiver_id"/>
+                <field name="state" widget="badge" decoration-success="state == 'acknowledged'" decoration-info="state == 'dispatched'"/>
+            </list>
+        </field>
+    </record>
+    <record id="ug_waste_manifest_action" model="ir.actions.act_window">
+        <field name="name">Waste Manifests</field>
+        <field name="res_model">ug.waste.manifest</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

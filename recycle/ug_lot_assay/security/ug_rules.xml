@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ug_assay_template_company_rule" model="ir.rule">
+        <field name="name">ug.assay.template multi-company</field>
+        <field name="model_id" ref="model_ug_assay_template"/>
+        <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+    <record id="ug_lot_assay_company_rule" model="ir.rule">
+        <field name="name">ug.lot.assay multi-company</field>
+        <field name="model_id" ref="model_ug_lot_assay"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="ug_lot_assay_line_company_rule" model="ir.rule">
+        <field name="name">ug.lot.assay.line multi-company</field>
+        <field name="model_id" ref="model_ug_lot_assay_line"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="ug_metal_price_company_rule" model="ir.rule">
+        <field name="name">ug.metal.price multi-company</field>
+        <field name="model_id" ref="model_ug_metal_price"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

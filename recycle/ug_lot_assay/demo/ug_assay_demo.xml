@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ug_recycling_base.product_bm_nmc" model="product.product">
+        <field name="ug_requires_assay" eval="True"/>
+        <field name="ug_assay_template_id" ref="template_nmc_black_mass"/>
+    </record>
+    <record id="ug_recycling_base.product_bm_lfp" model="product.product">
+        <field name="ug_requires_assay" eval="True"/>
+        <field name="ug_assay_template_id" ref="template_lfp_black_mass"/>
+    </record>
+
+    <!-- Illustrative prices (INR / kg of contained metal) -->
+    <record id="price_ni" model="ug.metal.price"><field name="element_id" ref="element_ni"/><field name="price_per_kg">1400</field><field name="date" eval="(DateTime.today() - relativedelta(days=10)).strftime('%Y-%m-%d')"/></record>
+    <record id="price_ni_latest" model="ug.metal.price"><field name="element_id" ref="element_ni"/><field name="price_per_kg">1450</field><field name="date" eval="DateTime.today().strftime('%Y-%m-%d')"/></record>
+    <record id="price_co" model="ug.metal.price"><field name="element_id" ref="element_co"/><field name="price_per_kg">2700</field></record>
+    <record id="price_mn" model="ug.metal.price"><field name="element_id" ref="element_mn"/><field name="price_per_kg">150</field></record>
+    <record id="price_li" model="ug.metal.price"><field name="element_id" ref="element_li"/><field name="price_per_kg">5500</field></record>
+    <record id="price_c" model="ug.metal.price"><field name="element_id" ref="element_c"/><field name="price_per_kg">60</field></record>
+    <record id="price_cu" model="ug.metal.price"><field name="element_id" ref="element_cu"/><field name="price_per_kg">750</field></record>
+    <record id="price_al" model="ug.metal.price"><field name="element_id" ref="element_al"/><field name="price_per_kg">200</field></record>
+
+    <function model="ug.demo" name="_ug_demo_assay_flow"/>
+</odoo>

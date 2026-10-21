@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_change_production_qty_wizard_ug" model="ir.ui.view">
+        <field name="name">change.production.qty.form.ug.recycling</field>
+        <field name="model">change.production.qty</field>
+        <field name="inherit_id" ref="mrp.view_change_production_qty_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='product_qty']" position="before">
+                <t groups="ug_recycling_base.group_ug_user">
+                    <field name="ug_is_recycling" invisible="1"/>
+                    <label for="ug_input_qty" invisible="not ug_is_recycling"/>
+                    <div invisible="not ug_is_recycling">
+                        <field name="ug_input_qty" class="oe_inline"/> kg
+                    </div>
+                </t>
+            </xpath>
+        </field>
+    </record>
+</odoo>

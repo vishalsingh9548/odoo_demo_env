@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Receive scrap stock and run a dismantle and a shred order end to end -->
+    <function model="ug.demo" name="_ug_demo_base_flow"/>
+</odoo>

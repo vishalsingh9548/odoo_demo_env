@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_pack_lfp" model="product.product">
+        <field name="name">Battery pack – LFP (scrap)</field>
+        <field name="default_code">BP-LFP</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">scrap_battery</field>
+        <field name="battery_chemistry_id" ref="chemistry_lfp"/>
+        <field name="sale_ok" eval="False"/>
+    </record>
+    <record id="product_pack_nmc" model="product.product">
+        <field name="name">Battery pack – NMC (scrap)</field>
+        <field name="default_code">BP-NMC</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">scrap_battery</field>
+        <field name="battery_chemistry_id" ref="chemistry_nmc"/>
+        <field name="sale_ok" eval="False"/>
+    </record>
+    <record id="product_cells_lfp" model="product.product">
+        <field name="name">Cells/modules – LFP</field>
+        <field name="default_code">CM-LFP</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">intermediate</field>
+        <field name="battery_chemistry_id" ref="chemistry_lfp"/>
+        <field name="sale_ok" eval="False"/>
+    </record>
+    <record id="product_cells_nmc" model="product.product">
+        <field name="name">Cells/modules – NMC</field>
+        <field name="default_code">CM-NMC</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">intermediate</field>
+        <field name="battery_chemistry_id" ref="chemistry_nmc"/>
+        <field name="sale_ok" eval="False"/>
+    </record>
+    <record id="product_bm_lfp" model="product.product">
+        <field name="name">Black mass – LFP</field>
+        <field name="default_code">BM-LFP</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">intermediate</field>
+        <field name="battery_chemistry_id" ref="chemistry_lfp"/>
+        <field name="sale_ok" eval="False"/>
+    </record>
+    <record id="product_bm_nmc" model="product.product">
+        <field name="name">Black mass – NMC</field>
+        <field name="default_code">BM-NMC</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">intermediate</field>
+        <field name="battery_chemistry_id" ref="chemistry_nmc"/>
+        <field name="sale_ok" eval="False"/>
+    </record>
+    <record id="product_casing" model="product.product">
+        <field name="name">Casing metal</field>
+        <field name="default_code">CASING</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">scrap_byproduct</field>
+    </record>
+    <record id="product_plastic" model="product.product">
+        <field name="name">Plastic</field>
+        <field name="default_code">PLASTIC</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">scrap_byproduct</field>
+    </record>
+    <record id="product_cables" model="product.product">
+        <field name="name">Cables and copper</field>
+        <field name="default_code">CABLE-CU</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">scrap_byproduct</field>
+    </record>
+    <record id="product_bms" model="product.product">
+        <field name="name">BMS/electronics</field>
+        <field name="default_code">BMS</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">scrap_byproduct</field>
+    </record>
+    <record id="product_cu_foil" model="product.product">
+        <field name="name">Copper foil</field>
+        <field name="default_code">CU-FOIL</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">scrap_byproduct</field>
+    </record>
+    <record id="product_al_foil" model="product.product">
+        <field name="name">Aluminium foil</field>
+        <field name="default_code">AL-FOIL</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">scrap_byproduct</field>
+    </record>
+    <record id="product_niso4" model="product.product">
+        <field name="name">Nickel sulphate</field>
+        <field name="default_code">NISO4</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">recovered_material</field>
+        <field name="battery_chemistry_id" ref="chemistry_nmc"/>
+    </record>
+    <record id="product_coso4" model="product.product">
+        <field name="name">Cobalt sulphate</field>
+        <field name="default_code">COSO4</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">recovered_material</field>
+        <field name="battery_chemistry_id" ref="chemistry_nmc"/>
+    </record>
+    <record id="product_li2co3" model="product.product">
+        <field name="name">Lithium carbonate</field>
+        <field name="default_code">LI2CO3</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">recovered_material</field>
+    </record>
+    <record id="product_mnso4" model="product.product">
+        <field name="name">Manganese sulphate</field>
+        <field name="default_code">MNSO4</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">recovered_material</field>
+        <field name="battery_chemistry_id" ref="chemistry_nmc"/>
+    </record>
+    <record id="product_graphite" model="product.product">
+        <field name="name">Graphite</field>
+        <field name="default_code">GRAPHITE</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">recovered_material</field>
+    </record>
+    <record id="product_fepo4" model="product.product">
+        <field name="name">Iron phosphate</field>
+        <field name="default_code">FEPO4</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">recovered_material</field>
+        <field name="battery_chemistry_id" ref="chemistry_lfp"/>
+    </record>
+    <record id="product_na2so4" model="product.product">
+        <field name="name">Sodium sulphate</field>
+        <field name="default_code">NA2SO4</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">recovered_material</field>
+    </record>
+    <record id="product_h2so4" model="product.product">
+        <field name="name">Sulphuric acid</field>
+        <field name="default_code">H2SO4</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">chemical</field>
+        <field name="sale_ok" eval="False"/>
+    </record>
+    <record id="product_h2o2" model="product.product">
+        <field name="name">Hydrogen peroxide</field>
+        <field name="default_code">H2O2</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">chemical</field>
+        <field name="sale_ok" eval="False"/>
+    </record>
+    <record id="product_naoh" model="product.product">
+        <field name="name">Sodium hydroxide</field>
+        <field name="default_code">NAOH</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">chemical</field>
+        <field name="sale_ok" eval="False"/>
+    </record>
+    <record id="product_sx" model="product.product">
+        <field name="name">Solvent extractant</field>
+        <field name="default_code">SX-EXT</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">chemical</field>
+        <field name="sale_ok" eval="False"/>
+    </record>
+    <record id="product_na2co3" model="product.product">
+        <field name="name">Sodium carbonate</field>
+        <field name="default_code">NA2CO3</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True"/>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="ug_material_type">chemical</field>
+        <field name="sale_ok" eval="False"/>
+    </record>
+</odoo>

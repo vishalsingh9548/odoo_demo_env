@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mrp_production_form_view_ug_assay" model="ir.ui.view">
+        <field name="name">mrp.production.form.ug.assay</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <t groups="ug_recycling_base.group_ug_user">
+                    <button name="action_ug_view_assays" type="object" class="oe_stat_button" icon="fa-flask"
+                        invisible="not ug_assay_count">
+                        <field name="ug_assay_count" widget="statinfo" string="Assays"/>
+                    </button>
+                </t>
+            </div>
+        </field>
+    </record>
+</odoo>

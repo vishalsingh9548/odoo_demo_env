@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ug_battery_chemistry_user,ug.battery.chemistry user,model_ug_battery_chemistry,group_ug_user,1,0,0,0
+access_ug_battery_chemistry_stock,ug.battery.chemistry stock user,model_ug_battery_chemistry,stock.group_stock_user,1,0,0,0
+access_ug_battery_chemistry_manager,ug.battery.chemistry manager,model_ug_battery_chemistry,group_ug_user,1,1,1,1
+access_ug_record_weights_user,ug.record.weights user,model_ug_record_weights,group_ug_user,1,1,1,1
+access_ug_record_weights_input_user,ug.record.weights.input user,model_ug_record_weights_input,group_ug_user,1,1,1,1
+access_ug_record_weights_byproduct_user,ug.record.weights.byproduct user,model_ug_record_weights_byproduct,group_ug_user,1,1,1,1

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_ug_epr_certificate" model="ir.sequence">
+            <field name="name">EPR Certificate</field>
+            <field name="code">ug.epr.certificate</field>
+            <field name="prefix">EPR/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_ug_waste_manifest" model="ir.sequence">
+            <field name="name">Hazardous Waste Manifest</field>
+            <field name="code">ug.waste.manifest</field>
+            <field name="prefix">HWM/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="epr_category_portable" model="ug.epr.category"><field name="name">Portable</field><field name="code">PORT</field></record>
+        <record id="epr_category_automotive" model="ug.epr.category"><field name="name">Automotive</field><field name="code">AUTO</field></record>
+        <record id="epr_category_industrial" model="ug.epr.category"><field name="name">Industrial</field><field name="code">IND</field></record>
+        <record id="epr_category_ev" model="ug.epr.category"><field name="name">Electric Vehicle</field><field name="code">EV</field></record>
+
+        <record id="product_epr_certificate" model="product.product">
+            <field name="name">EPR Certificate (per kg)</field>
+            <field name="default_code">EPR-CERT</field>
+            <field name="type">service</field>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="invoice_policy">order</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ug_mass_balance_report_company_rule" model="ir.rule">
+        <field name="name">ug.mass.balance.report multi-company</field>
+        <field name="model_id" ref="model_ug_mass_balance_report"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="ug_element_balance_report_company_rule" model="ir.rule">
+        <field name="name">ug.element.balance.report multi-company</field>
+        <field name="model_id" ref="model_ug_element_balance_report"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="ug_material_output_report_company_rule" model="ir.rule">
+        <field name="name">ug.material.output.report multi-company</field>
+        <field name="model_id" ref="model_ug_material_output_report"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

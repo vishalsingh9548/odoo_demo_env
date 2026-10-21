@@ -1,0 +1,17 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ug_assay_element_user,ug.assay.element user,model_ug_assay_element,ug_recycling_base.group_ug_user,1,0,0,0
+access_ug_assay_element_stock,ug.assay.element stock,model_ug_assay_element,stock.group_stock_user,1,0,0,0
+access_ug_assay_element_manager,ug.assay.element manager,model_ug_assay_element,ug_recycling_base.group_ug_user,1,1,1,1
+access_ug_assay_template_user,ug.assay.template user,model_ug_assay_template,ug_recycling_base.group_ug_user,1,0,0,0
+access_ug_assay_template_stock,ug.assay.template stock,model_ug_assay_template,stock.group_stock_user,1,0,0,0
+access_ug_assay_template_manager,ug.assay.template manager,model_ug_assay_template,ug_recycling_base.group_ug_user,1,1,1,1
+access_ug_lot_assay_stock,ug.lot.assay stock,model_ug_lot_assay,stock.group_stock_user,1,0,0,0
+access_ug_lot_assay_user,ug.lot.assay user,model_ug_lot_assay,ug_recycling_base.group_ug_user,1,0,0,0
+access_ug_lot_assay_lab,ug.lot.assay lab,model_ug_lot_assay,ug_recycling_base.group_ug_user,1,1,1,0
+access_ug_lot_assay_manager,ug.lot.assay manager,model_ug_lot_assay,ug_recycling_base.group_ug_user,1,1,1,1
+access_ug_lot_assay_line_stock,ug.lot.assay.line stock,model_ug_lot_assay_line,stock.group_stock_user,1,0,0,0
+access_ug_lot_assay_line_user,ug.lot.assay.line user,model_ug_lot_assay_line,ug_recycling_base.group_ug_user,1,0,0,0
+access_ug_lot_assay_line_lab,ug.lot.assay.line lab,model_ug_lot_assay_line,ug_recycling_base.group_ug_user,1,1,1,1
+access_ug_metal_price_user,ug.metal.price user,model_ug_metal_price,ug_recycling_base.group_ug_user,1,0,0,0
+access_ug_metal_price_stock,ug.metal.price stock,model_ug_metal_price,stock.group_stock_user,1,0,0,0
+access_ug_metal_price_manager,ug.metal.price manager,model_ug_metal_price,ug_recycling_base.group_ug_user,1,1,1,1

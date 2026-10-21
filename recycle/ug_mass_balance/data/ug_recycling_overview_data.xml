@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="overview_dismantle" model="ug.recycling.overview">
+        <field name="name">Dismantle</field>
+        <field name="card_type">dismantle</field>
+        <field name="description">Battery packs → cells/modules</field>
+        <field name="sequence">10</field>
+        <field name="color">2</field>
+    </record>
+    <record id="overview_shred" model="ug.recycling.overview">
+        <field name="name">Shred</field>
+        <field name="card_type">shred</field>
+        <field name="description">Cells/modules → black mass</field>
+        <field name="sequence">20</field>
+        <field name="color">3</field>
+    </record>
+    <record id="overview_recover" model="ug.recycling.overview">
+        <field name="name">Recover</field>
+        <field name="card_type">recover</field>
+        <field name="description">Black mass → metal salts</field>
+        <field name="sequence">30</field>
+        <field name="color">10</field>
+    </record>
+    <record id="overview_lab" model="ug.recycling.overview">
+        <field name="name">Lab</field>
+        <field name="card_type">lab</field>
+        <field name="description">Lot assays</field>
+        <field name="sequence">40</field>
+        <field name="color">4</field>
+    </record>
+    <record id="overview_epr" model="ug.recycling.overview">
+        <field name="name">EPR</field>
+        <field name="card_type">epr</field>
+        <field name="description">EPR certificates</field>
+        <field name="sequence">50</field>
+        <field name="color">7</field>
+    </record>
+</odoo>

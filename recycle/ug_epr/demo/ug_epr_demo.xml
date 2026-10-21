@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="partner_demo_producer" model="res.partner">
+        <field name="name">Volt Motors Pvt Ltd (battery producer)</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+    <record id="partner_demo_transporter" model="res.partner">
+        <field name="name">GreenHaul Logistics</field>
+    </record>
+    <record id="partner_demo_tsdf" model="res.partner">
+        <field name="name">Common TSDF Facility</field>
+    </record>
+
+    <record id="waste_manifest_demo" model="ug.waste.manifest">
+        <field name="waste_description">Spent electrolyte residue and filter cake</field>
+        <field name="quantity_kg">350</field>
+        <field name="transporter_id" ref="partner_demo_transporter"/>
+        <field name="receiver_id" ref="partner_demo_tsdf"/>
+        <field name="manifest_no">HWM-DEMO-0001</field>
+        <field name="state">dispatched</field>
+    </record>
+
+    <function model="ug.demo" name="_ug_demo_epr_flow"/>
+</odoo>

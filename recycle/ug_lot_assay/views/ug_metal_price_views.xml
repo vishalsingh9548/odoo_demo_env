@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ug_metal_price_view_list" model="ir.ui.view">
+        <field name="name">ug.metal.price.list</field>
+        <field name="model">ug.metal.price</field>
+        <field name="arch" type="xml">
+            <list editable="top">
+                <field name="date"/>
+                <field name="element_id"/>
+                <field name="price_per_kg"/>
+                <field name="currency_id" groups="base.group_multi_currency"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+    <record id="ug_metal_price_view_search" model="ir.ui.view">
+        <field name="name">ug.metal.price.search</field>
+        <field name="model">ug.metal.price</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="element_id"/>
+                <filter name="groupby_element" string="Element" context="{'group_by': 'element_id'}"/>
+            </search>
+        </field>
+    </record>
+    <record id="ug_metal_price_action" model="ir.actions.act_window">
+        <field name="name">Metal Prices</field>
+        <field name="res_model">ug.metal.price</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record metal prices</p>
+            <p>The latest price per element (by date) is used for the informational metal value estimate on lots.</p>
+        </field>
+    </record>
+</odoo>

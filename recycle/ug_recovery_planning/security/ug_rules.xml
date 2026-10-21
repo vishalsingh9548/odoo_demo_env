@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ug_bom_recovery_line_company_rule" model="ir.rule">
+        <field name="name">ug.bom.recovery.line multi-company</field>
+        <field name="model_id" ref="model_ug_bom_recovery_line"/>
+        <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+    <record id="ug_production_input_lot_company_rule" model="ir.rule">
+        <field name="name">ug.production.input.lot multi-company</field>
+        <field name="model_id" ref="model_ug_production_input_lot"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="ug_production_recovery_line_company_rule" model="ir.rule">
+        <field name="name">ug.production.recovery.line multi-company</field>
+        <field name="model_id" ref="model_ug_production_recovery_line"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="ug_process_queue_company_rule" model="ir.rule">
+        <field name="name">ug.process.queue multi-company</field>
+        <field name="model_id" ref="model_ug_process_queue"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

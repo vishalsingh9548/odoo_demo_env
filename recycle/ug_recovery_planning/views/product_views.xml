@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_template_form_view_ug_recovery" model="ir.ui.view">
+        <field name="name">product.template.form.ug.recovery</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="ug_recycling_base.product_template_form_view_ug"/>
+        <field name="arch" type="xml">
+            <group name="ug_classification" position="inside">
+                <t groups="ug_recycling_base.group_ug_user">
+                    <field name="ug_metal_element_id" invisible="ug_material_type != 'recovered_material'"/>
+                    <label for="ug_metal_content_pct" invisible="ug_material_type != 'recovered_material'"/>
+                    <div class="o_row" invisible="ug_material_type != 'recovered_material'">
+                        <field name="ug_metal_content_pct"/> %
+                    </div>
+                </t>
+            </group>
+        </field>
+    </record>
+</odoo>

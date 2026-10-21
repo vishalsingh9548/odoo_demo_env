@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="quant_search_view_ug" model="ir.ui.view">
+        <field name="name">stock.quant.search.ug.recycling</field>
+        <field name="model">stock.quant</field>
+        <field name="inherit_id" ref="stock.quant_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="battery_chemistry_id" groups="ug_recycling_base.group_ug_user"/>
+                <separator/>
+                <filter name="ug_scrap_battery" string="Scrap Batteries" domain="[('ug_material_type', '=', 'scrap_battery')]" groups="ug_recycling_base.group_ug_user"/>
+                <filter name="ug_intermediate" string="Intermediates" domain="[('ug_material_type', '=', 'intermediate')]" groups="ug_recycling_base.group_ug_user"/>
+                <filter name="ug_recovered" string="Recovered Materials" domain="[('ug_material_type', '=', 'recovered_material')]" groups="ug_recycling_base.group_ug_user"/>
+                <filter name="ug_scrap_byproduct" string="Scrap By-products" domain="[('ug_material_type', '=', 'scrap_byproduct')]" groups="ug_recycling_base.group_ug_user"/>
+                <filter name="ug_chemical" string="Chemicals" domain="[('ug_material_type', '=', 'chemical')]" groups="ug_recycling_base.group_ug_user"/>
+                <separator/>
+                <filter name="groupby_ug_material_type" string="Material Type" context="{'group_by': 'ug_material_type'}" groups="ug_recycling_base.group_ug_user"/>
+                <filter name="groupby_battery_chemistry" string="Battery Chemistry" context="{'group_by': 'battery_chemistry_id'}" groups="ug_recycling_base.group_ug_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_production_lot_form_ug" model="ir.ui.view">
+        <field name="name">stock.lot.form.ug.recycling</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+            <field name="ref" position="after">
+                <t groups="ug_recycling_base.group_ug_user">
+                    <field name="battery_chemistry_id" invisible="not battery_chemistry_id"/>
+                    <field name="ug_material_type" invisible="not ug_material_type"/>
+                </t>
+            </field>
+        </field>
+    </record>
+
+    <record id="search_product_lot_filter_ug" model="ir.ui.view">
+        <field name="name">stock.lot.search.ug.recycling</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.search_product_lot_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="battery_chemistry_id" groups="ug_recycling_base.group_ug_user"/>
+                <filter name="groupby_ug_material_type" string="Material Type" context="{'group_by': 'ug_material_type'}" groups="ug_recycling_base.group_ug_user"/>
+                <filter name="groupby_battery_chemistry" string="Battery Chemistry" context="{'group_by': 'battery_chemistry_id'}" groups="ug_recycling_base.group_ug_user"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

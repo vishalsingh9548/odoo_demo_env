@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ug_epr_certificate_company_rule" model="ir.rule">
+        <field name="name">ug.epr.certificate multi-company</field>
+        <field name="model_id" ref="model_ug_epr_certificate"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="ug_epr_allocation_company_rule" model="ir.rule">
+        <field name="name">ug.epr.allocation multi-company</field>
+        <field name="model_id" ref="model_ug_epr_allocation"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="ug_waste_manifest_company_rule" model="ir.rule">
+        <field name="name">ug.waste.manifest multi-company</field>
+        <field name="model_id" ref="model_ug_waste_manifest"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

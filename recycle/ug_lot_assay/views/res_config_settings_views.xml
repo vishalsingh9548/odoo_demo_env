@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_ug_assay" model="ir.ui.view">
+        <field name="name">res.config.settings.form.ug.assay</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="stock.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <block id="production_lot_info" position="inside">
+                <t groups="ug_recycling_base.group_ug_user">
+                    <setting id="ug_block_unassayed_lots" company_dependent="1"
+                        help="Block consumption in recover-stage MOs and customer deliveries of lots whose assay is pending">
+                        <field name="ug_block_unassayed_lots"/>
+                    </setting>
+                </t>
+            </block>
+        </field>
+    </record>
+</odoo>

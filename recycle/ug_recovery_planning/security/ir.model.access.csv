@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ug_bom_recovery_line_user,ug.bom.recovery.line user,model_ug_bom_recovery_line,ug_recycling_base.group_ug_user,1,0,0,0
+access_ug_bom_recovery_line_mrp,ug.bom.recovery.line mrp,model_ug_bom_recovery_line,mrp.group_mrp_user,1,0,0,0
+access_ug_bom_recovery_line_manager,ug.bom.recovery.line manager,model_ug_bom_recovery_line,ug_recycling_base.group_ug_user,1,1,1,1
+access_ug_bom_recovery_line_mrp_manager,ug.bom.recovery.line mrp manager,model_ug_bom_recovery_line,mrp.group_mrp_manager,1,1,1,1
+access_ug_production_input_lot_mrp,ug.production.input.lot mrp,model_ug_production_input_lot,mrp.group_mrp_user,1,0,0,0
+access_ug_production_input_lot_user,ug.production.input.lot user,model_ug_production_input_lot,ug_recycling_base.group_ug_user,1,1,1,1
+access_ug_production_recovery_line_mrp,ug.production.recovery.line mrp,model_ug_production_recovery_line,mrp.group_mrp_user,1,0,0,0
+access_ug_production_recovery_line_user,ug.production.recovery.line user,model_ug_production_recovery_line,ug_recycling_base.group_ug_user,1,1,1,1
+access_ug_process_queue_user,ug.process.queue user,model_ug_process_queue,ug_recycling_base.group_ug_user,1,0,0,0

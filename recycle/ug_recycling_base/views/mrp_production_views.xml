@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mrp_production_form_view_ug" model="ir.ui.view">
+        <field name="name">mrp.production.form.ug.recycling</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <!-- recycling orders are finished with Record Weights (actual weights), not Produce -->
+            <xpath expr="(//header/button[@name='button_mark_done'])[1]" position="attributes">
+                <attribute name="invisible" add="ug_is_recycling" separator=" or "/>
+            </xpath>
+            <xpath expr="(//header/button[@name='button_mark_done'])[2]" position="attributes">
+                <attribute name="invisible" add="ug_is_recycling" separator=" or "/>
+            </xpath>
+            <xpath expr="(//header/button[@name='button_mark_done'])[3]" position="attributes">
+                <attribute name="invisible" add="ug_is_recycling" separator=" or "/>
+            </xpath>
+            <xpath expr="(//header/button[@name='button_mark_done'])[4]" position="attributes">
+                <attribute name="invisible" add="ug_is_recycling" separator=" or "/>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <t groups="ug_recycling_base.group_ug_user">
+                    <button name="action_ug_record_weights" type="object" string="Record Weights" class="oe_highlight"
+                        invisible="not ug_is_recycling or state not in ('confirmed', 'progress', 'to_close')"/>
+                </t>
+            </xpath>
+            <xpath expr="//label[@name='bom_label']" position="before">
+                <t groups="ug_recycling_base.group_ug_user">
+                    <field name="ug_is_recycling" invisible="1"/>
+                    <label for="ug_input_qty" invisible="not ug_is_recycling"/>
+                    <div class="o_row" invisible="not ug_is_recycling">
+                        <field name="ug_input_qty" class="oe_inline" readonly="state != 'draft'"/>
+                        <span>kg</span>
+                        <button name="action_ug_change_input_qty" type="object" string="Change input weight"
+                            class="oe_link" icon="fa-balance-scale"
+                            invisible="state in ('draft', 'done', 'cancel')"/>
+                    </div>
+                    <field name="ug_stage" invisible="not ug_is_recycling"/>
+                    <field name="battery_chemistry_id" invisible="not battery_chemistry_id"/>
+                </t>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Mass Balance" name="ug_mass_balance" invisible="not ug_is_recycling" groups="ug_recycling_base.group_ug_user">
+                    <div class="alert alert-info" role="alert" invisible="state == 'done'">
+                        The mass balance is computed when the manufacturing order is marked as done.
+                    </div>
+                    <div class="alert alert-danger" role="alert" invisible="not ug_loss_exceeded">
+                        Process loss exceeds the maximum allowed by the BoM.
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="not ug_yield_out_of_band">
+                        Yield is outside the range expected by the BoM.
+                    </div>
+                    <group>
+                        <group string="Weights">
+                            <field name="ug_input_weight_kg"/>
+                            <field name="ug_output_weight_kg"/>
+                        </group>
+                        <group string="Process Loss">
+                            <field name="ug_loss_kg"/>
+                            <field name="ug_loss_pct"/>
+                            <field name="ug_max_loss_pct"/>
+                            <field name="ug_loss_exceeded"/>
+                        </group>
+                        <group string="Yield" invisible="not ug_yield_max_pct">
+                            <field name="ug_yield_pct"/>
+                            <field name="ug_standard_yield_pct"/>
+                            <label for="ug_yield_min_pct" string="Accepted Range"/>
+                            <div class="o_row">
+                                <field name="ug_yield_min_pct" class="oe_inline"/> – <field name="ug_yield_max_pct" class="oe_inline"/> %
+                            </div>
+                            <field name="ug_yield_out_of_band"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="mrp_production_tree_view_ug" model="ir.ui.view">
+        <field name="name">mrp.production.list.ug.recycling</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="product_qty" position="after">
+                <field name="ug_stage" optional="hide" groups="ug_recycling_base.group_ug_user"/>
+                <field name="ug_input_weight_kg" optional="hide" sum="Total" groups="ug_recycling_base.group_ug_user"/>
+                <field name="ug_output_weight_kg" optional="hide" sum="Total" groups="ug_recycling_base.group_ug_user"/>
+                <field name="ug_loss_pct" optional="hide" groups="ug_recycling_base.group_ug_user"/>
+                <field name="ug_yield_pct" optional="hide" groups="ug_recycling_base.group_ug_user"/>
+                <field name="ug_loss_exceeded" optional="hide" groups="ug_recycling_base.group_ug_user"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_mrp_production_filter_ug" model="ir.ui.view">
+        <field name="name">mrp.production.search.ug.recycling</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.view_mrp_production_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="battery_chemistry_id" groups="ug_recycling_base.group_ug_user"/>
+                <separator/>
+                <filter name="ug_recycling" string="Recycling" domain="[('ug_is_recycling', '=', True)]" groups="ug_recycling_base.group_ug_user"/>
+                <filter name="ug_loss_exceeded" string="Loss Exceeded" domain="[('ug_loss_exceeded', '=', True)]" groups="ug_recycling_base.group_ug_user"/>
+                <filter name="ug_yield_out_of_band" string="Yield Out of Range" domain="[('ug_yield_out_of_band', '=', True)]" groups="ug_recycling_base.group_ug_user"/>
+                <separator/>
+                <filter name="groupby_ug_stage" string="Recycling Stage" context="{'group_by': 'ug_stage'}" groups="ug_recycling_base.group_ug_user"/>
+                <filter name="groupby_battery_chemistry" string="Battery Chemistry" context="{'group_by': 'battery_chemistry_id'}" groups="ug_recycling_base.group_ug_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="ug_mrp_production_action" model="ir.actions.act_window">
+        <field name="name">Recycling Orders</field>
+        <field name="res_model">mrp.production</field>
+        <field name="view_mode">list,kanban,form,pivot,graph,activity</field>
+        <field name="search_view_id" ref="mrp.view_mrp_production_filter"/>
+        <field name="domain">[('ug_is_recycling', '=', True)]</field>
+        <field name="context">{'search_default_todo': True, 'default_company_id': allowed_company_ids[0]}</field>
+    </record>
+</odoo>

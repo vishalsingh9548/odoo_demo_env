@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_ug_root" name="Recycling" sequence="36"
+        web_icon="mrp,static/description/icon.png"
+        groups="ug_recycling_base.group_ug_user"/>
+
+    <menuitem id="menu_ug_operations" name="Operations" parent="menu_ug_root" sequence="10"/>
+    <menuitem id="menu_ug_reporting" name="Reporting" parent="menu_ug_root" sequence="50"/>
+    <menuitem id="menu_ug_configuration" name="Configuration" parent="menu_ug_root" sequence="90"
+        groups="ug_recycling_base.group_ug_user"/>
+
+    <menuitem id="menu_ug_production" name="Manufacturing Orders" parent="menu_ug_operations"
+        action="ug_mrp_production_action" sequence="10"/>
+    <menuitem id="menu_ug_bom" name="Recycling BoMs" parent="menu_ug_configuration"
+        action="ug_mrp_bom_action" sequence="5"/>
+    <menuitem id="menu_ug_chemistry" name="Chemistries" parent="menu_ug_configuration"
+        action="ug_battery_chemistry_action" sequence="10"/>
+</odoo>

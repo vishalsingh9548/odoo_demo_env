@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_ug_lot_assay" name="Lot Assays" parent="ug_recycling_base.menu_ug_operations"
+        action="ug_lot_assay_action" sequence="20"/>
+    <menuitem id="menu_ug_assay_element" name="Assay Elements" parent="ug_recycling_base.menu_ug_configuration"
+        action="ug_assay_element_action" sequence="20"/>
+    <menuitem id="menu_ug_assay_template" name="Assay Templates" parent="ug_recycling_base.menu_ug_configuration"
+        action="ug_assay_template_action" sequence="30"/>
+    <menuitem id="menu_ug_metal_price" name="Metal Prices" parent="ug_recycling_base.menu_ug_configuration"
+        action="ug_metal_price_action" sequence="40"/>
+</odoo>

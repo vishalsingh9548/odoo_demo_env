@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ug_record_weights_view_form" model="ir.ui.view">
+        <field name="name">ug.record.weights.form</field>
+        <field name="model">ug.record.weights</field>
+        <field name="arch" type="xml">
+            <form string="Record Weights">
+                <field name="production_id" invisible="1"/>
+                <field name="status" invisible="1"/>
+                <div class="alert alert-success mb-2" role="status" invisible="status != 'ok'">
+                    <field name="status_message" readonly="1" class="fw-bold"/>
+                </div>
+                <div class="alert alert-warning mb-2" role="status" invisible="status != 'warning'">
+                    <field name="status_message" readonly="1" class="fw-bold"/>
+                    <div>The order can be finished; the manager will be notified.</div>
+                </div>
+                <div class="alert alert-danger mb-2" role="alert" invisible="status != 'blocked'">
+                    <field name="status_message" readonly="1" class="fw-bold"/>
+                </div>
+                <group string="Input weighed in">
+                    <field name="input_line_ids" nolabel="1" colspan="2">
+                        <list editable="bottom" create="0" delete="0">
+                            <field name="move_line_id" column_invisible="True" force_save="1"/>
+                            <field name="product_id" force_save="1"/>
+                            <field name="lot_id" force_save="1"/>
+                            <field name="qty_kg" sum="Total"/>
+                        </list>
+                    </field>
+                </group>
+                <group string="Output weighed out">
+                    <group>
+                        <field name="product_id"/>
+                        <label for="main_qty_kg"/>
+                        <div class="o_row">
+                            <field name="main_qty_kg" class="oe_inline fw-bold"/>
+                            <span>kg (planned <field name="main_expected_kg" class="oe_inline" nolabel="1"/> kg)</span>
+                        </div>
+                    </group>
+                    <field name="byproduct_line_ids" nolabel="1" colspan="2">
+                        <list editable="bottom" create="0" delete="0">
+                            <field name="move_id" column_invisible="True" force_save="1"/>
+                            <field name="product_id" force_save="1"/>
+                            <field name="expected_kg" force_save="1"/>
+                            <field name="qty_kg" sum="Total"/>
+                        </list>
+                    </field>
+                </group>
+                <group string="Mass balance">
+                    <group>
+                        <field name="input_kg"/>
+                        <field name="output_kg"/>
+                        <field name="loss_kg"/>
+                    </group>
+                    <group>
+                        <label for="loss_pct"/>
+                        <div class="o_row">
+                            <field name="loss_pct" class="oe_inline"/> %
+                            <span class="text-muted">(max <field name="max_loss_pct" class="oe_inline" nolabel="1"/> %)</span>
+                        </div>
+                        <label for="yield_pct" invisible="not yield_max_pct"/>
+                        <div class="o_row" invisible="not yield_max_pct">
+                            <field name="yield_pct" class="oe_inline"/> %
+                            <span class="text-muted">(range <field name="yield_min_pct" class="oe_inline" nolabel="1"/> –
+                                <field name="yield_max_pct" class="oe_inline" nolabel="1"/> %)</span>
+                        </div>
+                        <field name="override_weights" invisible="status != 'blocked'"
+                            groups="ug_recycling_base.group_ug_user"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_confirm" type="object" string="Confirm &amp; Finish Order" class="btn-primary"
+                        data-hotkey="q"/>
+                    <button special="cancel" string="Cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_template_form_view_ug_assay" model="ir.ui.view">
+        <field name="name">product.template.form.ug.assay</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="ug_recycling_base.product_template_form_view_ug"/>
+        <field name="arch" type="xml">
+            <group name="ug_classification" position="after">
+                <t groups="ug_recycling_base.group_ug_user">
+                    <group name="ug_assay" string="Lab Assay">
+                        <field name="ug_requires_assay"/>
+                        <field name="ug_assay_template_id" invisible="not ug_requires_assay"/>
+                    </group>
+                </t>
+            </group>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ug_lot_assay_view_form" model="ir.ui.view">
+        <field name="name">ug.lot.assay.form</field>
+        <field name="model">ug.lot.assay</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" type="object" string="Submit" class="oe_highlight"
+                        invisible="state != 'draft'" groups="ug_recycling_base.group_ug_user"/>
+                    <button name="action_approve" type="object" string="Approve" class="oe_highlight"
+                        invisible="state != 'submitted'" groups="ug_recycling_base.group_ug_user"/>
+                    <button name="action_reject" type="object" string="Reject"
+                        invisible="state != 'submitted'" groups="ug_recycling_base.group_ug_user"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                        invisible="state not in ('submitted', 'rejected')" groups="ug_recycling_base.group_ug_user"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_productions" type="object" class="oe_stat_button" icon="fa-industry"
+                            invisible="not production_count">
+                            <field name="production_count" widget="statinfo" string="Manufacturing"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Current" invisible="not is_current"/>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="lot_id" readonly="state != 'draft'"
+                                domain="[('product_id.ug_requires_assay', '=', True)]"/>
+                            <field name="product_id"/>
+                            <field name="battery_chemistry_id"/>
+                            <field name="production_id" invisible="not production_id"/>
+                            <label for="basis_weight_kg"/>
+                            <div class="o_row">
+                                <field name="basis_weight_kg" class="oe_inline" readonly="state != 'draft'"/>
+                                <span>kg</span>
+                            </div>
+                        </group>
+                        <group>
+                            <field name="sample_date" readonly="state != 'draft'"/>
+                            <field name="sample_ref" placeholder="Lab sample / report no."/>
+                            <field name="lab_type" widget="radio" readonly="state != 'draft'"/>
+                            <field name="lab_partner_id" invisible="lab_type != 'external'"
+                                required="lab_type == 'external'" readonly="state != 'draft'"/>
+                            <field name="certificate_attachment_ids" widget="many2many_binary"
+                                invisible="lab_type != 'external'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Results" name="results">
+                            <div class="alert alert-info mb-2" role="alert" invisible="state != 'draft'">
+                                Enter the <b>mass % of each element</b> in the sample, as on the lab report
+                                (e.g. 22.5 for 22.5 % Fe). The kg columns are calculated. The rest of the
+                                sample (oxygen, binder, electrolyte residue…) appears as <i>Others</i>.
+                            </div>
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list editable="bottom" create="1" delete="1">
+                                    <field name="element_id" string="Element" width="220px" options="{'no_create': True}"/>
+                                    <field name="percentage" string="Result (%)" width="120px"/>
+                                    <field name="contained_kg_basis" string="kg in Lot (at Sampling)" sum="Total" width="170px"/>
+                                    <field name="contained_kg_current" string="kg in Lot (Now)" sum="Total" width="140px" optional="show"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="total_pct" string="Measured (%)"/>
+                                <field name="others_pct" string="Others (%)"/>
+                            </group>
+                        </page>
+                        <page string="Approval" name="approval">
+                            <group>
+                                <group>
+                                    <field name="approved_by"/>
+                                    <field name="approved_date"/>
+                                    <field name="is_current"/>
+                                </group>
+                            </group>
+                            <field name="note" placeholder="Lab notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="ug_lot_assay_view_list" model="ir.ui.view">
+        <field name="name">ug.lot.assay.list</field>
+        <field name="model">ug.lot.assay</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state == 'rejected'" decoration-info="state == 'submitted'">
+                <field name="name"/>
+                <field name="lot_id"/>
+                <field name="product_id"/>
+                <field name="battery_chemistry_id" optional="show"/>
+                <field name="production_id" optional="show"/>
+                <field name="sample_date"/>
+                <field name="lab_type" optional="show"/>
+                <field name="basis_weight_kg" optional="show"/>
+                <field name="is_current" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="activity_ids" widget="list_activity" optional="show"/>
+                <field name="state" widget="badge" decoration-success="state == 'approved'"
+                    decoration-info="state == 'submitted'" decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="ug_lot_assay_view_search" model="ir.ui.view">
+        <field name="name">ug.lot.assay.search</field>
+        <field name="model">ug.lot.assay</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="lot_id"/>
+                <field name="product_id"/>
+                <field name="sample_ref"/>
+                <field name="production_id"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="submitted" string="To Approve" domain="[('state', '=', 'submitted')]"/>
+                <filter name="approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                <filter name="current" string="Current" domain="[('is_current', '=', True)]"/>
+                <separator/>
+                <filter name="my_activities" string="My Activities" domain="[('activity_user_id', '=', uid)]"/>
+                <filter name="groupby_product" string="Product" context="{'group_by': 'product_id'}"/>
+                <filter name="groupby_chemistry" string="Chemistry" context="{'group_by': 'battery_chemistry_id'}"/>
+                <filter name="groupby_state" string="Status" context="{'group_by': 'state'}"/>
+                <filter name="groupby_production" string="Source MO" context="{'group_by': 'production_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="ug_lot_assay_action" model="ir.actions.act_window">
+        <field name="name">Lot Assays</field>
+        <field name="res_model">ug.lot.assay</field>
+        <field name="view_mode">list,form,activity</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No assay yet</p>
+            <p>Draft assays are created automatically when a manufacturing order produces a lot that requires an assay.</p>
+        </field>
+    </record>
+</odoo>
