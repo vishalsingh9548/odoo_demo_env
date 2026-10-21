@@ -26,11 +26,12 @@
                     <field name="product_id"/>
                     <field name="vendor_id" optional="show"/>
                     <field name="quantity_required" sum="Total"/>
-                    <field name="quantity_on_hand"/>
-                    <field name="quantity_to_purchase"/>
-                    <field name="quantity_ordered"/>
-                    <field name="quantity_remaining_to_order"/>
-                    <field name="quantity_issued"/>
+                    <field name="quantity_on_hand" optional="hide"/>
+                    <field name="quantity_issued" sum="Total"/>
+                    <field name="fulfilled_percent" optional="show"/>
+                    <field name="quantity_to_purchase" sum="Total"/>
+                    <field name="quantity_ordered" optional="hide"/>
+                    <field name="quantity_remaining_to_order" sum="Total"/>
                 </list>
             </field>
         </record>

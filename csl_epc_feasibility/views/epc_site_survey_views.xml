@@ -19,5 +19,16 @@
                 </xpath>
             </field>
         </record>
+    
+        <record id="epc_site_survey_view_list_feasibility" model="ir.ui.view">
+            <field name="name">epc.site.survey.list.feasibility</field>
+            <field name="model">epc.site.survey</field>
+            <field name="inherit_id" ref="csl_epc_site_survey.epc_site_survey_view_list"/>
+            <field name="arch" type="xml">
+                <field name="is_feasible" position="after">
+                    <field name="feasibility_count" string="Feasibility Studies" optional="show"/>
+                </field>
+            </field>
+        </record>
     </data>
 </odoo>

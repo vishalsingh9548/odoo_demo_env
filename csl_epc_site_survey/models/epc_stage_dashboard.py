@@ -18,7 +18,8 @@ class EpcStageDashboard(models.AbstractModel):
         delta_text, delta_trend = self._delta_text(this_count, last_count, 'last month')
 
         feasible_domain = [('is_feasible', '=', 'yes')]
-        decided = Survey.search_count([('is_feasible', 'in', ('yes', 'no'))])
+        decided_domain = [('is_feasible', 'in', ('yes', 'no'))]
+        decided = Survey.search_count(decided_domain)
         feasible = Survey.search_count(feasible_domain)
 
         # Surveys with no area filled in are left out of the average (and of the
@@ -37,7 +38,7 @@ class EpcStageDashboard(models.AbstractModel):
                       model='epc.site.survey', domain=this_domain),
             self._kpi('Feasible rate', self._pct(feasible, decided), 'pct',
                       sub='%s of %s decided surveys' % (feasible, decided), tone='good', icon='fa-check-circle-o',
-                      model='epc.site.survey', domain=feasible_domain),
+                      model='epc.site.survey', domain=decided_domain),
             self._kpi('Avg usable area', area_avg or 0, 'int', 'sq ft', sub='over %s surveys with an area' % area_count,
                       icon='fa-arrows-alt', model='epc.site.survey', domain=area_domain),
             self._kpi('Sanctioned load surveyed', load_sum or 0, 'int', 'kW', sub='across all surveys', icon='fa-bolt',
@@ -94,6 +95,8 @@ class EpcStageDashboard(models.AbstractModel):
             [('Survey', 'start'), ('Customer', 'start'), ('Engineer', 'start'), ('Area (sq ft)', 'end'),
              ('Waiting', 'end'), ('Status', 'start')],
             rows, source='epc.site.survey · approval_state = submitted', empty='No survey is waiting for approval.')
+
+        self._axis_titles(cards, {'monthly': ('Month', 'Surveys'), 'type': ('Number of surveys', 'Site type'), 'grid': ('Facility', 'Number of sites'), 'engineer': ('Number of surveys', 'Engineer')})
 
         return {'title': 'Site Survey', 'accent': '#8dbdf2',
                 'intro': 'How fast surveys are done, how many are viable, and what kind of sites come in.',

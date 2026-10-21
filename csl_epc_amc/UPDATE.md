@@ -77,3 +77,10 @@ Upgrade the module (`-u <module>`); new fields have safe defaults, no data migra
 
 ### Update 7 (2026-10-19) — dashboard colour
 The dashboard's accent colour in `models/epc_stage_dashboard.py` is now a light pastel to match the new shared look (see `csl_epc_core/UPDATE.md`, Update 7). No functional change.
+
+### Update 10 (2026-10-21) — axis headings on the dashboard charts
+Every bar, line and scatter chart on this dashboard now shows a heading on each axis (for example "Number of handovers" / "Document"), set in `models/epc_stage_dashboard.py` through `_axis_titles`. Doughnut charts have no axes. Upgrade: `-u csl_epc_core,csl_epc_<this module>`.
+
+### Update 11 (2026-10-21) — AMC contracts list shows the figures behind the tiles
+**Problem:** the *Annual contract value* tile (2,261,011 over 10 active contracts) opened a list with only dates and frequency, so the value could not be seen or added up. The *Avg SLA promise* and *Warranty ends in 60 days* tiles had no matching column either.
+**Fix:** the AMC Contracts list now has **Contract Value** (with a **Total** at the foot, equal to the tile when opened from it), **SLA Response (hours)** (with an **Average**, equal to *Avg SLA promise*) and **Warranty End Date**. File: `views/epc_amc_contract_views.xml`. Upgrade: `-u csl_epc_amc`.

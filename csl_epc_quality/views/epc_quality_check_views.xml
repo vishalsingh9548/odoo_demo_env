@@ -11,6 +11,9 @@
                     <field name="category"/>
                     <field name="inspector_id"/>
                     <field name="check_date"/>
+                    <field name="previous_check_id" string="Re-inspection of" optional="show"/>
+                    <field name="previous_check_date" optional="show"/>
+                    <field name="days_after_fail" avg="Average" optional="show"/>
                     <field name="overall_result" widget="badge"
                            decoration-success="overall_result == 'pass'"
                            decoration-danger="overall_result == 'fail'"

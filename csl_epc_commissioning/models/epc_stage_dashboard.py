@@ -130,6 +130,8 @@ class EpcStageDashboard(models.AbstractModel):
             rows, source='epc.commissioning · approval_state, sign-off checkboxes',
             empty='Every commissioning is signed off.')
 
+        self._axis_titles(cards, {'gates': ('Number of commissionings', 'Sign-off step'), 'generation': ('Project', 'Verified generation (kWh)'), 'owners': ('Open items', 'Owner'), 'ageing': ('Age of open item', 'Number of items'), 'monthly': ('Month', 'Commissionings')})
+
         return {'title': 'Commissioning', 'accent': '#c1b0f2',
                 'intro': 'Sign-off progress, punch list clearance and measured generation.',
                 'kpis': kpis, 'cards': cards, 'table': table}

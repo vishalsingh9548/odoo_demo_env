@@ -10,6 +10,9 @@
                     <field name="project_id"/>
                     <field name="requested_by"/>
                     <field name="request_date"/>
+                    <field name="submitted_date" optional="show"/>
+                    <field name="approved_date" optional="show"/>
+                    <field name="approval_days" avg="Average" optional="show"/>
                     <field name="approval_state" widget="badge"
                            decoration-success="approval_state == 'approved'"
                            decoration-danger="approval_state == 'rejected'"
@@ -71,6 +74,7 @@
                                 <field name="quantity_on_hand" readonly="1"/>
                                 <field name="quantity_to_purchase" readonly="1"/>
                                 <field name="quantity_ordered" readonly="1" optional="show"/>
+                                <field name="quantity_remaining_to_order" readonly="1" optional="show"/>
                                 <field name="quantity_issued" readonly="1" optional="show"/>
                                 <field name="vendor_id"/>
                             </list>

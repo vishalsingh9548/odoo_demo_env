@@ -37,10 +37,11 @@ class EpcStageDashboard(models.AbstractModel):
                       model='epc.handover', domain=[('id', 'in', any_missing.ids)]),
             self._kpi('Customer training done', self._pct(len(trained), total), 'pct',
                       sub='%s session(s) still pending' % (total - len(trained)), icon='fa-graduation-cap',
-                      model='epc.handover', domain=[('customer_training_done', '=', True)]),
+                      model='epc.handover', domain=[]),
             self._kpi('Approval time', self._approval_turnaround_days(approved), 'dec', 'd',
                       sub='submitted to approved, on average', icon='fa-clock-o',
-                      model='epc.handover', domain=[('approval_state', '=', 'approved')]),
+                      model='epc.handover', domain=[('approval_state', '=', 'approved'), ('submitted_date', '!=', False),
+                                                    ('approved_date', '!=', False)]),
             self._kpi('Closed this month', this_month, icon='fa-flag-checkered',
                       sub='%s waiting for approval' % len(waiting), model='epc.handover', domain=month_domain),
         ]
@@ -88,6 +89,8 @@ class EpcStageDashboard(models.AbstractModel):
             'Handovers with missing documents', 'epc.handover',
             [('Handover', 'start'), ('Project', 'start'), ('Documents', 'start'), ('Training', 'start'), ('Status', 'start')],
             rows, source='epc.handover · empty document fields', empty='Every handover has its full document pack.')
+
+        self._axis_titles(cards, {'missing': ('Number of handovers', 'Document'), 'monthly': ('Month', 'Handovers closed')})
 
         return {'title': 'Handover & Closure', 'accent': '#9fb4d8',
                 'intro': 'Is the customer pack complete, and how smoothly projects close out.',

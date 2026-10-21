@@ -137,6 +137,11 @@ export class EpcDashboard extends Component {
         this._renderProcurementStatusChart();
     }
 
+    // Axis heading, in the theme's text colour
+    _axisTitle(text) {
+        return { display: true, text, color: this.colors.text, font: { weight: "600", size: 12 } };
+    }
+
     _destroy(key) {
         if (this.charts[key]) {
             this.charts[key].destroy();
@@ -200,8 +205,8 @@ export class EpcDashboard extends Component {
                 plugins: { legend: { display: false } },
                 maintainAspectRatio: false,
                 scales: {
-                    x: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: this.colors.grid } },
-                    y: { grid: { display: false } },
+                    x: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: this.colors.grid }, title: this._axisTitle(_t("Open items")) },
+                    y: { grid: { display: false }, title: this._axisTitle(_t("Pipeline stage")) },
                 },
                 onClick: (_ev, elements) => {
                     if (!elements.length) return;
@@ -331,8 +336,8 @@ export class EpcDashboard extends Component {
                 plugins: { legend: { display: false } },
                 maintainAspectRatio: false,
                 scales: {
-                    y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: this.colors.grid } },
-                    x: { grid: { display: false } },
+                    y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: this.colors.grid }, title: this._axisTitle(_t("Purchase orders")) },
+                    x: { grid: { display: false }, title: this._axisTitle(_t("Purchase order stage")) },
                 },
                 onClick: (_ev, elements) => {
                     if (!elements.length) return;

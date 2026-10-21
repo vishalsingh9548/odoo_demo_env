@@ -97,6 +97,8 @@ class EpcStageDashboard(models.AbstractModel):
              ('Status', 'start')],
             rows, source='epc.amc.contract · active, end_date within 90 days', empty='No contract ends in the next 90 days.')
 
+        self._axis_titles(cards, {'renewals': ('Time left before the contract ends', 'Contracts'), 'tickets': ('Month', 'Tickets'), 'busiest': ('Number of tickets', 'Contract')})
+
         return {'title': 'AMC', 'accent': '#86d0e0',
                 'intro': 'Renewals, service load and warranty cliffs. Contract status and next visits stay on the main dashboard.',
                 'kpis': kpis, 'cards': cards, 'table': table}

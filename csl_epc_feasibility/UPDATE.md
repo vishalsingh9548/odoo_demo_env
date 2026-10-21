@@ -76,3 +76,17 @@ Upgrade the module (`-u <module>`); new fields have safe defaults, no data migra
 
 ### Update 7 (2026-10-19) — dashboard colour
 The dashboard's accent colour in `models/epc_stage_dashboard.py` is now a light pastel to match the new shared look (see `csl_epc_core/UPDATE.md`, Update 7). No functional change.
+
+### Update 10 (2026-10-21) — axis headings on the dashboard charts
+Every bar, line and scatter chart on this dashboard now shows a heading on each axis (for example "Number of handovers" / "Document"), set in `models/epc_stage_dashboard.py` through `_axis_titles`. Doughnut charts have no axes. Upgrade: `-u csl_epc_core,csl_epc_<this module>`.
+
+### Update 11 (2026-10-21) — Feasibility list shows the figures the tiles add up
+**Problem:** the *Capacity under study* tile (4.5 MWp over 19 proposals) opened a list that showed each proposed capacity but no total, so the relation to the tile was not visible. The *Expected generation* and *Avg performance ratio* tiles had no matching columns at all.
+**Fix:** the Feasibility Studies list now has a **Total** under *Proposed Capacity (kW)* (equals the tile, in kW: 4.5 MWp = 4,500+ kW), a new **Annual Generation (kWh)** column with a **Total** (equals *Expected generation*) and a **Performance Ratio** column with an **Average** (equals *Avg performance ratio* when opened from that tile). File: `views/epc_feasibility_views.xml`. Upgrade: `-u csl_epc_feasibility`.
+
+### Update 12 (2026-10-21) — Specific Yield per proposal
+The Feasibility Studies list now has a **Specific Yield (kWh/kWp)** column (estimated annual generation ÷ proposed capacity) so each proposal can be compared with the dashboard's overall *Specific yield* tile (total generation ÷ total capacity). It has no footer on purpose: the tile is a ratio of the two totals, not an average of the rows. New non-stored field `specific_yield` in `models/epc_feasibility.py`; column in `views/epc_feasibility_views.xml`. Upgrade: `-u csl_epc_feasibility`.
+
+### Update 13 (2026-10-21) — "Survey to feasibility" tile opens all surveys
+**Problem:** the tile showed 61.3% (19 of 31 surveys studied) but opened only the 19 surveys that have a feasibility study, so the 12 behind the rest of the percentage were missing.
+**Fix:** the tile now opens every site survey (31), and the Site Surveys list has a new **Feasibility Studies** column (how many studies were created from each survey; 0 = not studied yet). Surveys with a number above 0 are the 19 in the tile. Files: `models/epc_stage_dashboard.py`, `views/epc_site_survey_views.xml`. Upgrade: `-u csl_epc_feasibility`.

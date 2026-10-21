@@ -19,5 +19,19 @@
                 </xpath>
             </field>
         </record>
+
+        <record id="project_view_list_epc_boq" model="ir.ui.view">
+            <field name="name">project.view.list.epc.boq</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.view_project"/>
+            <field name="arch" type="xml">
+                <field name="partner_id" position="after">
+                    <field name="currency_id" column_invisible="1"/>
+                    <field name="boq_id" optional="show"/>
+                    <field name="capacity_kw" sum="Total" optional="show"/>
+                    <field name="boq_total_sell_price" string="Contract Value" sum="Total" optional="show"/>
+                </field>
+            </field>
+        </record>
     </data>
 </odoo>

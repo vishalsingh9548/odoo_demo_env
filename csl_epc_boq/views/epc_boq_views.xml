@@ -9,12 +9,15 @@
                     <field name="name"/>
                     <field name="lead_id"/>
                     <field name="partner_id"/>
-                    <field name="capacity_kw"/>
-                    <!-- Hidden for now: these read 0 until BOQ lines have a Unit Cost
-                         entered, which looks like a bug rather than an unfinished BOQ.
-                         See LOG.md for the plan to address this properly. -->
-                    <field name="total_cost" sum="Total Cost" optional="hide"/>
-                    <field name="total_sell_price" sum="Total Sell Price" optional="hide"/>
+                    <field name="revision_number" string="Version" optional="show"/>
+                    <field name="superseded" string="Superseded" optional="show"/>
+                    <field name="currency_id" column_invisible="1"/>
+                    <field name="capacity_kw" sum="Total"/>
+                    <field name="total_cost" sum="Total Cost" optional="show"/>
+                    <field name="cost_per_kw" optional="show"/>
+                    <field name="margin_percent" avg="Average" optional="show"/>
+                    <field name="total_sell_price" sum="Total Sell Price" optional="show"/>
+                    <field name="sale_order_id" string="Quotation" optional="show"/>
                     <field name="approval_state" widget="badge"
                            decoration-success="approval_state == 'approved'"
                            decoration-danger="approval_state == 'rejected'"
@@ -54,6 +57,13 @@
                                statusbar_visible="to_submit,submitted,approved"/>
                     </header>
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_older_versions" type="object"
+                                    class="oe_stat_button" icon="fa-history"
+                                    invisible="older_version_count == 0">
+                                <field name="older_version_count" widget="statinfo" string="Older Versions"/>
+                            </button>
+                        </div>
                         <widget name="web_ribbon" title="Superseded" bg_color="text-bg-secondary" invisible="not superseded"/>
                         <div class="oe_title">
                             <h1><field name="name" readonly="1"/></h1>

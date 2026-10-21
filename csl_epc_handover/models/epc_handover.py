@@ -59,6 +59,20 @@ class EpcHandover(models.Model):
         help="A written summary of the completed project, for internal records.",
     )
 
+    approval_days = fields.Float(
+        string='Days to Approve', compute='_compute_approval_days', digits=(16, 1),
+        help="Days between 'Submit for Approval' and 'Approve'. Shown in the list so the "
+             "dashboard's Approval time can be checked.",
+    )
+
+    @api.depends('submitted_date', 'approved_date')
+    def _compute_approval_days(self):
+        for handover in self:
+            if handover.submitted_date and handover.approved_date:
+                handover.approval_days = (handover.approved_date - handover.submitted_date).total_seconds() / 86400.0
+            else:
+                handover.approval_days = 0.0
+
     # Fills in the sequence-based reference number the first time a record is saved
     @api.model_create_multi
     def create(self, vals_list):

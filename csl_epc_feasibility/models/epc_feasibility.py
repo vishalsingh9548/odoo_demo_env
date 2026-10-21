@@ -64,6 +64,18 @@ class EpcFeasibility(models.Model):
         help="How much electricity the system is expected to generate in a year, "
              "used to calculate customer savings.",
     )
+    specific_yield = fields.Float(
+        string='Specific Yield (kWh/kWp)', compute='_compute_specific_yield', digits=(16, 0),
+        help="Estimated yearly generation per kWp of proposed capacity. Shown in the list so "
+             "the dashboard's Specific yield can be compared proposal by proposal.",
+    )
+
+    @api.depends('annual_generation_estimate_kwh', 'proposed_capacity_kw')
+    def _compute_specific_yield(self):
+        for study in self:
+            study.specific_yield = (study.annual_generation_estimate_kwh / study.proposed_capacity_kw
+                                    if study.proposed_capacity_kw else 0.0)
+
     performance_ratio = fields.Float(
         string='Performance Ratio (%)',
         help="A standard efficiency measure (0-100%) showing how much of the "

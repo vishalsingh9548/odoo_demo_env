@@ -9,7 +9,10 @@
                     <field name="name"/>
                     <field name="lead_id"/>
                     <field name="partner_id"/>
-                    <field name="proposed_capacity_kw"/>
+                    <field name="proposed_capacity_kw" sum="Total"/>
+                    <field name="annual_generation_estimate_kwh" sum="Total" optional="show"/>
+                    <field name="specific_yield" optional="show"/>
+                    <field name="performance_ratio" avg="Average" optional="show"/>
                     <field name="system_type"/>
                     <field name="feasibility_result"/>
                     <field name="approval_state" widget="badge"

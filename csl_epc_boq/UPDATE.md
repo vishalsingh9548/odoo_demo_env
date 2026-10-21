@@ -99,3 +99,27 @@ Upgrade the module (`-u <module>`); new fields have safe defaults, no data migra
 
 ### Update 7 (2026-10-19) — dashboard colour
 The dashboard's accent colour in `models/epc_stage_dashboard.py` is now a light pastel to match the new shared look (see `csl_epc_core/UPDATE.md`, Update 7). No functional change.
+
+### Update 10 (2026-10-21) — axis headings on the dashboard charts
+Every bar, line and scatter chart on this dashboard now shows a heading on each axis (for example "Number of handovers" / "Document"), set in `models/epc_stage_dashboard.py` through `_axis_titles`. Doughnut charts have no axes. Upgrade: `-u csl_epc_core,csl_epc_<this module>`.
+
+### Update 11 (2026-10-21) — BOQ list shows the figures behind the tiles
+**Problem:** the *Avg cost per kW* tile opened a list with only the capacity; Total Cost and Total Sell Price were hidden by default and there was no margin or cost-per-kW column, so none of the BOQ tiles (cost per kW, average margin, lowest margin) could be checked.
+**Fix:** the BOQs list now shows, by default, **System Capacity** (with a Total), **Total Cost** (Total), a new **Cost per kW** (total cost ÷ capacity, per BOQ), **Margin (%)** (Average) and **Total Sell Price** (Total). The tile's figure is the Total Cost footer divided by the System Capacity footer, so the two footers explain it. New non-stored field `cost_per_kw` in `models/epc_boq.py`; list in `views/epc_boq_views.xml` (the old "hidden for now" note was removed). Upgrade: `-u csl_epc_boq`.
+
+### Update 12 (2026-10-21) — money totals now show in the BOQ list footer
+The **Total Cost** and **Total Sell Price** footers showed "—" because Odoo only adds up money columns when the list also loads the currency. The BOQs list now carries the (hidden) Currency column, so both totals appear (all current BOQs are in one currency). File: `views/epc_boq_views.xml`. Upgrade: `-u csl_epc_boq`.
+
+### Update 13 (2026-10-21) — "Quotation created" tile opens all approved BOQs
+**Problem:** the tile showed 91.7% (11 of 12 approved BOQs have a quotation) but opened only the 11 with a quotation, so the one still missing could not be seen.
+**Fix:** the tile now opens every approved current BOQ (12), the set the percentage is calculated over, and the BOQs list has a new **Quotation** column; the BOQ with no quotation yet is the one with an empty cell. Files: `models/epc_stage_dashboard.py`, `views/epc_boq_views.xml`. Upgrade: `-u csl_epc_boq`.
+
+### Update 14 (2026-10-21) — BOQ list shows Version and Superseded
+**Problem:** a bar of the *Versions per BOQ* chart (e.g. v1 = 17) opened the right records, but the list did not show which version each record is, nor whether it has been replaced by a newer one, so the bar could not be understood.
+**Fix:** the BOQs list now has **Version** and **Superseded** columns. The chart counts every BOQ record, including older versions that were replaced (22 records: 17 at v1, 3 at v2, 2 at v3); *Superseded* = ticked marks those older copies. Files: `views/epc_boq_views.xml`. Upgrade: `-u csl_epc_boq`.
+
+### Update 15 (2026-10-21) — "Older Versions" smart button on the BOQ form
+A BOQ that was revised from an earlier one now has an **Older Versions** smart button at the top of its form (hidden on a first version). It shows how many earlier versions there are (the whole chain, e.g. a v3 shows 2) and opens them: straight to the record when there is just one, otherwise to a list showing each version, with the old copies marked *Superseded*. New fields/methods `older_version_count`, `_older_versions`, `action_view_older_versions` in `models/epc_boq.py`; button in `views/epc_boq_views.xml`. Upgrade: `-u csl_epc_boq`.
+
+### Update 16 (2026-10-21) — Projects list shows the BOQ, capacity and contract value
+The Projects list (also opened from the Solar Dashboard's *Contract Value*, *Active Projects* and *Completed Projects* tiles) now has **BOQ**, **System Capacity** and **Contract Value** columns, the last two with a **Total** at the foot. Contract Value is the sell price of the BOQ linked to the project. File: `views/project_project_views.xml`. Upgrade: `-u csl_epc_boq`.

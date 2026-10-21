@@ -235,6 +235,19 @@ class EpcMaterialRequest(models.Model):
             'domain': [('material_request_id', '=', self.id)],
         }
 
+    approval_days = fields.Float(
+        string='Days to Approve', compute='_compute_approval_days', digits=(16, 1),
+        help="Days between 'Submit for Approval' and 'Approve'. Shown in the list so the "
+             "dashboard's Request approval time can be checked.",
+    )
+
+    @api.depends('submitted_date', 'approved_date')
+    def _compute_approval_days(self):
+        for request in self:
+            if request.submitted_date and request.approved_date:
+                request.approval_days = (request.approved_date - request.submitted_date).total_seconds() / 86400.0
+            else:
+                request.approval_days = 0.0
 
 class EpcMaterialRequestLine(models.Model):
     """One material line on a Material Request — how much of a product is
@@ -275,7 +288,8 @@ class EpcMaterialRequestLine(models.Model):
     )
     quantity_ordered = fields.Float(
         string='Quantity Ordered', compute='_compute_quantity_ordered',
-        help="How much of this product is already on this request's purchase orders.",
+        help="How much of this product is on this request's purchase orders and has not arrived yet "
+             "(goods already received are in stock, so they are not counted again).",
     )
     quantity_remaining_to_order = fields.Float(
         string='Still To Order', compute='_compute_quantity_ordered',
@@ -289,6 +303,19 @@ class EpcMaterialRequestLine(models.Model):
         string='Can Issue Now', compute='_compute_quantity_issued',
         help="How much could be issued to the project right now.",
     )
+    fulfilled_percent = fields.Float(
+        string='Fulfilled (%)', compute='_compute_fulfilled_percent', digits=(16, 0),
+        help="Quantity issued divided by quantity required, for this line. Shown in the list so "
+             "the dashboard's Fulfilment rate can be read line by line.",
+    )
+
+    @api.depends('product_id', 'quantity_required', 'request_id.name', 'request_id.project_id')
+    def _compute_fulfilled_percent(self):
+        for line in self:
+            line.fulfilled_percent = (
+                min(line._issued_quantity() * 100.0 / line.quantity_required, 100.0)
+                if line.quantity_required else 0.0)
+
     vendor_id = fields.Many2one(
         'res.partner', string='Preferred Vendor',
         help="Who to buy this from. If left blank, the product's default vendor is used.",
@@ -296,25 +323,48 @@ class EpcMaterialRequestLine(models.Model):
 
     # Looks up how much stock is free (on hand minus reserved) for this product,
     # and works out how much more needs to be purchased to cover what is required
-    @api.depends('product_id', 'quantity_required')
+    @api.depends('product_id', 'quantity_required', 'request_id.name', 'request_id.project_id')
     def _compute_quantity_on_hand(self):
         for line in self:
             line.quantity_on_hand = line.product_id.sudo().free_qty if line.product_id else 0.0
-            line.quantity_to_purchase = max(line.quantity_required - line.quantity_on_hand, 0.0)
+            # what was already sent to site no longer has to be found or bought
+            line.quantity_to_purchase = max(
+                line.quantity_required - line._issued_quantity() - line.quantity_on_hand, 0.0)
+
+    # How much of this line has already been moved to the project site, from the
+    # transfers this request created
+    def _issued_quantity(self):
+        self.ensure_one()
+        if not (self.product_id and self.request_id.name):
+            return 0.0
+        moves = self.env['stock.move'].sudo().search([
+            ('picking_id.origin', '=', self.request_id.name),
+            ('picking_id.project_id', '=', self.request_id.project_id.id),
+            ('product_id', '=', self.product_id.id),
+            ('state', '!=', 'cancel'),
+        ])
+        return sum(moves.mapped('product_uom_qty'))
 
     # How much is already on this request's purchase orders, and so how much
     # of the shortfall is still left to order
-    @api.depends('product_id', 'quantity_required', 'request_id.purchase_order_ids.state',
-                 'request_id.purchase_order_ids.order_line.product_qty')
+    @api.depends('product_id', 'quantity_required', 'request_id.name', 'request_id.project_id',
+                 'request_id.purchase_order_ids.state',
+                 'request_id.purchase_order_ids.order_line.product_qty',
+                 'request_id.purchase_order_ids.order_line.qty_received')
     def _compute_quantity_ordered(self):
         for line in self:
             ordered = 0.0
             if line.product_id:
                 order_lines = line.request_id.sudo().purchase_order_ids.filtered(
                     lambda order: order.state != 'cancel').mapped('order_line')
-                ordered = sum(order_lines.filtered(
-                    lambda order_line: order_line.product_id == line.product_id).mapped('product_qty'))
-            shortfall = max(line.quantity_required - (line.product_id.sudo().free_qty if line.product_id else 0.0), 0.0)
+                # only what has not arrived yet counts as "on order": goods already
+                # received are in stock, and must not be counted twice
+                ordered = sum(
+                    max(order_line.product_qty - order_line.qty_received, 0.0)
+                    for order_line in order_lines.filtered(
+                        lambda order_line: order_line.product_id == line.product_id))
+            shortfall = max(line.quantity_required - line._issued_quantity()
+                            - (line.product_id.sudo().free_qty if line.product_id else 0.0), 0.0)
             line.quantity_ordered = ordered
             line.quantity_remaining_to_order = max(shortfall - ordered, 0.0)
 
@@ -323,15 +373,7 @@ class EpcMaterialRequestLine(models.Model):
     @api.depends('product_id', 'quantity_required', 'request_id.name', 'request_id.project_id')
     def _compute_quantity_issued(self):
         for line in self:
-            issued = 0.0
-            if line.product_id and line.request_id.name:
-                moves = self.env['stock.move'].sudo().search([
-                    ('picking_id.origin', '=', line.request_id.name),
-                    ('picking_id.project_id', '=', line.request_id.project_id.id),
-                    ('product_id', '=', line.product_id.id),
-                    ('state', '!=', 'cancel'),
-                ])
-                issued = sum(moves.mapped('product_uom_qty'))
+            issued = line._issued_quantity()
             free = line.product_id.sudo().free_qty if line.product_id else 0.0
             line.quantity_issued = issued
             line.quantity_issuable = max(min(line.quantity_required - issued, free), 0.0)

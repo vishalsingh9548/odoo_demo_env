@@ -51,18 +51,22 @@ export class EpcStageDashboard extends Component {
         this.charts = [];
         this.stage = (this.props.action.params && this.props.action.params.stage)
             || (this.props.action.context && this.props.action.context.stage);
-        this.state = useState({ loading: true, error: false, data: null });
+        this.state = useState({ loading: true, error: false, data: null, counts: {} });
+        this.firstLoad = true;
 
         onWillStart(async () => {
             await loadBundle("web.chartjs_lib");
             await this.load();
         });
         onMounted(() => {
+            this.startCountUp();
             // Keep the screen live without anyone pressing Refresh
             this.timer = setInterval(() => this.load(true), REFRESH_MS);
         });
         onWillUnmount(() => {
             clearInterval(this.timer);
+            cancelAnimationFrame(this.raf);
+            clearTimeout(this.countTimer);
             this.destroyCharts();
         });
         useEffect(
@@ -80,7 +84,12 @@ export class EpcStageDashboard extends Component {
             this.state.loading = true;
         }
         try {
-            this.state.data = this.applyLayout(await this.orm.call("epc.stage.dashboard", "get_data", [this.stage]));
+            const data = this.applyLayout(await this.orm.call("epc.stage.dashboard", "get_data", [this.stage]));
+            if (this.firstLoad && !this.reducedMotion()) {
+                // the tile numbers start at 0 and count up once the page is shown
+                this.state.counts = Object.fromEntries(data.kpis.map((_k, i) => [i, 0]));
+            }
+            this.state.data = data;
             this.state.error = false;
         } catch (error) {
             if (!silent) {
@@ -121,9 +130,42 @@ export class EpcStageDashboard extends Component {
         return data;
     }
 
+    reducedMotion() {
+        return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }
+
+    // Counts the tile numbers up from 0 to their value (about 0.8 s, eased out).
+    // Only on the first load; later automatic refreshes just show the new numbers.
+    startCountUp() {
+        const data = this.state.data;
+        if (!this.firstLoad || !data || !Object.keys(this.state.counts).length) {
+            return;
+        }
+        this.firstLoad = false;
+        const duration = 800;
+        // wait for the tiles' fade-in so the numbers start moving as they appear
+        this.countTimer = setTimeout(() => {
+            const start = performance.now();
+            const step = (now) => {
+                const t = Math.min((now - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - t, 3);
+                data.kpis.forEach((kpi, i) => {
+                    this.state.counts[i] = (kpi.value || 0) * eased;
+                });
+                if (t < 1) {
+                    this.raf = requestAnimationFrame(step);
+                } else {
+                    this.state.counts = {};
+                }
+            };
+            this.raf = requestAnimationFrame(step);
+        }, 150);
+    }
+
     // ---- formatting ------------------------------------------------------
-    formatKpi(kpi) {
-        const value = kpi.value || 0;
+    formatKpi(kpi, index) {
+        const shown = this.state.counts[index];
+        const value = shown === undefined ? kpi.value || 0 : shown;
         switch (kpi.fmt) {
             case "money":
                 return formatMonetary(value, { currencyId: this.state.data.currency_id });
@@ -226,6 +268,7 @@ export class EpcStageDashboard extends Component {
 
     buildChart(canvas, card, theme) {
         const { text, grid, surface, accent } = theme;
+        const text_ = text;
         const isPie = card.kind === "doughnut";
         const isScatter = card.kind === "scatter";
         const horizontal = card.kind === "hbar";
@@ -308,16 +351,28 @@ export class EpcStageDashboard extends Component {
             if (card.pct) {
                 value.max = 100;
             }
+            const title = (text) => ({
+                display: !!text,
+                text,
+                color: text_,
+                font: { weight: "600", size: 12 },
+            });
             if (isScatter) {
                 options.scales = {
-                    x: { ...value, title: { display: true, text: card.xlabel, color: text } },
-                    y: { ...value, title: { display: true, text: card.ylabel, color: text } },
+                    x: { ...value, title: title(card.xlabel) },
+                    y: { ...value, title: title(card.ylabel) },
                 };
             } else if (horizontal) {
                 options.indexAxis = "y";
-                options.scales = { y: category, x: { ...value, stacked: !!card.stack } };
+                options.scales = {
+                    y: { ...category, title: title(card.ylabel) },
+                    x: { ...value, stacked: !!card.stack, title: title(card.xlabel) },
+                };
             } else {
-                options.scales = { x: { ...category, stacked: !!card.stack }, y: { ...value, stacked: !!card.stack } };
+                options.scales = {
+                    x: { ...category, stacked: !!card.stack, title: title(card.xlabel) },
+                    y: { ...value, stacked: !!card.stack, title: title(card.ylabel) },
+                };
             }
         }
         return new Chart(canvas, { type, data: { labels: card.labels, datasets }, options });

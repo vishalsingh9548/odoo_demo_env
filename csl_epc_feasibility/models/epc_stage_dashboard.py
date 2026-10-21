@@ -34,7 +34,7 @@ class EpcStageDashboard(models.AbstractModel):
                       model='epc.feasibility', domain=[]),
             self._kpi('Survey to feasibility', self._pct(surveyed, survey_total), 'pct',
                       sub='%s of %s surveys studied' % (surveyed, survey_total), icon='fa-exchange',
-                      model='epc.site.survey', domain=[('feasibility_ids', '!=', False)]),
+                      model='epc.site.survey', domain=[]),
         ]
 
         type_l, type_c, type_d = self._group_selection('epc.feasibility', 'system_type', empty_label='Not set')
@@ -97,6 +97,8 @@ class EpcStageDashboard(models.AbstractModel):
              ('kWh/kWp', 'end'), ('PR', 'end')],
             rows, source='epc.feasibility · annual_generation_estimate_kwh ÷ proposed_capacity_kw',
             empty='No proposal has capacity and generation filled in yet.')
+
+        self._axis_titles(cards, {'size': ('Capacity band', 'Proposals'), 'orientation': ('Number of proposals', 'Orientation'), 'pr': ('Performance ratio range', 'Proposals')})
 
         return {'title': 'Feasibility', 'accent': '#8b95f0',
                 'intro': 'Technical sizing and yield: what we are proposing and how well it should perform.',

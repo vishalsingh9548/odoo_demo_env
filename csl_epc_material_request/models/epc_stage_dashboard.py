@@ -18,7 +18,8 @@ class EpcStageDashboard(models.AbstractModel):
         short = lines.filtered(lambda l: l.quantity_to_purchase > 0)
         required = sum(lines.mapped('quantity_required'))
         issued = sum(lines.mapped('quantity_issued'))
-        remaining = sum(lines.mapped('quantity_remaining_to_order'))
+        pending_domain = [('approval_state', 'in', ('to_submit', 'submitted'))]
+        pending = requests.filtered(lambda r: r.approval_state in ('to_submit', 'submitted'))
         approved = requests.filtered(lambda r: r.approval_state == 'approved')
         turnaround = self._approval_turnaround_days(approved)
         blocking = len(short.mapped('request_id'))
@@ -31,11 +32,11 @@ class EpcStageDashboard(models.AbstractModel):
                       tone='good' if required and issued >= required else '', icon='fa-truck',
                       model='epc.material.request.line', domain=[]),
             self._kpi('Request approval time', turnaround, 'dec', 'd', sub='submitted to approved, on average',
-                      icon='fa-clock-o', model='epc.material.request', domain=[('approval_state', '=', 'approved')]),
-            self._kpi('Still to order', remaining, 'int', 'units', sub='not yet on a purchase order',
-                      tone='warn' if remaining else '', icon='fa-shopping-cart',
-                      model='epc.material.request.line', domain=[('id', 'in', lines.filtered(
-                          lambda l: l.quantity_remaining_to_order > 0).ids)]),
+                      icon='fa-clock-o', model='epc.material.request',
+                      domain=[('approval_state', '=', 'approved'), ('submitted_date', '!=', False), ('approved_date', '!=', False)]),
+            self._kpi('Pending requests', len(pending), tone='warn' if pending else 'good', icon='fa-hourglass-half',
+                      sub='not approved yet (to submit or submitted)', model='epc.material.request',
+                      domain=pending_domain),
             self._kpi('Issued to site', issued, 'int', 'units', sub='all requests', icon='fa-check-square-o',
                       model='epc.material.request.line', domain=[('id', 'in', lines.filtered('quantity_issued').ids)]),
         ]
@@ -113,14 +114,18 @@ class EpcStageDashboard(models.AbstractModel):
             rows.append({'id': line.request_id.id, 'cells': [
                 line.product_id.display_name or line.description or '', line.request_id.name,
                 '{:,.0f}'.format(line.quantity_required), '{:,.0f}'.format(line.quantity_on_hand),
-                {'text': '{:,.0f}'.format(line.quantity_to_purchase), 'pill': 'bad'},
+                '{:,.0f}'.format(line.quantity_ordered),
+                {'text': '{:,.0f}'.format(line.quantity_remaining_to_order),
+                 'pill': 'bad' if line.quantity_remaining_to_order else 'good'},
                 line.vendor_id.display_name or '-']})
         table = self._tbl(
             'Items short on stock', 'epc.material.request',
             [('Product', 'start'), ('Request', 'start'), ('Required', 'end'), ('In stock', 'end'),
-             ('To buy', 'end'), ('Vendor', 'start')],
+             ('On order', 'end'), ('To buy', 'end'), ('Vendor', 'start')],
             rows, source='epc.material.request.line · quantity_to_purchase > 0',
             empty='Every requested item is covered by stock.')
+
+        self._axis_titles(cards, {'products': ('Product', 'Units'), 'vendors': ('Units ordered', 'Vendor'), 'monthly': ('Month', 'Requests'), 'projects': ('Fulfilled (%)', 'Project')})
 
         return {'title': 'Material Requests', 'accent': '#7fc8e8',
                 'intro': 'Whether stock covers site needs, what is still to buy, and how much material has reached site.',

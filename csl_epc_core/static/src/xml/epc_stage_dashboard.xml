@@ -19,25 +19,19 @@
                         <h2 t-esc="state.data.title"/>
                         <p t-esc="state.data.intro"/>
                     </div>
-                    <div class="o_epc_sd_tools">
-                        <span class="o_epc_sd_updated">Updated <t t-esc="formatTime(state.data.generated_at)"/></span>
-                        <button class="btn btn-secondary btn-sm" t-on-click="() => this.load()" title="Refresh the numbers">
-                            <i t-attf-class="fa fa-refresh #{state.loading ? 'fa-spin' : ''}"/> Refresh
-                        </button>
-                    </div>
                 </header>
 
                 <section class="o_epc_sd_kpis">
                     <div t-foreach="state.data.kpis" t-as="kpi" t-key="kpi_index"
                          t-attf-class="o_epc_sd_kpi o_epc_sd_tone_#{kpi.tone || 'none'} #{kpi.model ? 'o_epc_sd_click' : ''}"
-                         t-att-tabindex="kpi.model ? 0 : -1"
+                         t-att-tabindex="kpi.model ? 0 : -1" t-att-style="'--i:' + kpi_index"
                          t-on-click="() => this.openList(kpi.model, kpi.domain, kpi.label)"
                          t-on-keydown="(ev) => ev.key === 'Enter' &amp;&amp; this.openList(kpi.model, kpi.domain, kpi.label)">
                         <div class="o_epc_sd_kpi_icon"><i t-attf-class="fa #{kpi.icon}"/></div>
                         <div class="o_epc_sd_kpi_body">
                             <div class="o_epc_sd_kpi_label" t-esc="kpi.label"/>
                             <div class="o_epc_sd_kpi_value">
-                                <t t-esc="formatKpi(kpi)"/><small t-if="kpi.unit" t-esc="kpi.unit"/>
+                                <t t-esc="formatKpi(kpi, kpi_index)"/><small t-if="kpi.unit" t-esc="kpi.unit"/>
                             </div>
                             <div t-if="kpi.sub" t-attf-class="o_epc_sd_kpi_sub o_epc_sd_trend_#{kpi.trend || 'none'}" t-esc="kpi.sub"/>
                         </div>
@@ -46,7 +40,7 @@
 
                 <section class="o_epc_sd_grid">
                     <article t-foreach="state.data.cards" t-as="card" t-key="card.key"
-                             t-attf-class="o_epc_sd_card o_epc_sd_span#{card._span}">
+                             t-attf-class="o_epc_sd_card o_epc_sd_span#{card._span}" t-att-style="'--i:' + (state.data.kpis.length + card_index)">
                         <h3 t-esc="card.title"/>
                         <p class="o_epc_sd_sub" t-esc="card.sub"/>
                         <t t-if="hasData(card)">
@@ -74,7 +68,8 @@
                         </t>
                         <div t-else="" class="o_epc_sd_empty">No data yet</div>
                     </article>
-                <article t-if="state.data.table" t-attf-class="o_epc_sd_card o_epc_sd_table_card o_epc_sd_span#{state.data._tableSpan}">
+                <article t-if="state.data.table" t-attf-class="o_epc_sd_card o_epc_sd_table_card o_epc_sd_span#{state.data._tableSpan}"
+                         t-att-style="'--i:' + (state.data.kpis.length + state.data.cards.length)">
                     <h3 t-esc="state.data.table.title"/>
                     <div class="o_epc_sd_scroll">
                         <table t-if="state.data.table.rows.length" class="o_epc_sd_table">

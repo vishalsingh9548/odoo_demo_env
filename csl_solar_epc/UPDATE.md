@@ -107,3 +107,10 @@ The main **Solar Dashboard** (tiles, Portfolio by Phase, Pipeline Activity, AMC 
 
 ### Update 7 (2026-10-19) — legend text colour
 The AMC Contract Health legend (and the Portfolio legend) showed black text on the dark background because the legend colour was not set. It now uses the theme's text colour in both light and dark mode. File: `static/src/js/epc_dashboard.js`. Upgrade: `-u csl_solar_epc`, hard-refresh.
+
+### Update 8 (2026-10-21) — axis headings on the charts
+The bar charts now have headings on their axes (Pipeline Activity: "Open items" / "Pipeline stage"; Procurement Status: "Purchase order stage" / "Purchase orders"). The doughnut and funnel charts have no axes. File: `static/src/js/epc_dashboard.js`. Upgrade: `-u csl_solar_epc`, hard-refresh.
+
+### Update 9 (2026-10-21) — "Contract Value" tile is now clickable
+**Problem:** the *Contract Value* tile on the Solar Dashboard did nothing when clicked, unlike the other tiles.
+**Fix:** it now opens the list of projects it adds up (every project that has a BOQ, 15 at the moment), and that list has **BOQ**, **System Capacity** and **Contract Value** columns with a **Total** at the foot equal to the tile. The figure itself is unchanged: the sell price of the BOQ linked to each project. Files: `models/epc_dashboard.py`, `static/src/xml/epc_dashboard.xml`; the list columns are in `csl_epc_boq` (see its Update 16). Upgrade: `-u csl_epc_boq,csl_solar_epc`.

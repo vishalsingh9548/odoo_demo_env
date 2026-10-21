@@ -64,6 +64,15 @@ class EpcStageDashboard(models.AbstractModel):
         return card
 
     @api.model
+    def _axis_titles(self, cards, titles):
+        """Adds the axis headings to charts: `titles` maps a card key to
+        (bottom axis, left axis). Pie charts have no axes and are left alone."""
+        for card in cards:
+            if card and card['key'] in titles:
+                card['xlabel'], card['ylabel'] = titles[card['key']]
+        return cards
+
+    @api.model
     def _tbl(self, title, model, cols, rows, source='', empty='Nothing to show right now.'):
         """`cols` = [(label, 'start'|'end')], each row = {'id': record id,
         'cells': [text | {'text':..., 'pill': good|warn|bad|neutral}]}."""

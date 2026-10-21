@@ -144,7 +144,13 @@
     .o_epc_sd_span4 { grid-column: span 4; }
     .o_epc_sd_span5 { grid-column: span 5; }
     .o_epc_sd_span6 { grid-column: span 6; }
-    .o_epc_sd_chart { position: relative; height: 16em; }
+    // The chart grows to fill its card (cards in a row share the tallest one's
+    // height), so there is no empty band under the axis. The canvas is taken out
+    // of the flow so it can never push the card taller by itself.
+    .o_epc_sd_chart {
+        position: relative; flex: 1 1 16em; min-height: 16em; min-width: 0;
+        canvas { position: absolute; inset: 0; }
+    }
     .o_epc_sd_empty {
         flex: 1; min-height: 8em; display: grid; place-items: center; color: var(--epc-sd-muted);
         border: 1px dashed var(--epc-sd-border); border-radius: 0.7em; padding: 1em; text-align: center;
@@ -214,6 +220,21 @@
     }
 }
 
+// Tiles and cards fade up one after another when the page opens (about 0.4 s
+// each). `backwards` applies the starting look only during the delay, so the
+// hover lift on the tiles keeps working afterwards.
+@keyframes o_epc_sd_rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.o_epc_sd .o_epc_sd_kpi, .o_epc_sd .o_epc_sd_card {
+    animation: o_epc_sd_rise 0.4s ease-out backwards;
+    animation-delay: calc(var(--i, 0) * 60ms);
+}
+@media (prefers-reduced-motion: reduce) {
+    .o_epc_sd .o_epc_sd_kpi, .o_epc_sd .o_epc_sd_card { animation: none; }
+}
+
 // Layout follows the width of the dashboard itself. Selectors are prefixed with
 // .o_epc_sd so they beat the base rules above (same specificity, later wins).
 // ---- narrower than a tablet: two cards per row; phone: one ----
@@ -227,10 +248,10 @@
     .o_epc_sd .o_epc_sd_kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .o_epc_sd .o_epc_sd_kpi { flex-direction: column; align-items: flex-start; gap: 0.4em; }
     .o_epc_sd .o_epc_sd_kpi_value { font-size: 1.45em; }
-    .o_epc_sd .o_epc_sd_chart { height: 14em; }
+    .o_epc_sd .o_epc_sd_chart { flex-basis: 14em; min-height: 14em; }
 }
 // ---- big screens / projectors: taller charts, larger numbers ----
 @container (min-width: 100em) {
-    .o_epc_sd .o_epc_sd_chart { height: 19em; }
+    .o_epc_sd .o_epc_sd_chart { flex-basis: 19em; min-height: 19em; }
     .o_epc_sd .o_epc_sd_kpi_value { font-size: 1.9em; }
 }

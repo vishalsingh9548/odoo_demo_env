@@ -13,6 +13,9 @@
                     <field name="end_date"/>
                     <field name="service_frequency"/>
                     <field name="next_service_date"/>
+                    <field name="contract_value" sum="Total" optional="show"/>
+                    <field name="sla_response_hours" avg="Average" optional="show"/>
+                    <field name="warranty_end_date" optional="show"/>
                     <field name="state" widget="badge"
                            decoration-success="state == 'active'"
                            decoration-muted="state in ('expired', 'terminated')"/>

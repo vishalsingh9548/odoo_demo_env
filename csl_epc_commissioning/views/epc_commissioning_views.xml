@@ -10,6 +10,7 @@
                     <field name="project_id"/>
                     <field name="partner_id"/>
                     <field name="commissioning_date"/>
+                    <field name="generation_verification_kwh" sum="Total" optional="show"/>
                     <field name="customer_approved"/>
                     <field name="approval_state" widget="badge"
                            decoration-success="approval_state == 'approved'"
@@ -117,6 +118,18 @@
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">Create your first Commissioning record</p>
                 <p>The formal switch-on and sign-off point before Handover.</p>
+            </field>
+        </record>
+
+        <record id="epc_handover_view_list_commissioning" model="ir.ui.view">
+            <field name="name">epc.handover.list.commissioning</field>
+            <field name="model">epc.handover</field>
+            <field name="inherit_id" ref="csl_epc_handover.epc_handover_view_list"/>
+            <field name="arch" type="xml">
+                <field name="closure_date" position="after">
+                    <field name="commissioning_date" optional="show"/>
+                    <field name="days_from_commissioning" avg="Average" optional="show"/>
+                </field>
             </field>
         </record>
     </data>

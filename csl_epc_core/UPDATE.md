@@ -118,3 +118,18 @@ The frosted-glass look was too faint on a white page (nothing behind the cards t
 
 ### Update 10 (2026-10-19) — dark mode
 The stage dashboards now follow Odoo's own light/dark switch (user menu → *Dark mode*, stored in the `color_scheme` cookie). In dark mode the same pastel colours are used on dark frosted glass: navy page with soft blue/lavender glows, translucent dark cards, off-white text, and brighter chart colours. Light mode is unchanged. Implementation: colours became CSS variables in `static/src/scss/epc_stage_dashboard.scss` with a `.o_epc_sd_dark` override; `static/src/js/epc_stage_dashboard.js` reads the cookie, picks the dark chart palette and brightens the stage colour; the template adds the `o_epc_sd_dark` class. Upgrade: `-u csl_epc_core`, hard-refresh. To switch, use Odoo's user menu (the page reloads in the other mode).
+
+### Update 11 (2026-10-21) — Refresh button and "Updated" time removed
+The **Refresh** button and the "Updated hh:mm" label were removed from the top-right of every stage dashboard. The numbers still reload on their own every 2 minutes and every time the dashboard is opened. File: `static/src/xml/epc_stage_dashboard.xml`. Upgrade: `-u csl_epc_core`, hard-refresh.
+
+### Update 12 (2026-10-21) — axis headings
+Charts can carry axis headings: a stage module passes `xlabel` (bottom axis) and `ylabel` (left axis) for a card, either directly or through the helper `_axis_titles(cards, {key: (xlabel, ylabel)})`. For horizontal bar charts the bottom axis is the value axis. The screen draws them in the theme's text colour (`static/src/js/epc_stage_dashboard.js`). Upgrade: `-u csl_epc_core`.
+
+### Update 13 (2026-10-21) — charts fill their card
+**Problem:** when a chart card sat beside a taller card (for example "Most often missing" next to the document checklist), the card stretched but the chart kept its fixed height, leaving an empty band below the axis.
+**Fix:** the chart area now grows to fill the card (it never gets shorter than before: 16em, 14em on a phone, 19em on a projector). The canvas is positioned inside its box so it cannot make the card grow by itself. File: `static/src/scss/epc_stage_dashboard.scss`. Upgrade: `-u csl_epc_core`, hard-refresh.
+
+### Update 14 (2026-10-21) — fade-in and count-up
+- **Fade-in:** tiles, charts and the table fade up one after another (0.4 s each, 60 ms apart) when a dashboard opens. The starting look is only applied during the delay, so the hover lift on tiles still works.
+- **Count-up:** the tile numbers count up from 0 to their value (about 0.8 s, eased out) the first time the page loads. Automatic refreshes every 2 minutes update the numbers directly, without replaying either animation.
+- Both are switched off for users who have "reduce motion" turned on in their system. Files: `static/src/scss/epc_stage_dashboard.scss`, `static/src/js/epc_stage_dashboard.js`, `static/src/xml/epc_stage_dashboard.xml`. Upgrade: `-u csl_epc_core`, hard-refresh.

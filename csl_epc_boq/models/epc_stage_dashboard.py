@@ -36,7 +36,7 @@ class EpcStageDashboard(models.AbstractModel):
                       icon='fa-refresh', model='epc.boq', domain=revised_domain),
             self._kpi('Quotation created', self._pct(len(quoted), len(approved)), 'pct',
                       sub='%s of %s approved BOQs' % (len(quoted), len(approved)), icon='fa-file-text-o',
-                      model='epc.boq', domain=live_domain + [('approval_state', '=', 'approved'), ('sale_order_id', '!=', False)]),
+                      model='epc.boq', domain=live_domain + [('approval_state', '=', 'approved')]),
         ]
 
         Line = self.env['epc.boq.line']
@@ -99,6 +99,8 @@ class EpcStageDashboard(models.AbstractModel):
             [('BOQ', 'start'), ('Customer', 'start'), ('kW', 'end'), ('Cost', 'end'), ('Margin', 'end'), ('Version', 'end')],
             table_rows, source='epc.boq · margin below floor or revision_number >= %s' % MANY_REVISIONS,
             empty='No BOQ needs a pricing review.')
+
+        self._axis_titles(cards, {'margin': ('BOQ', 'Margin (%)'), 'trend': ('Month', 'Cost per kW'), 'revisions': ('Version', 'Number of BOQs')})
 
         return {'title': 'BOQ & Costing', 'accent': '#b4a7f0',
                 'intro': 'Cost and margin health of every bill of quantities, and how often prices were revised.',

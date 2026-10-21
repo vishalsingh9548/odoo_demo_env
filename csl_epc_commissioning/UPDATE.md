@@ -89,3 +89,13 @@ Upgrade the module (`-u <module>`); new fields have safe defaults, no data migra
 
 ### Update 7 (2026-10-19) — dashboard colour
 The dashboard's accent colour in `models/epc_stage_dashboard.py` is now a light pastel to match the new shared look (see `csl_epc_core/UPDATE.md`, Update 7). No functional change.
+
+### Update 10 (2026-10-21) — axis headings on the dashboard charts
+Every bar, line and scatter chart on this dashboard now shows a heading on each axis (for example "Number of handovers" / "Document"), set in `models/epc_stage_dashboard.py` through `_axis_titles`. Doughnut charts have no axes. Upgrade: `-u csl_epc_core,csl_epc_<this module>`.
+
+### Update 11 (2026-10-21) — lists behind the "Commissioning to handover" and "Verified generation" tiles
+**Problem:** the *Commissioning to handover* tile (average days) opened a Handover list that showed neither the commissioning date nor the number of days, only the approval turnaround, so the figure could not be checked. The *Verified generation* tile opened a Commissioning list with no generation column.
+**Fix:**
+- The Handover list now also shows **Commissioned On** and **Days After Commissioning** (closure date minus the project's commissioning date, the same rule as the tile), with an **Average** at the foot equal to the tile. New non-stored fields on `epc.handover` in `models/epc_handover.py`; list added in `views/epc_commissioning_views.xml`.
+- The Commissioning list now has a **Verified Generation (kWh)** column with a **Total** at the foot equal to the tile.
+Upgrade: `-u csl_epc_commissioning`.

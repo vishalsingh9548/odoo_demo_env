@@ -11,6 +11,9 @@
                     <field name="partner_id"/>
                     <field name="survey_date"/>
                     <field name="engineer_id"/>
+                    <field name="roof_or_land_type" optional="show"/>
+                    <field name="grid_access_available" optional="show"/>
+                    <field name="has_existing_transformer" optional="show"/>
                     <field name="available_area_sqft" avg="Average" string="Usable Area (sq ft)"/>
                     <field name="sanctioned_load_kw" sum="Total" string="Sanctioned Load (kW)"/>
                     <field name="is_feasible"/>

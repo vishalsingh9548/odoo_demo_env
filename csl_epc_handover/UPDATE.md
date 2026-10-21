@@ -73,3 +73,13 @@ Upgrade the module (`-u <module>`); new fields have safe defaults, no data migra
 
 ### Update 7 (2026-10-19) — dashboard colour
 The dashboard's accent colour in `models/epc_stage_dashboard.py` is now a light pastel to match the new shared look (see `csl_epc_core/UPDATE.md`, Update 7). No functional change.
+
+### Update 6 (2026-10-21) — "Customer training done" opens every handover
+**Problem:** the tile shows a percentage of all handovers (for example 10 of 12 = 83.3%), but clicking it opened only the handovers with training done, so the list looked 100% complete and hid the pending ones.
+**Fix:** the tile now opens the full list of handovers, so the ticked and the not-ticked *Customer Training Done* rows are both visible and add up to the percentage. The "Customer training" doughnut chart still opens just the Done or just the Pending group. File: `models/epc_stage_dashboard.py`. Restart the server (Python change only).
+
+### Update 7 (2026-10-21) — Approval time can be checked in the list
+The Handover list now has **Submitted**, **Approved** and **Days to Approve** columns (they can be hidden from the column picker). The footer under *Days to Approve* shows the **Average**, which is the "Approval time" tile. The tile now opens only the approved handovers that have both dates, so the rows and the average match the tile exactly (an approved handover missing either date is left out of both). Files: `models/epc_handover.py` (new computed, not stored, field `approval_days`), `views/epc_handover_views.xml`, `models/epc_stage_dashboard.py`. Upgrade: `-u csl_epc_handover`.
+
+### Update 10 (2026-10-21) — axis headings on the dashboard charts
+Every bar, line and scatter chart on this dashboard now shows a heading on each axis (for example "Number of handovers" / "Document"), set in `models/epc_stage_dashboard.py` through `_axis_titles`. Doughnut charts have no axes. Upgrade: `-u csl_epc_core,csl_epc_<this module>`.

@@ -69,6 +69,22 @@ class EpcQualityCheck(models.Model):
         'epc.quality.check', string='Re-inspection Of', copy=False, readonly=True,
         help="The failed check this one was created from when it was re-inspected.",
     )
+
+    previous_check_date = fields.Date(
+        string='Failed On', related='previous_check_id.check_date',
+        help="Date of the failed check this one re-inspects.",
+    )
+    days_after_fail = fields.Float(
+        string='Days After Fail', compute='_compute_days_after_fail', digits=(16, 1),
+        help="Days between the failed check and this re-inspection. Shown in the list so the "
+             "dashboard's 'Days from fail to pass' can be checked.",
+    )
+
+    @api.depends('check_date', 'previous_check_id.check_date')
+    def _compute_days_after_fail(self):
+        for check in self:
+            previous = check.previous_check_id.check_date
+            check.days_after_fail = (check.check_date - previous).days if check.check_date and previous else 0.0
     fail_notified = fields.Boolean(
         copy=False,
         help="Technical flag: a 'quality check failed' to-do has already been sent for this check.",

@@ -47,6 +47,17 @@ class EpcBoq(models.Model):
         string='Total Cost', compute='_compute_totals', store=True, currency_field='currency_id',
         help="The sum of every line's cost — what this project costs the company to deliver.",
     )
+    cost_per_kw = fields.Monetary(
+        string='Cost per kW', compute='_compute_cost_per_kw', currency_field='currency_id',
+        help="Total cost divided by system capacity. Shown in the list so the dashboard's "
+             "Avg cost per kW can be compared BOQ by BOQ.",
+    )
+
+    @api.depends('total_cost', 'capacity_kw')
+    def _compute_cost_per_kw(self):
+        for boq in self:
+            boq.cost_per_kw = boq.total_cost / boq.capacity_kw if boq.capacity_kw else 0.0
+
     margin_percent = fields.Float(
         string='Margin (%)', default=15.0,
         help="The profit margin to add on top of the total cost to arrive at the "
@@ -70,6 +81,25 @@ class EpcBoq(models.Model):
         'epc.boq', string='Revision Of', copy=False, readonly=True,
         help="The earlier version of the BOQ this one was revised from.",
     )
+    older_version_count = fields.Integer(
+        string='Older Versions', compute='_compute_older_versions',
+        help="How many earlier versions this BOQ was revised from (the whole chain back to version 1).",
+    )
+
+    def _older_versions(self):
+        """The chain of earlier versions of this BOQ, newest first."""
+        self.ensure_one()
+        chain, current = self.browse(), self.revision_of_id
+        while current and current not in chain:
+            chain |= current
+            current = current.revision_of_id
+        return chain
+
+    @api.depends('revision_of_id')
+    def _compute_older_versions(self):
+        for boq in self:
+            boq.older_version_count = len(boq._older_versions())
+
     superseded = fields.Boolean(
         string='Superseded', copy=False, readonly=True,
         help="Ticked automatically on the old version once a newer revision exists; "
@@ -201,6 +231,22 @@ class EpcBoq(models.Model):
             'res_id': new.id,
             'target': 'current',
         }
+
+    # Opens the earlier versions of this BOQ, called from the "Older Versions" smart button
+    def action_view_older_versions(self):
+        self.ensure_one()
+        older = self._older_versions()
+        action = {
+            'type': 'ir.actions.act_window',
+            'name': 'Older Versions of %s' % self.name,
+            'res_model': 'epc.boq',
+            'target': 'current',
+        }
+        if len(older) == 1:
+            action.update({'view_mode': 'form', 'res_id': older.id})
+        else:
+            action.update({'view_mode': 'list,form', 'domain': [('id', 'in', older.ids)]})
+        return action
 
     # Opens the Quotation generated from this BOQ, called from the "View Quotation" button
     def action_view_quotation(self):

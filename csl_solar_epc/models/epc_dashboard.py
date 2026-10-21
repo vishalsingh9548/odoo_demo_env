@@ -98,7 +98,11 @@ class EpcDashboard(models.AbstractModel):
 
         return {
             'active_projects': {'count': len(active_projects), 'domain': active_projects_domain},
-            'contract_value': {'value': sum(all_projects.mapped('boq_total_sell_price'))},
+            'contract_value': {
+                'value': sum(all_projects.mapped('boq_total_sell_price')),
+                'count': len(all_projects),
+                'domain': all_projects_domain,
+            },
             'completed_projects': {'count': len(handed_over_project_ids), 'domain': completed_projects_domain},
             'pending_material_requests': {
                 'count': self.env['epc.material.request'].search_count(material_request_domain),

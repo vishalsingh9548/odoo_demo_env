@@ -86,3 +86,14 @@ The Site Surveys list now has **Usable Area (sq ft)** and **Sanctioned Load (kW)
 ### Update 9 (2026-10-19) — "Avg usable area" now matches the list footer
 **Problem:** the tile showed 11,306 but the list it opens showed an average of 10,576. Two surveys had no area filled in: the tile left them out, while the list counted them as 0.
 **Fix:** the tile averages only surveys that have an area, and opens a list of exactly those surveys, so tile and list footer show the same figure. The tile's sub-line says how many surveys it covers. "Sanctioned load surveyed" is still the total over all surveys. File: `models/epc_stage_dashboard.py`. Restart the server (Python change only).
+
+### Update 10 (2026-10-21) — axis headings on the dashboard charts
+Every bar, line and scatter chart on this dashboard now shows a heading on each axis (for example "Number of handovers" / "Document"), set in `models/epc_stage_dashboard.py` through `_axis_titles`. Doughnut charts have no axes. Upgrade: `-u csl_epc_core,csl_epc_<this module>`.
+
+### Update 11 (2026-10-21) — "Feasible rate" tile now opens all decided surveys
+**Problem:** the tile showed 75.0% (18 of 24 decided surveys) but opened only the 18 feasible surveys, so the list was all "Yes" and the other 6 behind the 25% could not be seen.
+**Fix:** the tile now opens every decided survey (Feasible = Yes or No, 24 records), the same set the percentage is calculated over. The *Feasible?* column shows the 18 / 6 split; group by it to count them. File: `models/epc_stage_dashboard.py`. Restart the server (Python change) — no module upgrade needed.
+
+### Update 12 (2026-10-21) — Survey list shows the columns the charts count
+**Problem:** clicking a bar of *Site type mix* (or *Grid readiness*) opened the right surveys, but the list had no *Site type*, *Grid access* or *Transformer* column, so the reason a survey was in the list could not be seen.
+**Fix:** the Site Surveys list now has **Site Type**, **Grid Access** and **Existing Transformer** columns (shown by default, can be hidden from the column picker). Files: `views/epc_site_survey_views.xml`. Upgrade: `-u csl_epc_site_survey`.

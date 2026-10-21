@@ -112,3 +112,17 @@ The dashboard's accent colour in `models/epc_stage_dashboard.py` is now a light 
 
 ### Update 8 (2026-10-19) — workers on site chart totals per day
 The *Workers on site* chart on the Quality dashboard plotted one dot per daily report, so two reports on the same day (different projects) showed as two separate, lower dots with the same date. It now adds up the workers of all reports on a day, over the last 14 days that have reports, and clicking a point opens that day's reports. File: `models/epc_stage_dashboard.py`. Restart the server (Python change) — no module upgrade needed.
+
+### Update 10 (2026-10-21) — axis headings on the dashboard charts
+Every bar, line and scatter chart on this dashboard now shows a heading on each axis (for example "Number of handovers" / "Document"), set in `models/epc_stage_dashboard.py` through `_axis_titles`. Doughnut charts have no axes. Upgrade: `-u csl_epc_core,csl_epc_<this module>`.
+
+### Update 11 (2026-10-21) — "First-pass yield" tile now opens all first inspections
+**Problem:** the tile showed 69.2% (45 of 65 first inspections passed) but clicking it opened only the 45 passed checks, so the list looked like 100% pass and did not explain the figure.
+**Fix:** the tile now opens every first inspection (passed and failed, 65 records), the same set the percentage is calculated over. Group by *Overall Result* to see the 45 / 20 split. File: `models/epc_stage_dashboard.py`. Restart the server (Python change) — no module upgrade needed.
+
+### Update 12 (2026-10-21) — "Days from fail to pass" can now be checked in the list
+**Problem:** the tile showed 2.2 d, but the list it opened gave no way to see where that came from.
+**Fix:** the Quality Checks list now has three columns — *Re-inspection of* (the failed check), *Failed On* (its date) and *Days After Fail* — with an **Average** at the foot that equals the tile (the dashboard uses the same rule: re-inspection date minus failed-check date, for passed re-inspections). New non-stored fields `previous_check_date` and `days_after_fail` in `models/epc_quality_check.py`; list in `views/epc_quality_check_views.xml`. Upgrade: `-u csl_epc_quality`.
+
+### Update 13 (2026-10-21) — weekly chart shows the whole week
+The *Passed and failed, weekly* chart labelled each bar with the Monday the week starts on (e.g. "31 Aug"), so checks dated 5–6 Sep looked out of place under it. Bars are now labelled with the full range ("31 Aug – 6 Sep"), the axis heading reads "Week (Monday to Sunday)", and the list that opens shows the same range in its title. Counts are unchanged. File: `models/epc_stage_dashboard.py`. Restart the server (Python change) — no module upgrade needed.

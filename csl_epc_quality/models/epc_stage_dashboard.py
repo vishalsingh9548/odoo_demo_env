@@ -37,7 +37,7 @@ class EpcStageDashboard(models.AbstractModel):
             self._kpi('First-pass yield', self._pct(first_passed, first_total), 'pct',
                       sub='%s of %s first inspections passed' % (first_passed, first_total),
                       tone='good' if first_total and first_passed == first_total else '', icon='fa-check-circle-o',
-                      model='epc.quality.check', domain=first_passed_domain),
+                      model='epc.quality.check', domain=first_try),
             self._kpi('Failed this month', failed_month, tone='bad' if failed_month else 'good', icon='fa-times-circle-o',
                       sub='checks marked Fail since %s' % month_start.strftime('%d %b'),
                       model='epc.quality.check', domain=failed_month_domain),
@@ -57,7 +57,8 @@ class EpcStageDashboard(models.AbstractModel):
         for back in range(7, -1, -1):
             start = week_start - timedelta(weeks=back)
             rng = self._range('check_date', start, start + timedelta(weeks=1))
-            labels.append(start.strftime('%d %b'))
+            end = start + timedelta(days=6)
+            labels.append('%s – %s' % (start.strftime('%d %b'), end.strftime('%d %b')))
             pdom, fdom = rng + [('overall_result', '=', 'pass')], rng + [('overall_result', '=', 'fail')]
             pass_dom.append(pdom)
             fail_dom.append(fdom)
@@ -119,6 +120,8 @@ class EpcStageDashboard(models.AbstractModel):
             [('Check', 'start'), ('Project', 'start'), ('Stage', 'start'), ('Inspector', 'start'),
              ('Reason', 'start'), ('Status', 'start')],
             rows, source='epc.quality.check · overall_result = fail, fail_reason', empty='No quality check has failed.')
+
+        self._axis_titles(cards, {'weekly': ('Week (Monday to Sunday)', 'Checks'), 'stage': ('Stage', 'Pass rate (%)'), 'checkpoints': ('Number of failures', 'Checkpoint'), 'manpower': ('Date', 'Workers on site')})
 
         return {'title': 'Quality', 'accent': '#a3b5f7',
                 'intro': 'First-pass quality, where failures come from, and what daily site reports say.',

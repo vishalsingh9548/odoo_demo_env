@@ -11,6 +11,9 @@
                     <field name="partner_id"/>
                     <field name="closure_date"/>
                     <field name="customer_training_done"/>
+                    <field name="submitted_date" optional="show"/>
+                    <field name="approved_date" optional="show"/>
+                    <field name="approval_days" avg="Average" optional="show"/>
                     <field name="approval_state" widget="badge"
                            decoration-success="approval_state == 'approved'"
                            decoration-danger="approval_state == 'rejected'"

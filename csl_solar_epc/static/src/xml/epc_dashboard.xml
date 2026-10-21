@@ -19,7 +19,8 @@
                             <div class="o_epc_tile_value" t-esc="state.data.kpis.active_projects.count"/>
                         </div>
                     </div>
-                    <div class="o_epc_tile o_epc_tile_pass">
+                    <div class="o_epc_tile o_epc_tile_pass o_epc_clickable" tabindex="0"
+                         t-on-click="() => this.openList(state.data.kpis.contract_value.domain, 'Contract Value', 'project.project')">
                         <div class="o_epc_tile_icon"><i class="fa fa-money"/></div>
                         <div class="o_epc_tile_body">
                             <div class="o_epc_tile_label">Contract Value</div>
