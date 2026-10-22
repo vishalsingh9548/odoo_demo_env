@@ -18,6 +18,10 @@
             <xpath expr="//button[@id='action_confirm']" position="attributes">
                 <attribute name="invisible">advmfg_so_active and state not in ('draft', 'sent', 'confirm_order') or not advmfg_so_active and state not in ['sent']</attribute>
             </xpath>
+            <!-- Odoo has two Confirm buttons (quotation-sent and draft); in this mode one is enough. -->
+            <xpath expr="//button[@name='action_confirm'][not(@id)]" position="attributes">
+                <attribute name="invisible">state != 'draft' or advmfg_so_active</attribute>
+            </xpath>
             <xpath expr="//field[@name='payment_term_id']" position="after">
                 <field name="reference_so_id" options="{'no_create': True}" placeholder="Select a splited sale order…"
                        invisible="not advmfg_so_active" readonly="state in ('sale', 'rejected')" force_save="1"/>

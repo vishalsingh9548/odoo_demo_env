@@ -54,6 +54,8 @@ class AdvmfgUnit(models.Model):
     pallet_id = fields.Many2one('advmfg.pallet', string='Pallet', copy=False, ondelete='set null')
     # True once the pallet the unit sits on has been confirmed.
     is_packed = fields.Boolean(compute='_compute_is_packed', store=True)
+    # Wattage text for the sticker: the product's wattage, or the number in its name ("540W" -> "540 W").
+    label_wattage = fields.Char(compute='_compute_label_wattage')
     # Where the unit physically is: on the floor, or in the packed area.
     current_location = fields.Char(compute='_compute_current_location', string='Current Location')
 
@@ -63,6 +65,21 @@ class AdvmfgUnit(models.Model):
         """A unit counts as 'packed' once its pallet is confirmed."""
         for unit in self:
             unit.is_packed = unit.pallet_id.state == 'confirmed'
+
+    @api.depends('product_id')
+    def _compute_label_wattage(self):
+        """Text for the wattage tag on the serial sticker (blank when nothing sensible is known)."""
+        for unit in self:
+            product = unit.product_id
+            text = ''
+            if product.wattage and product.wattage > 1:
+                text = '%d W' % product.wattage
+            else:
+                for token in (product.product_tmpl_id.name or '').split():
+                    if token.upper().endswith('W') and token[:-1].isdigit():
+                        text = '%s W' % token[:-1]
+                        break
+            unit.label_wattage = text
 
     @api.depends('is_packed', 'floor_id', 'production_id.state', 'company_id.advmfg_packed_location_id')
     def _compute_current_location(self):
@@ -215,6 +232,13 @@ class AdvmfgUnit(models.Model):
                 raise UserError(_('There is no quality check to pass for unit %s.', unit.name))
             unit.qc_id.action_pass()
         return True
+
+    def action_fail_qc(self):
+        """Fail button on the row: opens the 'why did it fail' window for the unit's current quality check."""
+        self.ensure_one()
+        if not self.qc_id:
+            raise UserError(_('There is no quality check to fail for unit %s.', self.name))
+        return self.qc_id.action_fail()
 
     def action_start(self):
         """Start button: Yet To Start -> In Progress."""

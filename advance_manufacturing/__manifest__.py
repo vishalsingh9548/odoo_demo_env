@@ -50,6 +50,10 @@ Everyone else keeps using standard Odoo manufacturing.
         'web.assets_backend': [
             'advance_manufacturing/static/src/js/serial_lookup_input.js',
             'advance_manufacturing/static/src/xml/serial_lookup_input.xml',
+            'advance_manufacturing/static/src/scss/serial_boxes.scss',
+        ],
+        'web.assets_web_dark': [
+            'advance_manufacturing/static/src/scss/serial_boxes.dark.scss',
         ],
     },
     'installable': True,

@@ -22,6 +22,7 @@ class MrpProduction(models.Model):
     # When a unit is scrapped (grade C), a 1-unit "replacement" order is created and linked here.
     advmfg_parent_mo_id = fields.Many2one('mrp.production', string='Parent Order', copy=False)
     advmfg_child_mo_count = fields.Integer(compute='_compute_advmfg_child_mo_count')
+    advmfg_pallet_count = fields.Integer(compute='_compute_advmfg_pallet_count')
     # The sale order and customer this order is being built for.
     sale_order_id = fields.Many2one('sale.order', related='procurement_group_id.sale_id', string='Sale Order',
                                     store=True, readonly=True)
@@ -47,6 +48,19 @@ class MrpProduction(models.Model):
         switch = self.env['advmfg.switch']
         for mo in self:
             mo.advmfg_active = switch.is_active(mo.company_id or self.env.company)
+
+    @api.depends('advmfg_pallet_ids')
+    def _compute_advmfg_pallet_count(self):
+        """How many pallets this order has (shown on the Print Pallet button)."""
+        for mo in self:
+            mo.advmfg_pallet_count = len(mo.advmfg_pallet_ids)
+
+    def action_advmfg_print_all_pallets(self):
+        """Print Pallet button: one PDF with every pallet of this order (one pallet per page)."""
+        self.ensure_one()
+        if not self.advmfg_pallet_ids:
+            raise UserError(_('No pallets have been made for this Manufacturing Order yet.'))
+        return self.env.ref('advance_manufacturing.action_report_advmfg_mo_pallets').report_action(self)
 
     def _compute_advmfg_child_mo_count(self):
         """How many replacement orders were created from this one."""

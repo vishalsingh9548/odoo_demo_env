@@ -1,56 +1,239 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Pallet sheet: pallet name, QR code and serial list. -->
+    <!-- Paper sizes: A4 with slim margins (the reports draw their own header), and a 100 x 60 mm sticker. -->
+    <record id="paperformat_advmfg_a4" model="report.paperformat">
+        <field name="name">Advance Manufacturing A4</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+    <record id="paperformat_advmfg_label" model="report.paperformat">
+        <field name="name">Advance Manufacturing Label 100x60</field>
+        <field name="default" eval="False"/>
+        <field name="format">custom</field>
+        <field name="page_width">100</field>
+        <field name="page_height">60</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">0</field>
+        <field name="margin_bottom">0</field>
+        <field name="margin_left">0</field>
+        <field name="margin_right">0</field>
+        <field name="header_spacing">0</field>
+        <field name="disable_shrinking" eval="True"/>
+        <field name="dpi">96</field>
+    </record>
+
+    <!-- ============ one pallet, drawn on one page (used by the Pallet Sheet and the MO Pallet Report) ============ -->
+    <template id="advmfg_pallet_page">
+        <t t-set="mo" t-value="pallet.production_id"/>
+        <t t-set="company" t-value="mo.company_id"/>
+        <div class="page" style="font-family:Arial,Helvetica,sans-serif;color:#1F2A37;">
+            <!-- top bar -->
+            <table style="width:100%;border-collapse:collapse;border-bottom:3px solid #6D4AA8;">
+                <tr>
+                    <td style="width:60px;padding:0 0 12px 0;vertical-align:middle;">
+                        <div style="width:46px;height:46px;border-radius:10px;background:#6D4AA8;color:#FFFFFF;font-size:18px;font-weight:bold;text-align:center;line-height:46px;">
+                            <t t-esc="(company.name or 'M')[:2].upper()"/>
+                        </div>
+                    </td>
+                    <td style="padding:0 0 12px 0;vertical-align:middle;">
+                        <div style="font-size:15px;font-weight:bold;"><t t-esc="company.name"/></div>
+                        <div style="font-size:11px;color:#5B6776;">Pallet Sheet</div>
+                    </td>
+                    <td style="padding:0 0 12px 0;text-align:right;vertical-align:middle;font-size:11px;color:#5B6776;">
+                        Printed <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d %b %Y')"/>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- title, facts and QR -->
+            <table style="width:100%;border-collapse:collapse;margin-top:22px;">
+                <tr>
+                    <td style="vertical-align:top;padding-right:22px;">
+                        <div style="font-size:10px;font-weight:bold;color:#5B6776;letter-spacing:1px;text-transform:uppercase;">Pallet number</div>
+                        <div style="font-size:38px;font-weight:bold;line-height:1.15;margin-top:2px;"><t t-esc="pallet.name"/></div>
+                        <div style="margin-top:8px;">
+                            <span t-if="pallet.state == 'confirmed'" style="background:#E8F6EF;color:#116A47;border-radius:12px;padding:4px 12px;font-size:11px;font-weight:bold;">Confirmed - locked</span>
+                            <span t-else="" style="background:#FFF3DF;color:#8A5300;border-radius:12px;padding:4px 12px;font-size:11px;font-weight:bold;">Draft - still open</span>
+                        </div>
+                        <table style="width:100%;border-collapse:separate;border-spacing:8px;margin:14px 0 0 -8px;">
+                            <tr>
+                                <td style="width:50%;background:#F4EFFB;border-radius:8px;padding:8px 12px;">
+                                    <div style="font-size:9px;font-weight:bold;color:#5B6776;text-transform:uppercase;">Manufacturing order</div>
+                                    <div style="font-size:13px;font-weight:bold;margin-top:2px;"><t t-esc="mo.name"/></div>
+                                </td>
+                                <td style="width:50%;background:#F4EFFB;border-radius:8px;padding:8px 12px;">
+                                    <div style="font-size:9px;font-weight:bold;color:#5B6776;text-transform:uppercase;">Sale order</div>
+                                    <div style="font-size:13px;font-weight:bold;margin-top:2px;"><t t-esc="mo.origin or '-'"/></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="background:#F4EFFB;border-radius:8px;padding:8px 12px;">
+                                    <div style="font-size:9px;font-weight:bold;color:#5B6776;text-transform:uppercase;">Customer</div>
+                                    <div style="font-size:13px;font-weight:bold;margin-top:2px;"><t t-esc="mo.partner_id.name or '-'"/></div>
+                                </td>
+                                <td style="background:#F4EFFB;border-radius:8px;padding:8px 12px;">
+                                    <div style="font-size:9px;font-weight:bold;color:#5B6776;text-transform:uppercase;">Product</div>
+                                    <div style="font-size:13px;font-weight:bold;margin-top:2px;"><t t-esc="mo.product_id.display_name"/></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="background:#F4EFFB;border-radius:8px;padding:8px 12px;">
+                                    <div style="font-size:9px;font-weight:bold;color:#5B6776;text-transform:uppercase;">Units on pallet</div>
+                                    <div style="font-size:13px;font-weight:bold;margin-top:2px;"><t t-esc="pallet.unit_count"/></div>
+                                </td>
+                                <td style="background:#F4EFFB;border-radius:8px;padding:8px 12px;">
+                                    <div style="font-size:9px;font-weight:bold;color:#5B6776;text-transform:uppercase;">Last updated</div>
+                                    <div style="font-size:13px;font-weight:bold;margin-top:2px;"><span t-esc="context_timestamp(pallet.write_date).strftime('%d %b %Y, %H:%M')"/></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="width:210px;vertical-align:top;">
+                        <div style="border:2px solid #E3DAF2;border-radius:14px;padding:14px;text-align:center;">
+                            <img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=360&amp;height=360' % pallet.qr_text"
+                                 style="width:170px;height:170px;"/>
+                            <div style="font-size:10px;color:#5B6776;margin-top:6px;">Scan to see this pallet's<br/>serial numbers</div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- serial table -->
+            <table style="width:100%;border-collapse:collapse;margin-top:22px;">
+                <tr>
+                    <td style="font-size:14px;font-weight:bold;padding-bottom:8px;">Serial numbers on this pallet</td>
+                    <td style="text-align:right;font-size:11px;color:#5B6776;padding-bottom:8px;"><t t-esc="pallet.unit_count"/> units</td>
+                </tr>
+            </table>
+            <table style="width:100%;border-collapse:collapse;border:1px solid #E3DAF2;">
+                <thead>
+                    <tr style="background:#6D4AA8;color:#FFFFFF;">
+                        <th style="width:12%;padding:9px 12px;font-size:10px;text-align:left;text-transform:uppercase;">No.</th>
+                        <th style="padding:9px 12px;font-size:10px;text-align:left;text-transform:uppercase;">Serial number</th>
+                        <th style="width:24%;padding:9px 12px;font-size:10px;text-align:left;text-transform:uppercase;">Status</th>
+                        <th style="width:14%;padding:9px 12px;font-size:10px;text-align:left;text-transform:uppercase;">Grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="pallet.unit_ids" t-as="unit">
+                        <tr style="page-break-inside:avoid;">
+                            <td style="padding:8px 12px;font-size:12px;color:#5B6776;border-top:1px solid #EFE9F8;"><t t-esc="unit_index + 1"/></td>
+                            <td style="padding:8px 12px;font-size:13px;font-weight:bold;border-top:1px solid #EFE9F8;"><t t-esc="unit.name"/></td>
+                            <td style="padding:8px 12px;font-size:11px;border-top:1px solid #EFE9F8;"><t t-esc="dict(unit._fields['state'].selection).get(unit.state)"/></td>
+                            <td style="padding:8px 12px;font-size:12px;font-weight:bold;border-top:1px solid #EFE9F8;"><t t-esc="unit.grade or ''"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+
+            <!-- signatures -->
+            <table style="width:100%;border-collapse:collapse;margin-top:34px;">
+                <tr>
+                    <td style="width:46%;border-bottom:1px solid #9AA8B7;height:38px;"></td>
+                    <td style="width:8%;"></td>
+                    <td style="width:46%;border-bottom:1px solid #9AA8B7;height:38px;"></td>
+                </tr>
+                <tr>
+                    <td style="font-size:10px;color:#5B6776;padding-top:5px;">Packed by</td>
+                    <td></td>
+                    <td style="font-size:10px;color:#5B6776;padding-top:5px;">Checked by (Quality)</td>
+                </tr>
+            </table>
+            <div style="text-align:center;font-size:9px;color:#9AA8B7;margin-top:22px;">System generated document - <t t-esc="company.name"/></div>
+        </div>
+    </template>
+
+    <!-- Pallet Sheet: one page per selected pallet -->
     <record id="action_report_advmfg_pallet" model="ir.actions.report">
         <field name="name">Pallet Sheet</field>
         <field name="model">advmfg.pallet</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">advance_manufacturing.report_advmfg_pallet</field>
         <field name="report_file">advance_manufacturing.report_advmfg_pallet</field>
+        <field name="paperformat_id" ref="paperformat_advmfg_a4"/>
+        <field name="print_report_name">'Pallet Sheet - %s' % object.name</field>
         <field name="binding_model_id" ref="model_advmfg_pallet"/>
         <field name="binding_type">report</field>
     </record>
     <template id="report_advmfg_pallet">
-        <t t-call="web.html_container">
+        <t t-call="web.basic_layout">
             <t t-foreach="docs" t-as="pallet">
-                <t t-call="web.external_layout">
-                    <div class="page">
-                        <h2 t-field="pallet.name"/>
-                        <p>Order: <span t-field="pallet.production_id.name"/> | Units: <span t-field="pallet.unit_count"/></p>
-                        <img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=200&amp;height=200' % pallet.qr_text"
-                             style="width:200px;height:200px;"/>
-                        <table class="table table-sm mt-3">
-                            <thead><tr><th>#</th><th>Serial Number</th></tr></thead>
-                            <tbody>
-                                <t t-foreach="pallet.unit_ids" t-as="unit">
-                                    <tr><td><t t-esc="unit_index + 1"/></td><td><span t-field="unit.name"/></td></tr>
-                                </t>
-                            </tbody>
-                        </table>
-                    </div>
-                </t>
+                <div t-att-style="'page-break-before: always;' if not pallet_first else ''"/>
+                <t t-call="advance_manufacturing.advmfg_pallet_page"/>
             </t>
         </t>
     </template>
 
-    <!-- Serial labels: one barcode label per unit. -->
+    <!-- ============ Serial label: 100 x 60 mm sticker ============ -->
     <record id="action_report_advmfg_unit_label" model="ir.actions.report">
         <field name="name">Serial Labels</field>
         <field name="model">advmfg.unit</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">advance_manufacturing.report_advmfg_unit_label</field>
         <field name="report_file">advance_manufacturing.report_advmfg_unit_label</field>
+        <field name="paperformat_id" ref="paperformat_advmfg_label"/>
+        <field name="print_report_name">'Serial Label - %s' % (object.name if len(object) == 1 else 'multiple')</field>
         <field name="binding_model_id" ref="model_advmfg_unit"/>
         <field name="binding_type">report</field>
     </record>
     <template id="report_advmfg_unit_label">
         <t t-call="web.basic_layout">
             <t t-foreach="docs" t-as="unit">
-                <div class="page" style="page-break-after:always; text-align:center;">
-                    <img t-att-src="'/report/barcode/?barcode_type=Code128&amp;value=%s&amp;width=400&amp;height=100' % unit.name"
-                         style="width:300px;height:80px;"/>
-                    <div><strong t-field="unit.name"/></div>
-                    <div t-field="unit.product_id.display_name"/>
+                <t t-set="company" t-value="unit.company_id"/>
+                <t t-set="product" t-value="unit.product_id"/>
+                <!-- zoom 1.3333 cancels the PDF engine's 75% shrink on small custom pages, so the sticker prints at true 100 x 60 mm -->
+                <div class="page" style="zoom:1.3333;page-break-after:always;width:100mm;height:59mm;overflow:hidden;font-family:Arial,Helvetica,sans-serif;color:#1F2A37;">
+                    <table style="width:100%;height:58mm;border-collapse:collapse;">
+                        <tr>
+                            <td style="height:10mm;padding:2.5mm 4mm 0 4mm;vertical-align:middle;">
+                                <table style="width:100%;border-collapse:collapse;">
+                                    <tr>
+                                        <td style="width:7mm;vertical-align:middle;">
+                                            <div style="width:7mm;height:7mm;border-radius:2mm;background:#6D4AA8;color:#FFFFFF;font-size:8pt;font-weight:bold;text-align:center;line-height:7mm;"><t t-esc="(company.name or 'M')[:2].upper()"/></div>
+                                        </td>
+                                        <td style="padding-left:2mm;font-size:9pt;font-weight:bold;vertical-align:middle;"><t t-esc="company.name"/></td>
+                                        <td style="text-align:right;vertical-align:middle;">
+                                            <span t-if="unit.label_wattage" style="background:#EFE8FA;color:#6D4AA8;border-radius:3mm;padding:1mm 3mm;font-size:8pt;font-weight:bold;"><t t-esc="unit.label_wattage"/></span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;vertical-align:middle;padding:0 4mm;">
+                                <img t-att-src="'/report/barcode/?barcode_type=Code128&amp;value=%s&amp;width=600&amp;height=120' % unit.name"
+                                     style="width:78mm;height:17mm;"/>
+                                <div style="font-size:17pt;font-weight:bold;letter-spacing:1mm;margin-top:1mm;"><t t-esc="unit.name"/></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height:12mm;padding:0 4mm 2mm 4mm;vertical-align:bottom;">
+                                <table style="width:100%;border-collapse:collapse;border-top:0.3mm solid #E6DEF3;">
+                                    <tr>
+                                        <td style="width:36%;padding-top:1.2mm;vertical-align:top;">
+                                            <div style="font-size:5.5pt;font-weight:bold;color:#5B6776;text-transform:uppercase;">Model</div>
+                                            <div style="font-size:7.5pt;font-weight:bold;"><t t-esc="product.product_tmpl_id.name"/></div>
+                                        </td>
+                                        <td style="width:34%;padding-top:1.2mm;vertical-align:top;">
+                                            <div style="font-size:5.5pt;font-weight:bold;color:#5B6776;text-transform:uppercase;">Cell type</div>
+                                            <div style="font-size:7.5pt;font-weight:bold;"><t t-esc="', '.join(product.product_template_attribute_value_ids.mapped('name')) or '-'"/></div>
+                                        </td>
+                                        <td style="width:30%;padding-top:1.2mm;vertical-align:top;">
+                                            <div style="font-size:5.5pt;font-weight:bold;color:#5B6776;text-transform:uppercase;">Made on</div>
+                                            <div style="font-size:7.5pt;font-weight:bold;"><span t-esc="context_timestamp(unit.create_date).strftime('%d %b %Y')"/></div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </t>
         </t>
@@ -76,6 +259,91 @@
                             <p><span t-field="pack.serial_text"/></p>
                         </t>
                     </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ============ All pallets of one manufacturing order: cover page, then one page per pallet ============ -->
+    <record id="action_report_advmfg_mo_pallets" model="ir.actions.report">
+        <field name="name">Manufacturing Order Pallet Report</field>
+        <field name="model">mrp.production</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">advance_manufacturing.report_advmfg_mo_pallets</field>
+        <field name="report_file">advance_manufacturing.report_advmfg_mo_pallets</field>
+        <field name="paperformat_id" ref="paperformat_advmfg_a4"/>
+        <field name="print_report_name">'Pallet Report - %s' % object.name</field>
+    </record>
+    <template id="report_advmfg_mo_pallets">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="mo">
+                <t t-set="company" t-value="mo.company_id"/>
+                <t t-set="pallets" t-value="mo.advmfg_pallet_ids"/>
+                <t t-set="live_units" t-value="mo.advmfg_unit_ids.filtered(lambda u: u.state != 'cancel')"/>
+                <t t-set="packed_units" t-value="pallets.unit_ids"/>
+                <!-- cover page -->
+                <div class="page" style="font-family:Arial,Helvetica,sans-serif;color:#1F2A37;">
+                    <table style="width:100%;border-collapse:collapse;border-bottom:3px solid #6D4AA8;">
+                        <tr>
+                            <td style="width:60px;padding:0 0 12px 0;vertical-align:middle;">
+                                <div style="width:46px;height:46px;border-radius:10px;background:#6D4AA8;color:#FFFFFF;font-size:18px;font-weight:bold;text-align:center;line-height:46px;"><t t-esc="(company.name or 'M')[:2].upper()"/></div>
+                            </td>
+                            <td style="padding:0 0 12px 0;vertical-align:middle;">
+                                <div style="font-size:15px;font-weight:bold;"><t t-esc="company.name"/></div>
+                                <div style="font-size:11px;color:#5B6776;">Manufacturing Order Pallet Report</div>
+                            </td>
+                            <td style="padding:0 0 12px 0;text-align:right;vertical-align:middle;font-size:11px;color:#5B6776;">
+                                Printed <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d %b %Y')"/><br/>Cover page, then one page per pallet
+                            </td>
+                        </tr>
+                    </table>
+                    <div style="font-size:10px;font-weight:bold;color:#5B6776;letter-spacing:1px;text-transform:uppercase;margin-top:22px;">Manufacturing order</div>
+                    <div style="font-size:34px;font-weight:bold;margin-top:2px;"><t t-esc="mo.name"/></div>
+                    <table style="width:100%;border-collapse:separate;border-spacing:8px;margin:10px 0 0 -8px;">
+                        <tr>
+                            <td style="width:25%;background:#F4EFFB;border-radius:8px;padding:9px 12px;"><div style="font-size:9px;font-weight:bold;color:#5B6776;text-transform:uppercase;">Product</div><div style="font-size:13px;font-weight:bold;margin-top:2px;"><t t-esc="mo.product_id.display_name"/></div></td>
+                            <td style="width:25%;background:#F4EFFB;border-radius:8px;padding:9px 12px;"><div style="font-size:9px;font-weight:bold;color:#5B6776;text-transform:uppercase;">Sale order</div><div style="font-size:13px;font-weight:bold;margin-top:2px;"><t t-esc="mo.origin or '-'"/></div></td>
+                            <td style="width:25%;background:#F4EFFB;border-radius:8px;padding:9px 12px;"><div style="font-size:9px;font-weight:bold;color:#5B6776;text-transform:uppercase;">Customer</div><div style="font-size:13px;font-weight:bold;margin-top:2px;"><t t-esc="mo.partner_id.name or '-'"/></div></td>
+                            <td style="width:25%;background:#F4EFFB;border-radius:8px;padding:9px 12px;"><div style="font-size:9px;font-weight:bold;color:#5B6776;text-transform:uppercase;">Quantity</div><div style="font-size:13px;font-weight:bold;margin-top:2px;"><t t-esc="'%d units' % mo.product_qty"/></div></td>
+                        </tr>
+                    </table>
+                    <table style="width:100%;border-collapse:separate;border-spacing:8px;margin:6px 0 0 -8px;">
+                        <tr>
+                            <td style="width:33%;border:1px solid #E3DAF2;border-radius:10px;padding:10px 12px;"><span style="display:inline-block;width:34px;height:34px;border-radius:17px;background:#EFE8FA;color:#5A3D91;font-size:16px;font-weight:bold;text-align:center;line-height:34px;"><t t-esc="len(pallets)"/></span><span style="font-size:12px;font-weight:bold;margin-left:10px;">Pallets</span></td>
+                            <td style="width:33%;border:1px solid #E3DAF2;border-radius:10px;padding:10px 12px;"><span style="display:inline-block;width:34px;height:34px;border-radius:17px;background:#E8F6EF;color:#116A47;font-size:16px;font-weight:bold;text-align:center;line-height:34px;"><t t-esc="len(packed_units)"/></span><span style="font-size:12px;font-weight:bold;margin-left:10px;">Units packed</span></td>
+                            <td style="width:33%;border:1px solid #E3DAF2;border-radius:10px;padding:10px 12px;"><span style="display:inline-block;width:34px;height:34px;border-radius:17px;background:#EEF3F8;color:#5B6776;font-size:16px;font-weight:bold;text-align:center;line-height:34px;"><t t-esc="len(live_units) - len(packed_units)"/></span><span style="font-size:12px;font-weight:bold;margin-left:10px;">Units not packed</span></td>
+                        </tr>
+                    </table>
+                    <div style="font-size:14px;font-weight:bold;margin:16px 0 8px 0;">Pallets in this order</div>
+                    <table style="width:100%;border-collapse:separate;border-spacing:8px;margin:0 0 0 -8px;">
+                        <t t-foreach="range(0, len(pallets), 2)" t-as="start">
+                            <tr>
+                                <t t-foreach="pallets[start:start + 2]" t-as="pal">
+                                    <td style="width:50%;border:1px solid #E3DAF2;border-radius:12px;padding:12px;vertical-align:top;page-break-inside:avoid;">
+                                        <table style="width:100%;border-collapse:collapse;">
+                                            <tr>
+                                                <td style="width:84px;vertical-align:top;">
+                                                    <img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=240&amp;height=240' % pal.qr_text" style="width:76px;height:76px;"/>
+                                                </td>
+                                                <td style="vertical-align:top;">
+                                                    <div style="font-size:15px;font-weight:bold;"><t t-esc="pal.name"/></div>
+                                                    <div style="font-size:10px;color:#5B6776;margin-top:1px;"><t t-esc="pal.unit_count"/> units - <span t-esc="'Confirmed' if pal.state == 'confirmed' else 'Draft'"/></div>
+                                                    <div style="font-size:10px;font-weight:bold;margin-top:6px;line-height:1.5;"><t t-esc="' - '.join(pal.unit_ids.mapped('name'))"/></div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </t>
+                                <td t-if="len(pallets[start:start + 2]) == 1" style="width:50%;"></td>
+                            </tr>
+                        </t>
+                    </table>
+                    <div style="text-align:center;font-size:9px;color:#9AA8B7;margin-top:18px;">Each pallet is printed in full on the pages that follow - System generated document - <t t-esc="company.name"/></div>
+                </div>
+                <!-- one page per pallet -->
+                <t t-foreach="pallets" t-as="pallet">
+                    <div style="page-break-before: always;"/>
+                    <t t-call="advance_manufacturing.advmfg_pallet_page"/>
                 </t>
             </t>
         </t>

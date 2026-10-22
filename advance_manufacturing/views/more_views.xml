@@ -127,8 +127,6 @@
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
                 <field name="advmfg_active" invisible="1"/>
-                <button name="action_advmfg_generate_packs" type="object" string="Generate Packs"
-                        invisible="not advmfg_active or state in ('done', 'cancel')"/>
                 <button name="action_advmfg_print_packs" type="object" string="Print Packs"
                         invisible="not advmfg_active or not advmfg_pack_ids"/>
             </xpath>
@@ -160,7 +158,7 @@
                         <list editable="bottom" decoration-success="state == 'confirmed'">
                             <field name="name"/>
                             <field name="pallet_ids" widget="many2many_tags"
-                                   domain="[('state', '=', 'confirmed')]" options="{'no_create': True}"
+                                   domain="[('state', '=', 'confirmed'), ('delivery_pack_ids', '=', False), '|', ('production_id.sale_order_id', '=', parent.sale_id), ('production_id.origin', '=', parent.origin)]" options="{'no_create': True}"
                                    readonly="state == 'confirmed'"/>
                             <field name="unit_count"/>
                             <field name="state" widget="badge"/>

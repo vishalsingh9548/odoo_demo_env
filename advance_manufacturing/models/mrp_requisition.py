@@ -39,19 +39,26 @@ class MrpProduction(models.Model):
         loc = self.location_src_id
         for move in self.move_raw_ids.filtered(lambda m: m.state not in ('done', 'cancel') and m.product_id and m.product_uom_qty > 0):
             # Stock this very order has already reserved counts as available to it.
-            avail = self._advmfg_free_real_qty(move.product_id, move.location_id or loc) + sum(move.move_line_ids.mapped('quantity'))
+            # For lot-tracked parts only reservations that carry a real lot count: a line with no lot is Odoo's
+            # force-reservation of stock that isn't really there (a phantom), so it must not hide the shortage.
+            own = sum(ml.quantity for ml in move.move_line_ids if ml.lot_id or move.product_id.tracking == 'none')
+            avail = self._advmfg_free_real_qty(move.product_id, move.location_id or loc) + own
             short = move.product_uom_qty - avail
             if float_compare(short, 0, precision_rounding=move.product_uom.rounding) > 0:
                 result.append((move, move.product_uom_qty, avail, short))
         return result
 
     def _advmfg_low_stock_moves(self):
-        """Components whose gross on-hand quantity at their source is lower than the demand."""
+        """Components that are really short: the same rule that shows the Material Requisition button.
+
+        Stock this order has already reserved counts as available, and only real lots are counted, so a
+        stray negative balance can no longer block Book Serial / Plan when the button says "nothing short".
+        """
         self.ensure_one()
-        return self.move_raw_ids.filtered(
-            lambda m: m.state not in ('done', 'cancel') and m.product_uom_qty > 0 and
-            float_compare(m.product_id.with_context(location=(m.location_id or self.location_src_id).id).qty_available,
-                          m.product_uom_qty, precision_rounding=m.product_uom.rounding) < 0)
+        moves = self.env['stock.move']
+        for move, _required, _avail, _short in self._advmfg_shortages():
+            moves |= move
+        return moves
 
     def _advmfg_check_raw_materials(self, text):
         """Stop an action when components are insufficient (only in Advance Manufacturing mode)."""

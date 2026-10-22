@@ -14,9 +14,6 @@
                 <button name="action_advmfg_allocate_serials" type="object" string="Allocate Serials"
                         groups="advance_manufacturing.group_advmfg_manager"
                         invisible="not advmfg_active or state in ('done', 'cancel')"/>
-                <button name="action_advmfg_new_pallet" type="object" string="New Pallet"
-                        groups="advance_manufacturing.group_advmfg_manager"
-                        invisible="not advmfg_active or state in ('done', 'cancel')"/>
                 <button name="action_advmfg_confirm_packs" type="object" string="Confirm Packs"
                         groups="advance_manufacturing.group_advmfg_manager"
                         invisible="not advmfg_active or state in ('done', 'cancel')"/>
@@ -24,8 +21,18 @@
             <xpath expr="//div[@name='bom_div']" position="after">
                 <field name="advmfg_floor_id" groups="advance_manufacturing.group_advmfg_manager"
                        invisible="not advmfg_active" required="advmfg_active and state == 'confirmed'"/>
+                <field name="sale_order_id" readonly="1" invisible="not sale_order_id"
+                       groups="advance_manufacturing.group_advmfg_manager"/>
+                <field name="partner_id" readonly="1" invisible="not sale_order_id"
+                       groups="advance_manufacturing.group_advmfg_manager"/>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_advmfg_print_all_pallets" type="object" class="oe_stat_button" icon="fa-print"
+                        groups="advance_manufacturing.group_advmfg_manager"
+                        invisible="advmfg_pallet_count == 0"
+                        help="Print every pallet of this order: QR code and serial numbers.">
+                    <field name="advmfg_pallet_count" widget="statinfo" string="Print Pallet"/>
+                </button>
                 <button name="action_advmfg_view_child_mos" type="object" class="oe_stat_button" icon="fa-industry"
                         groups="advance_manufacturing.group_advmfg_manager"
                         invisible="advmfg_child_mo_count == 0">
@@ -49,6 +56,7 @@
                             <field name="pallet_id"/>
                             <field name="current_location" optional="hide"/>
                             <button name="action_pass_qc" type="object" string="Pass" icon="fa-check" invisible="not show_pass_button"/>
+                            <button name="action_fail_qc" type="object" string="Fail" icon="fa-times" invisible="not show_pass_button"/>
                             <button name="action_print_label" type="object" string="Barcode For Serial Number" icon="fa-print"/>
                             <button name="action_start" type="object" string="Start" icon="fa-play"
                                     invisible="state != 'yet_to_start'"/>
@@ -70,16 +78,20 @@
                 </page>
                 <page string="Pallets" name="advmfg_pallets" groups="advance_manufacturing.group_advmfg_manager"
                       invisible="not advmfg_active">
-                    <field name="advmfg_pallet_ids" readonly="1">
-                        <list decoration-success="state == 'confirmed'">
+                    <field name="advmfg_pallet_ids" readonly="state in ('done', 'cancel')">
+                        <list editable="bottom" decoration-success="state == 'confirmed'">
                             <field name="name"/>
+                            <field name="unit_pick_ids" widget="many2many_tags" string="Serial Numbers"
+                                   domain="[('production_id', '=', parent.id), ('state', '=', 'completed'), ('pallet_id', '=', False)]"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   readonly="state == 'confirmed'"/>
                             <field name="unit_count"/>
                             <field name="state" widget="badge"/>
-                            <button name="action_add_serial" type="object" string="Add Serial" icon="fa-plus-circle"
-                                    invisible="state == 'confirmed'"/>
+                            <button name="action_add_serial" type="object" string="Scan Serial" icon="fa-barcode"
+                                    invisible="state == 'confirmed' or not id"/>
                             <button name="action_confirm" type="object" string="Confirm" icon="fa-check"
-                                    invisible="state == 'confirmed'"/>
-                            <button name="action_print" type="object" string="Print" icon="fa-print"/>
+                                    invisible="state == 'confirmed' or not id"/>
+                            <button name="action_print" type="object" string="Print" icon="fa-print" invisible="not id"/>
                         </list>
                     </field>
                 </page>

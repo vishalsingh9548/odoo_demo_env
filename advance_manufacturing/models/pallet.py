@@ -16,9 +16,39 @@ class AdvmfgPallet(models.Model):
     company_id = fields.Many2one(related='production_id.company_id', store=True)
     state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed')], default='draft', required=True)
     unit_ids = fields.One2many('advmfg.unit', 'pallet_id', string='Units')
+    # The delivery pack(s) this pallet has been put into (used to hide pallets that are already packed).
+    delivery_pack_ids = fields.Many2many('advmfg.delivery.pack', 'advmfg_delivery_pack_advmfg_pallet_rel',
+                                         'advmfg_pallet_id', 'advmfg_delivery_pack_id', string='Delivery Packs', copy=False)
+    # Same units as 'unit_ids', but editable as tags on the pallet line: picking a serial puts it on the pallet,
+    # removing it takes it off (only while the pallet is still a draft).
+    unit_pick_ids = fields.Many2many('advmfg.unit', string='Serial Numbers', compute='_compute_unit_pick_ids',
+                                     inverse='_inverse_unit_pick_ids')
     unit_count = fields.Integer(compute='_compute_unit_count')
     # Text packed inside the QR code: pallet name, how many units, and the serial list.
     qr_text = fields.Char(compute='_compute_qr_text')
+
+    @api.depends('unit_ids')
+    def _compute_unit_pick_ids(self):
+        """The serials currently on the pallet."""
+        for pallet in self:
+            pallet.unit_pick_ids = pallet.unit_ids
+
+    def _inverse_unit_pick_ids(self):
+        """Apply the serials chosen on the line: new ones go on the pallet, removed ones come off."""
+        for pallet in self:
+            if pallet.state == 'confirmed':
+                continue
+            chosen = pallet.unit_pick_ids
+            (pallet.unit_ids - chosen).write({'pallet_id': False})
+            for unit in chosen - pallet.unit_ids:
+                if unit.production_id != pallet.production_id:
+                    raise ValidationError(_("Serial '%(s)s' belongs to %(mo)s, not to this order.",
+                                            s=unit.name, mo=unit.production_id.name))
+                if unit.pallet_id:
+                    raise ValidationError(_("Serial '%(s)s' is already on pallet '%(p)s'.", s=unit.name, p=unit.pallet_id.name))
+                if unit.state != 'completed':
+                    raise ValidationError(_("Serial '%s' is not completed yet.", unit.name))
+                unit.pallet_id = pallet.id
 
     @api.depends('unit_ids')
     def _compute_unit_count(self):

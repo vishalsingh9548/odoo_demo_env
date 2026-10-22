@@ -6,8 +6,30 @@
         <field name="model">advmfg.scan.wizard</field>
         <field name="arch" type="xml">
             <form>
-                <group><field name="serial_number" widget="advmfg_serial_lookup_input" nolabel="1"/></group>
-                <footer><button string="Close" special="cancel"/></footer>
+                <div class="advmfg_box advmfg_scan">
+                    <div class="advmfg_head">
+                        <div class="advmfg_badge"><i class="fa fa-barcode"/></div>
+                        <div class="advmfg_titles">
+                            <div class="advmfg_title">Scan Serial</div>
+                            <div class="advmfg_sub">Update a panel on the line: quality check, grade and next stage</div>
+                        </div>
+                        <button special="cancel" class="advmfg_x" string="×" aria-label="Close"/>
+                    </div>
+                    <div class="advmfg_body">
+                        <div class="advmfg_label">Serial number</div>
+                        <field name="serial_number" widget="advmfg_serial_lookup_input" nolabel="1"/>
+                        <div class="advmfg_hint">Point the scanner at the sticker, or type the serial and press Enter.</div>
+                        <div class="advmfg_steps">
+                            <div class="advmfg_step"><div class="advmfg_n">1</div><div><div class="advmfg_st">Scan</div><div class="advmfg_sd">Opens the unit on its current stage</div></div></div>
+                            <div class="advmfg_step"><div class="advmfg_n">2</div><div><div class="advmfg_st">Check quality</div><div class="advmfg_sd">Pass or Fail the open check</div></div></div>
+                            <div class="advmfg_step"><div class="advmfg_n">3</div><div><div class="advmfg_st">Update status</div><div class="advmfg_sd">Set the grade and move to the next stage</div></div></div>
+                        </div>
+                    </div>
+                </div>
+                <footer>
+                    <span class="advmfg_foot_note">Finished serials show a short message. Use Serial Track for their full history.</span>
+                    <button string="Close" special="cancel" class="btn-secondary"/>
+                </footer>
             </form>
         </field>
     </record>
@@ -142,6 +164,55 @@
             </xpath>
         </field>
     </record>
+
+    <!-- ===== Serial Track app: scan a serial, see its whole live lifecycle ===== -->
+    <record id="view_advmfg_track_wizard_form" model="ir.ui.view">
+        <field name="name">advmfg.track.wizard.form</field>
+        <field name="model">advmfg.track.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <div class="advmfg_box advmfg_track">
+                    <div class="advmfg_head">
+                        <div class="advmfg_badge"><i class="fa fa-road"/></div>
+                        <div class="advmfg_titles">
+                            <div class="advmfg_title">Serial Track</div>
+                            <div class="advmfg_sub">See the full live journey of any serial number</div>
+                        </div>
+                        <button special="cancel" class="advmfg_x" string="×" aria-label="Close"/>
+                    </div>
+                    <div class="advmfg_body">
+                        <div class="advmfg_label">Serial number</div>
+                        <field name="serial_number" widget="advmfg_serial_lookup_input" nolabel="1"/>
+                        <div class="advmfg_hint">Works for any serial: in manufacturing, packed, delivered or scrapped.</div>
+                        <div class="advmfg_label">You will see</div>
+                        <div class="advmfg_chips">
+                            <span class="advmfg_chip"><i style="background:#2F7FD1"/>Where it is now</span>
+                            <span class="advmfg_chip"><i style="background:#178A62"/>Stages and quality checks</span>
+                            <span class="advmfg_chip"><i style="background:#C77A12"/>Grade</span>
+                            <span class="advmfg_chip"><i style="background:#C77A12"/>Pallet and pack</span>
+                            <span class="advmfg_chip"><i style="background:#2F7FD1"/>Delivery, vehicle and driver</span>
+                            <span class="advmfg_chip"><i style="background:#9AA8B7"/>Full history</span>
+                            <span class="advmfg_chip"><i style="background:#9AA8B7"/>Printable report</span>
+                        </div>
+                    </div>
+                </div>
+                <footer>
+                    <span class="advmfg_live"><i/>Live data, read fresh every time</span>
+                    <button string="Close" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_advmfg_track_wizard" model="ir.actions.act_window">
+        <field name="name">Serial Track</field>
+        <field name="res_model">advmfg.track.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    <menuitem id="menu_advmfg_track_root" name="Serial Track" web_icon="advance_manufacturing,static/description/icon_track.png"
+              groups="advance_manufacturing.group_advmfg_manager" sequence="86"/>
+    <menuitem id="menu_advmfg_track" name="Track Serial Number" parent="menu_advmfg_track_root"
+              action="action_advmfg_track_wizard" sequence="1"/>
 
     <!-- Live Serial Journey screen -->
     <record id="view_advmfg_serial_journey_form" model="ir.ui.view">

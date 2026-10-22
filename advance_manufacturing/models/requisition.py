@@ -330,6 +330,20 @@ class MaterialRequisition(models.Model):
         for act in self.activity_ids.filtered(lambda a: a.user_id == self.env.user):
             act.action_feedback(feedback=_('Approval action completed.'))
 
+    def _refresh_stock_figures(self):
+        """Recalculate the stock numbers on open requisitions (they are saved figures, so they go stale otherwise)."""
+        lines = self.filtered(lambda r: r.state in ('draft', 'waiting_for_approval', 'second_approval')).material_requisition_line_ids
+        if lines:
+            lines.invalidate_recordset(['onhand_quantity', 'is_stock_available', 'qty_to_purchase', 'qty_to_transfer'])
+            for name in ('onhand_quantity', 'is_stock_available', 'qty_to_purchase', 'qty_to_transfer'):
+                self.env.add_to_compute(lines._fields[name], lines)
+            lines.mapped('onhand_quantity')  # touching one field runs the recalculation of all four
+
+    def web_read(self, specification):
+        """Opening a requisition shows up-to-date stock figures."""
+        self._refresh_stock_figures()
+        return super().web_read(specification)
+
     def action_request_approval(self):
         """Request Approval: validate, align the approval type with the requester's role, start the chain."""
         for rec in self:
@@ -368,6 +382,7 @@ class MaterialRequisition(models.Model):
     def action_recommend_and_forward(self):
         """Recommend & Forward: needs stock or a purchase order first; moves to Second Approval (or opens the lot picker)."""
         self.ensure_one()
+        self._refresh_stock_figures()
         if self.has_unavailable_products and not self.env['purchase.order'].search_count([('origin', 'like', self.name)]):
             raise UserError(_('You have products with insufficient stock. Please create a purchase order first '
                               'or adjust the quantities.'))

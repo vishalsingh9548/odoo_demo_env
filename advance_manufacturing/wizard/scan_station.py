@@ -23,9 +23,14 @@ class AdvmfgScanWizard(models.TransientModel):
                 return {'status': 'info', 'message': _("Serial '%s' is booked on %s but not allocated to a unit yet.",
                                                        serial, pooled.production_id.name)}
             return {'status': 'missing', 'message': _("Serial number '%s' does not exist. Please check.", serial)}
-        journey = self.env['advmfg.serial.journey'].create({'unit_id': unit.id})
-        return {'status': 'ok', 'wizard_id': journey.id, 'title': _('Serial Journey: %s', serial),
-                'res_model': 'advmfg.serial.journey'}
+        if unit.state == 'completed':
+            return {'status': 'completed', 'message': _("This serial number '%s' is already completed.", serial)}
+        if unit.state == 'cancel':
+            return {'status': 'cancel', 'message': _("This serial number '%s' has been cancelled.", serial)}
+        wizard_id = self.create_and_return_lookup_wizard(serial)
+        if not wizard_id:
+            return {'status': 'failed', 'message': _('Failed to get details for serial: %s. No wizard created.', serial)}
+        return {'status': 'ok', 'wizard_id': wizard_id, 'title': _('Serial Details: %s', serial)}
 
     @api.model
     def create_and_return_lookup_wizard(self, serial):
@@ -34,6 +39,29 @@ class AdvmfgScanWizard(models.TransientModel):
         if not unit:
             return False
         return self.env['advmfg.serial.lookup.wizard'].create({'unit_id': unit.id}).id
+
+
+class AdvmfgTrackWizard(models.TransientModel):
+    """The scan box of the Serial Track app: type or scan a serial to see its full live lifecycle."""
+    _name = 'advmfg.track.wizard'
+    _description = 'Serial Track'
+
+    serial_number = fields.Char(string='Serial Number')
+
+    @api.model
+    def lookup_serial(self, serial):
+        """Find the serial (completed or not) and return the live Serial Journey screen for it."""
+        serial = (serial or '').strip()
+        unit = self.env['advmfg.unit'].search([('name', '=', serial)], order='create_date desc, id desc', limit=1)
+        if not unit:
+            pooled = self.env['advmfg.serial'].search([('name', '=', serial)], limit=1)
+            if pooled:
+                return {'status': 'info', 'message': _("Serial '%s' is booked on %s but not allocated to a unit yet.",
+                                                       serial, pooled.production_id.name)}
+            return {'status': 'missing', 'message': _("Serial number '%s' does not exist. Please check.", serial)}
+        journey = self.env['advmfg.serial.journey'].create({'unit_id': unit.id})
+        return {'status': 'ok', 'wizard_id': journey.id, 'title': _('Serial Journey: %s', serial),
+                'res_model': 'advmfg.serial.journey'}
 
 
 class AdvmfgSerialLookupWizard(models.TransientModel):

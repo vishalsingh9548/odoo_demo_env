@@ -113,7 +113,7 @@ All of these passed: switch on for Expo and off for the other companies; a user 
 
 ## 8. Demo data for Manufacturing Expo (added 2026-10-22)
 
-Script: `scripts/seed_expo_demo_data.py` (safe to run twice; it skips anything that already exists).
+(The demo-data script that did this was removed later, see section 18. The data it made stays in `solar_epc_v2`.)
 
 **What it did to `solar_epc_v2`** (every record stamped with the company Manufacturing Expo only):
 - Read-only copy of structure from the reference database `crm_complete` (that database was not changed).
@@ -210,4 +210,65 @@ Scope agreed with the user: emails, WhatsApp and cron jobs are excluded; dead/br
 - Timeline times come from record dates (QC checks, pallet, pack, delivery); pallet/pack times are the record's create/confirm dates.
 
 ## 15. Components tracked by lots
-- The 28 Manufacturing Expo components are now tracked **By Lots**; the 12 finished panels (and variants) stay **By Quantity**. Existing stock was moved into one lot per component (LOT-<id>-001), nothing deleted. The seed script (scripts/seed_expo_demo_data.py) now creates components with lot tracking and stocks them with a lot, and converts any lot-less stock when re-run.
+- The 28 Manufacturing Expo components are now tracked **By Lots**; the 12 finished panels (and variants) stay **By Quantity**. Existing stock was moved into one lot per component (LOT-<id>-001), nothing deleted.
+
+## 16. Tweaks after first UI test
+- MO header: removed the "Update Bulk Attachments" button (documents are no longer required to move on). Kept Print Serial Labels, Update Bill Of Material, Update Serial Number Prefix, Link to Sale Order, Maintenance Request.
+- Units tab: added a **Fail** button beside **Pass** (opens the failure-reason window).
+- Pallets tab: each pallet row now lists its serial numbers.
+- Added `advance_manufacturing/.gitignore`.
+- Company: Expo Customer / Expo Vendor and the module's number sequences (pallet, serial, delivery pack, requisition) now belong to Manufacturing Expo
+
+## 17. Serial Scan restored, new Serial Track app
+- **Serial Scan** is back to its original behaviour: a live unit opens the Serial Details window (Create QC, Pass, Fail, Update Status); a completed or cancelled serial shows the message.
+- New app **Serial Track** (own icon `icon_track.png`, model `advmfg.track.wizard`): scan or type any serial, completed or not, and the live Serial Journey screen opens (stages, QC, pallet, pack, delivery, history, Refresh, Update Status, Print). The scan-box widget now calls `lookup_serial` on whichever screen it sits on.
+
+## 18. Demo-data script removed - and what you must set up by hand in production
+
+**What was removed:** `scripts/seed_expo_demo_data.py`. Nothing in the module (manifest, Python, XML) loaded or called it; it was only ever run by hand. The module works the same without it. The only other mentions were in this log, which were reworded. The data it created in `solar_epc_v2` stays as it is.
+
+**What else it did:** besides creating demo products, it set up some configuration the module needs. In production you have to create these yourself:
+
+| Setting | What to create |
+|---|---|
+| Company switch | Advance Manufacturing turned on for the company (Company form). |
+| Process stages | For example Cell Stringing to Final Flash Test (Manufacturing > Configuration > Process Stages). |
+| Serial number prefix | One per company (Sales > Configuration > Serial Number Prefix Config). |
+| Bank account | For the sale order terms (bank account master). |
+| Flagged locations | Store (requisition source), Packaging (pallet/pack stock), Rejection (scrap), and Maintenance Store and Maintenance Shop. |
+| Requisition approvers | The approver masters for material requisitions. |
+| Maintenance team | One per company. |
+| Product settings | The finished-good flag on panels, and lot tracking on components (panels stay By Quantity). |
+| User access | Advance Manufacturing set to **Administrator** on every user who needs it (Settings > Users > Access Rights). |
+
+## 19. Scan pop-ups restyled
+- Serial Scan (teal) and Serial Track (blue) pop-ups now use a custom look: own header with icon and close, large rounded scan input with icon and Enter tag, helper text, three-step cards (Scan) or 'You will see' chips (Track), footer note. Files: static/src/scss/serial_boxes.scss, static/src/xml/serial_lookup_input.xml, views/scan_views.xml. The grey Odoo title bar is hidden on these two pop-ups only.
+- Dark mode: the two pop-ups now read their colours from variables; static/src/scss/serial_boxes.dark.scss (loaded only in web.assets_web_dark) swaps in a dark palette. Footer and frame follow the theme.
+
+## 20. Recommend & Forward lot picker, and one stock rule for the MR button and Book Serial
+- The lot picker opens for lot-tracked lines that have free stock in the requisition's source location (EXP/Store), as in the reference. A Purchase Order raised from a requisition delivers to the requisition's destination (the MO floor), not the Store (reference MR-04; already in `models/requisition.py`). Plain receipts keep their normal destination (I briefly changed Expo's Receipts destination to the Store and reverted it).
+- Verified end to end (rolled back): two lots in Store, picker opened, lot B chosen, transfer reserved lot B, MO got lot B.
+- Fix: `_advmfg_low_stock_moves` (used by Book Serial / Plan / Start) now uses the same rule as the Material Requisition button (real free lots plus what the order already reserved). Before, Book Serial used gross on-hand, so negative lot balances (LOT-280-001 -0.17, LOT-310-001 -1.00) blocked it while the button said nothing was short.
+
+## 21. Sale/delivery tidy-up
+- Sale order: only one **Confirm** button in this mode (Odoo's second draft-state Confirm is hidden; other companies still get both).
+- Delivery > Generated Packs: removed the **Generate Packs** header button; packs are added with **Add a line**. The pallet choice on a line lists only confirmed pallets that belong to the delivery's sale order (through its manufacturing orders) and are not already in another pack (new field `delivery_pack_ids` on the pallet).
+
+## 22. MO Pallet Report (missing report added)
+- New **Print Pallet** smart button on the manufacturing order (shows the pallet count; hidden when there are none). It prints `Manufacturing Order Pallet Report`: every pallet of that order, one pallet per page, with QR code and serial numbers (reference: ib_sales `action_print_manufacturing_pallet_report`). Files: `models/mrp_production.py`, `views/mrp_production_views.xml`, `report/report.xml`.
+- The three report layouts (Pallet Sheet, Serial Label, MO Pallet Report) have designs waiting for approval; code restyle comes after approval.
+
+## 23. Reports restyled (light purple)
+- **Pallet Sheet**, **Serial Label** (100 x 60 mm sticker) and **Manufacturing Order Pallet Report** (cover page with totals and pallet cards, then one full page per pallet) now use the approved light purple design. Layout is table-based so the PDF engine keeps it aligned. The pallet page is one shared template (`advmfg_pallet_page`) used by both pallet reports.
+- New paper formats: A4 with slim margins, and a 100 x 60 mm label (zoom 1.3333 in the label layout cancels the PDF engine's 75% shrink on small custom pages). New field `label_wattage` on the unit (wattage, or the number in the product name).
+- Checked by rendering the PDFs and looking at them. The QR/barcode images only show when the server can serve them, as in the browser.
+
+## 24. Shortage check ignores lot-less reservations
+- Components with no lot on their reservation (Odoo force-reserves when real stock is missing, e.g. EXP/MO/00017 RIBBON 0.30MM and FRAME 2278) no longer count as available, so the Material Requisition button appears and Book Serial is blocked until the lots really exist.
+
+## 25. Negative stock cleaned, requisition stock figures stay fresh
+- The two negative lots in EXP/Stock (LOT-280-001 -0.17, LOT-310-001 -1.00, left by test consumption) were corrected with proper inventory adjustments; no negative internal stock remains for Manufacturing Expo.
+- Requisition lines keep saved stock figures that only refreshed when the product or location changed. Opening an open requisition (draft, waiting, second approval) or pressing Recommend & Forward now recalculates them (`_refresh_stock_figures`, `web_read` in `models/requisition.py`).
+
+## 26. Pallets tab: Add a line
+- Removed the **New Pallet** button from the manufacturing order header. On the Pallets tab a pallet is now added with **Add a line**; serial numbers are picked on the line itself (only completed, un-palleted units of this order are offered; removing a tag takes it off while the pallet is a draft). Scan Serial, Confirm and Print icons stay on the saved row. New field `unit_pick_ids` on the pallet.

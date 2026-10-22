@@ -52,3 +52,4 @@ access_maint_component_wizard_line,maintenance.component.wizard.line,model_maint
 access_maint_reason_wizard,maintenance.reason.wizard,model_maintenance_reason_wizard,base.group_user,1,1,1,1
 access_maint_reason_wizard_line,maintenance.reason.wizard.line,model_maintenance_reason_wizard_line,base.group_user,1,1,1,1
 access_advmfg_serial_journey,advmfg.serial.journey,model_advmfg_serial_journey,base.group_user,1,1,1,1
+access_advmfg_track_wizard,advmfg.track.wizard,model_advmfg_track_wizard,base.group_user,1,1,1,1

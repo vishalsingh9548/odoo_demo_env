@@ -14,13 +14,18 @@ export class SerialLookupInput extends Component {
         this.notification = useService("notification");
     }
 
+    // Search icon on the Serial Track box, barcode icon on the Serial Scan box.
+    get iconClass() {
+        return this.props.record.resModel === "advmfg.track.wizard" ? "fa fa-search" : "fa fa-barcode";
+    }
+
     // Runs when the typed value changes (scanners press Enter after the serial).
     async onSerialChange(ev) {
         const serial = ev.target.value.trim();
         if (!serial) {
             return;
         }
-        const result = await this.orm.call("advmfg.scan.wizard", "lookup_serial", [serial]);
+        const result = await this.orm.call(this.props.record.resModel, "lookup_serial", [serial]);
         if (result.status === "ok") {
             this.action.doAction({
                 type: "ir.actions.act_window",
