@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="crm.crm_lead_view_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//notebook" position="inside">
-                    <page name="epc_solar_details" string="Solar Details">
+                    <page name="epc_solar_details" string="Solar Details" groups="csl_epc_core.group_epc_user">
                         <group>
                             <group string="Requirement">
                                 <field name="customer_segment"/>

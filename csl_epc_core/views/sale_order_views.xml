@@ -9,12 +9,12 @@
                 <xpath expr="//div[@name='button_box']" position="inside">
                     <button name="action_view_epc_project" type="object"
                             class="oe_stat_button" icon="fa-building-o"
-                            invisible="epc_project_count == 0">
+                            groups="csl_epc_core.group_epc_user" invisible="epc_project_count == 0">
                         <field name="epc_project_count" widget="statinfo" string="EPC Project"/>
                     </button>
                 </xpath>
                 <xpath expr="//notebook" position="inside">
-                    <page name="epc_terms" string="Solar EPC Terms">
+                    <page name="epc_terms" string="Solar EPC Terms" groups="csl_epc_core.group_epc_user">
                         <group>
                             <field name="is_epc_order"/>
                         </group>
