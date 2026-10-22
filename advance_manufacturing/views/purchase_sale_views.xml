@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sale order: advance / outstanding / LC interest / pending amount -->
+    <record id="view_sale_order_form_advmfg_payment" model="ir.ui.view">
+        <field name="name">sale.order.form.advmfg.payment</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='order_details']" position="inside">
+                <field name="advance_payment" invisible="not advmfg_so_active"/>
+                <field name="outstanding_payment" invisible="not advmfg_so_active"/>
+                <field name="lc_amount" invisible="not advmfg_so_active"/>
+                <field name="lc_total_label" invisible="1"/>
+                <field name="remaining_amount" invisible="not advmfg_so_active"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Purchase order: approval flow -->
+    <record id="view_purchase_order_form_advmfg_approval" model="ir.ui.view">
+        <field name="name">purchase.order.form.advmfg.approval</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="is_current_user_restricted_purchaser" invisible="1"/>
+                <field name="is_current_user_purchase_approver" invisible="1"/>
+                <field name="is_current_user_it_approver" invisible="1"/>
+                <button name="action_advmfg_send_approval" type="object" string="Send Approval" class="btn-primary"
+                        invisible="not is_current_user_restricted_purchaser or approval_state not in ('none', 'rejected') or state not in ('draft', 'sent')"/>
+                <button name="action_advmfg_reject" type="object" string="Reject" class="btn-danger"
+                        invisible="approval_state != 'pending' or not (is_current_user_purchase_approver or is_current_user_it_approver)"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="attributes">
+                <attribute name="string">PO created by</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_ref']" position="after">
+                <field name="allowed_category_ids" widget="many2many_tags" options="{'no_create': True}"
+                       invisible="not is_current_user_restricted_purchaser"
+                       readonly="approval_state in ('pending', 'approved')"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Approval" name="advmfg_approval">
+                    <group>
+                        <group>
+                            <field name="approval_state"/>
+                            <field name="approval_channel"/>
+                            <field name="approval_requested_by_id"/>
+                            <field name="approved_by_id"/>
+                            <field name="is_approval_locked"/>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_product_category_form_advmfg_allowed" model="ir.ui.view">
+        <field name="name">product.category.form.advmfg.allowed</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='parent_id']" position="after">
+                <field name="advmfg_po_approval" groups="advance_manufacturing.group_advmfg_manager"/>
+                <field name="allowed" groups="advance_manufacturing.group_advmfg_manager"/>
+                <field name="allowed_it" groups="advance_manufacturing.group_advmfg_manager"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vendor bill / invoice: gate number -->
+    <record id="view_move_form_advmfg_gate" model="ir.ui.view">
+        <field name="name">account.move.form.advmfg.gate</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="gate_number" invisible="move_type not in ('in_invoice', 'in_refund', 'out_invoice')"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Partner: customer / vendor classification -->
+    <record id="view_partner_form_advmfg_rank" model="ir.ui.view">
+        <field name="name">res.partner.form.advmfg.rank</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Partner Type Classification" name="advmfg_rank" groups="base.group_system">
+                    <group>
+                        <field name="customer_rank"/>
+                        <field name="supplier_rank"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

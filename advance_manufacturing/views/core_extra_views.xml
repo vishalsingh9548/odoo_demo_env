@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ===== Stage form: show the quality test type only when a check is required ===== -->
+    <record id="view_advmfg_stage_form" model="ir.ui.view">
+        <field name="name">advmfg.stage.form</field>
+        <field name="model">advmfg.stage</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="sequence"/>
+                            <field name="parent_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="qc_required"/>
+                            <field name="test_type" invisible="not qc_required" required="qc_required"/>
+                            <field name="attachment_required"/>
+                            <field name="show_grade"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ===== Product: finished-good tick and "keep MO in Draft" tick ===== -->
+    <record id="view_product_template_form_advmfg" model="ir.ui.view">
+        <field name="name">product.template.form.advmfg</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='group_general']" position="inside">
+                <field name="is_finished_good" groups="advance_manufacturing.group_advmfg_manager"/>
+            </xpath>
+            <xpath expr="//group[@name='group_general']" position="after">
+                <group string="Manufacturing Order Behavior" name="advmfg_mo_behavior"
+                       groups="advance_manufacturing.group_advmfg_manager">
+                    <field name="keep_mo_in_draft"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_stock_route_form_advmfg" model="ir.ui.view">
+        <field name="name">stock.route.form.advmfg</field>
+        <field name="model">stock.route</field>
+        <field name="inherit_id" ref="stock.stock_location_route_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Manufacturing Order Behavior" groups="advance_manufacturing.group_advmfg_manager">
+                    <field name="keep_mo_in_draft_by_default"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Serial prefix configuration (Sales > Configuration) ===== -->
+    <record id="view_advmfg_serial_prefix_list" model="ir.ui.view">
+        <field name="name">advmfg.serial.prefix.list</field>
+        <field name="model">advmfg.serial.prefix</field>
+        <field name="arch" type="xml">
+            <list><field name="company_id"/><field name="prefix"/></list>
+        </field>
+    </record>
+    <record id="view_advmfg_serial_prefix_form" model="ir.ui.view">
+        <field name="name">advmfg.serial.prefix.form</field>
+        <field name="model">advmfg.serial.prefix</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet><group><field name="company_id"/><field name="prefix"/></group></sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_advmfg_serial_prefix" model="ir.actions.act_window">
+        <field name="name">Serial Number Prefix Config</field>
+        <field name="res_model">advmfg.serial.prefix</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ===== Quality check: documents, extra columns ===== -->
+    <record id="view_advmfg_qc_form" model="ir.ui.view">
+        <field name="name">advmfg.qc.form</field>
+        <field name="model">advmfg.qc</field>
+        <field name="arch" type="xml">
+            <form create="0">
+                <header>
+                    <button name="action_pass" type="object" string="Pass" class="btn-primary" invisible="state != 'todo'"/>
+                    <button name="action_fail" type="object" string="Fail" invisible="state != 'todo'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_attachments" type="object" class="oe_stat_button" icon="fa-paperclip">
+                            <field name="attachment_count" widget="statinfo" string="Attachments"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="unit_id"/>
+                            <field name="stage_id"/>
+                            <field name="production_id"/>
+                            <field name="sale_order_id"/>
+                        </group>
+                        <group><field name="fail_reason"/></group>
+                    </group>
+                    <notebook>
+                        <page string="Attachments">
+                            <field name="attachment_ids" widget="many2many_binary" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_advmfg_qc_attachment_wizard_form" model="ir.ui.view">
+        <field name="name">advmfg.qc.attachment.wizard.form</field>
+        <field name="model">advmfg.qc.attachment.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="qc_id" invisible="1"/>
+                <field name="attachment_ids" widget="many2many_binary"/>
+                <footer>
+                    <button name="action_save" type="object" string="Save" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="view_advmfg_attachment_bulk_wizard_form" model="ir.ui.view">
+        <field name="name">advmfg.attachment.bulk.wizard.form</field>
+        <field name="model">advmfg.attachment.bulk.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="line_ids">
+                    <list editable="bottom" create="0" delete="0">
+                        <field name="unit_id" column_invisible="1"/>
+                        <field name="serial_number"/>
+                        <field name="stage_id"/>
+                        <field name="attachment_ids" widget="many2many_binary"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_update" type="object" string="Update" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ===== Tracker: extra search fields and an empty-state message ===== -->
+    <record id="view_advmfg_unit_search_extra" model="ir.ui.view">
+        <field name="name">advmfg.unit.search.extra</field>
+        <field name="model">advmfg.unit</field>
+        <field name="inherit_id" ref="advance_manufacturing.view_advmfg_unit_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sale_order_id']" position="after">
+                <field name="floor_id"/>
+                <field name="current_location"/>
+            </xpath>
+            <xpath expr="//filter[@name='g_floor']" position="after">
+                <filter name="g_location" string="Current Location" context="{'group_by': 'current_location'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Manufacturing order: customer column, sale info, hide Misc tab and Cancel, scrap button, bulk attachments ===== -->
+    <record id="view_mrp_production_form_advmfg_core" model="ir.ui.view">
+        <field name="name">mrp.production.form.advmfg.core</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="is_quality_user_only" invisible="1"/>
+                <button name="action_advmfg_bulk_attachments" type="object" string="Update Bulk Attachments"
+                        groups="advance_manufacturing.group_advmfg_manager" invisible="not advmfg_active or is_quality_user_only or state in ('done', 'cancel')"/>
+                <button name="action_advmfg_print_labels" type="object" string="Print Serial Labels"
+                        groups="advance_manufacturing.group_advmfg_manager" invisible="not advmfg_active"/>
+            </xpath>
+            <xpath expr="//button[@name='button_plan']" position="attributes">
+                <attribute name="invisible">is_quality_user_only or state not in ('confirmed', 'progress', 'to_close') or not workorder_ids or is_planned</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_cancel']" position="attributes">
+                <attribute name="invisible">advmfg_active or state in ('done', 'cancel') or not id</attribute>
+            </xpath>
+            <xpath expr="//page[@name='miscellaneous']" position="attributes">
+                <attribute name="invisible">advmfg_active</attribute>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_unit_scraps" type="object" class="oe_stat_button" icon="fa-trash"
+                        groups="advance_manufacturing.group_advmfg_manager" invisible="not advmfg_active">
+                    <field name="scrap_count_units" widget="statinfo" string="Scrap"/>
+                </button>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="after">
+                <group string="Sale Information" invisible="not sale_order_id" groups="advance_manufacturing.group_advmfg_manager">
+                    <field name="sale_order_id" readonly="1"/>
+                    <field name="partner_id" readonly="1"/>
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='bom_id']" position="after">
+                <field name="total_manufacturing_quantity" invisible="1"/>
+                <field name="uncompleted_lines_count" invisible="1"/>
+                <field name="advmfg_parent_mo_id" readonly="1" invisible="not advmfg_parent_mo_id"
+                       groups="advance_manufacturing.group_advmfg_manager"/>
+            </xpath>
+            <xpath expr="//page[@name='advmfg_units']" position="attributes">
+                <attribute name="invisible">not advmfg_active or is_quality_user_only</attribute>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_mrp_production_tree_advmfg" model="ir.ui.view">
+        <field name="name">mrp.production.list.advmfg</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="partner_id" optional="hide" groups="advance_manufacturing.group_advmfg_manager"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

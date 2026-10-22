@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Pallet sheet: pallet name, QR code and serial list. -->
+    <record id="action_report_advmfg_pallet" model="ir.actions.report">
+        <field name="name">Pallet Sheet</field>
+        <field name="model">advmfg.pallet</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">advance_manufacturing.report_advmfg_pallet</field>
+        <field name="report_file">advance_manufacturing.report_advmfg_pallet</field>
+        <field name="binding_model_id" ref="model_advmfg_pallet"/>
+        <field name="binding_type">report</field>
+    </record>
+    <template id="report_advmfg_pallet">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="pallet">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 t-field="pallet.name"/>
+                        <p>Order: <span t-field="pallet.production_id.name"/> | Units: <span t-field="pallet.unit_count"/></p>
+                        <img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=200&amp;height=200' % pallet.qr_text"
+                             style="width:200px;height:200px;"/>
+                        <table class="table table-sm mt-3">
+                            <thead><tr><th>#</th><th>Serial Number</th></tr></thead>
+                            <tbody>
+                                <t t-foreach="pallet.unit_ids" t-as="unit">
+                                    <tr><td><t t-esc="unit_index + 1"/></td><td><span t-field="unit.name"/></td></tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Serial labels: one barcode label per unit. -->
+    <record id="action_report_advmfg_unit_label" model="ir.actions.report">
+        <field name="name">Serial Labels</field>
+        <field name="model">advmfg.unit</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">advance_manufacturing.report_advmfg_unit_label</field>
+        <field name="report_file">advance_manufacturing.report_advmfg_unit_label</field>
+        <field name="binding_model_id" ref="model_advmfg_unit"/>
+        <field name="binding_type">report</field>
+    </record>
+    <template id="report_advmfg_unit_label">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="unit">
+                <div class="page" style="page-break-after:always; text-align:center;">
+                    <img t-att-src="'/report/barcode/?barcode_type=Code128&amp;value=%s&amp;width=400&amp;height=100' % unit.name"
+                         style="width:300px;height:80px;"/>
+                    <div><strong t-field="unit.name"/></div>
+                    <div t-field="unit.product_id.display_name"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Delivery pack list: each pack with its pallets and serial numbers. -->
+    <record id="action_report_advmfg_delivery_packs" model="ir.actions.report">
+        <field name="name">Delivery Pack List</field>
+        <field name="model">stock.picking</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">advance_manufacturing.report_advmfg_delivery_packs</field>
+        <field name="report_file">advance_manufacturing.report_advmfg_delivery_packs</field>
+    </record>
+    <template id="report_advmfg_delivery_packs">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="picking">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Pack List - <span t-field="picking.name"/></h2>
+                        <p>Sale Order: <span t-field="picking.sale_id.name"/> | Vehicle: <span t-field="picking.advmfg_vehicle_number"/> | Driver: <span t-field="picking.advmfg_driver_name"/></p>
+                        <t t-foreach="picking.advmfg_pack_ids" t-as="pack">
+                            <h4><span t-field="pack.name"/> (<span t-field="pack.unit_count"/> units, <span t-field="pack.state"/>)</h4>
+                            <p><span t-field="pack.serial_text"/></p>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

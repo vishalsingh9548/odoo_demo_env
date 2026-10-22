@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Product: machine flag and due date -->
+    <record id="view_product_template_machine_advmfg" model="ir.ui.view">
+        <field name="name">product.template.machine.advmfg</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='barcode']" position="after">
+                <field name="is_machine_product"/>
+                <field name="maintenance_due_on" invisible="not is_machine_product"/>
+                <field name="last_maintenance_mail_sent_on" invisible="not is_machine_product"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Location flags -->
+    <record id="view_location_form_maintenance_advmfg" model="ir.ui.view">
+        <field name="name">stock.location.maintenance.advmfg</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='usage']" position="after">
+                <field name="is_maintenance_location"/>
+                <field name="is_maintenance_source_location"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- User flags -->
+    <record id="view_users_form_maintenance_advmfg" model="ir.ui.view">
+        <field name="name">res.users.maintenance.advmfg</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Maintenance Approval" name="advmfg_maintenance" groups="base.group_system">
+                    <group>
+                        <field name="is_maintenance_manager"/>
+                        <field name="is_maintenance_store_person"/>
+                        <field name="notify_on_maintenance_transfer_validated"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Maintenance request form -->
+    <record id="view_maintenance_request_form_advmfg" model="ir.ui.view">
+        <field name="name">maintenance.request.form.advmfg</field>
+        <field name="model">maintenance.request</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="stage_name" invisible="1"/>
+                <button name="action_select_components" type="object" string="Select Components"
+                        invisible="not machine_product_id"/>
+                <button name="action_describe_reasons" type="object" string="Maintenance Reason"
+                        invisible="not component_line_ids"/>
+                <button name="action_send_for_approval" type="object" string="Send for Approval" class="btn-primary"
+                        invisible="stage_name != 'New Request' or not machine_product_id"/>
+                <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                        invisible="stage_name != 'Approval Send'" groups="base.group_user"/>
+                <button name="action_start_progress" type="object" string="Start Progress" invisible="stage_name != 'Approved'"/>
+                <button name="action_mark_done" type="object" string="Mark to Done" invisible="stage_name != 'In Progress'"/>
+                <button name="action_repairing_state" type="object" string="Repairing State"
+                        invisible="stage_name not in ('Approved', 'In Progress')"/>
+                <button name="action_repairing_done" type="object" string="Repairing Done" invisible="stage_name != 'Repairing'"/>
+                <button name="action_scrap_machine" type="object" string="Scrap" invisible="stage_name != 'Done' or not machine_product_id"/>
+            </xpath>
+            <xpath expr="//field[@name='stage_id']" position="attributes">
+                <attribute name="readonly">machine_product_id</attribute>
+            </xpath>
+            <xpath expr="//div[@class='oe_title']" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_maintenance_picking" type="object" class="oe_stat_button" icon="fa-exchange"
+                            invisible="picking_count == 0">
+                        <field name="picking_count" widget="statinfo" string="Internal Transfer"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='equipment_id']" position="after">
+                <field name="machine_product_id" options="{'no_create': True}"/>
+                <field name="bom_id" invisible="1"/>
+                <field name="picking_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Equipments" name="advmfg_components" invisible="not component_line_ids">
+                    <field name="component_line_ids" readonly="1">
+                        <list><field name="product_id"/><field name="product_qty"/><field name="uom_id"/></list>
+                    </field>
+                </page>
+                <page string="Maintenance Reason" name="advmfg_reasons" invisible="not reason_line_ids">
+                    <field name="reason_line_ids" readonly="1">
+                        <list><field name="product_id"/><field name="reason"/><field name="image" widget="image" options="{'size': [60, 60]}"/></list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_maintenance_component_wizard_form" model="ir.ui.view">
+        <field name="name">maintenance.component.wizard.form</field>
+        <field name="model">maintenance.component.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="request_id" invisible="1"/>
+                <field name="line_ids">
+                    <list editable="bottom" create="0" delete="0">
+                        <field name="selected"/>
+                        <field name="product_id"/>
+                        <field name="bom_qty"/>
+                        <field name="qty_needed"/>
+                        <field name="uom_id"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_maintenance_reason_wizard_form" model="ir.ui.view">
+        <field name="name">maintenance.reason.wizard.form</field>
+        <field name="model">maintenance.reason.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="request_id" invisible="1"/>
+                <field name="line_ids">
+                    <list editable="bottom" create="0" delete="0">
+                        <field name="product_id"/>
+                        <field name="reason"/>
+                        <field name="image" widget="image" options="{'size': [60, 60]}"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Machine Maintenance Schedule menu -->
+    <record id="action_machine_schedule" model="ir.actions.act_window">
+        <field name="name">Machine Maintenance Schedule</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_machine_product', '=', True)]</field>
+        <field name="context">{'default_is_machine_product': True}</field>
+    </record>
+    <menuitem id="menu_machine_schedule" name="Machine Maintenance Schedule" parent="maintenance.menu_maintenance_title"
+              action="action_machine_schedule" sequence="4"/>
+</odoo>

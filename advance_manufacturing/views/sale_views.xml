@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ===== Sale order form: confirm/split buttons, reference PI, terms tab, bank, addresses ===== -->
+    <record id="view_sale_order_form_advmfg" model="ir.ui.view">
+        <field name="name">sale.order.form.advmfg</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="advmfg_so_active" invisible="1"/>
+                <field name="approval_state" invisible="1"/>
+                <field name="can_send_for_approval" invisible="1"/>
+                <field name="is_sales_admin_user" invisible="1"/>
+                <button name="action_reject" type="object" string="Split" class="btn-danger"
+                        confirm="Are you sure you want to Split this sale order?"
+                        invisible="not advmfg_so_active or state not in ('confirm_order', 'sale')"/>
+            </xpath>
+            <xpath expr="//button[@id='action_confirm']" position="attributes">
+                <attribute name="invisible">advmfg_so_active and state not in ('draft', 'sent', 'confirm_order') or not advmfg_so_active and state not in ['sent']</attribute>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="reference_so_id" options="{'no_create': True}" placeholder="Select a splited sale order…"
+                       invisible="not advmfg_so_active" readonly="state in ('sale', 'rejected')" force_save="1"/>
+            </xpath>
+            <xpath expr="//group[@name='order_details']" position="inside">
+                <field name="confirm_sale_order" invisible="not advmfg_so_active" readonly="state == 'sale'"
+                       groups="advance_manufacturing.group_advmfg_manager"/>
+                <field name="shipping_same_as_billing" invisible="not advmfg_so_active"/>
+                <field name="billing_gst_number" invisible="not advmfg_so_active"/>
+                <field name="shipping_gst_number" invisible="not advmfg_so_active"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Terms and Conditions" name="advmfg_terms" invisible="not advmfg_so_active">
+                    <group>
+                        <group string="Commercial Terms">
+                            <field name="payment_type" required="advmfg_so_active"/>
+                            <field name="payment_terms_description"/>
+                            <field name="warranty_type" required="advmfg_so_active"/>
+                            <field name="warranty_details"/>
+                            <field name="delivery_type" required="advmfg_so_active"/>
+                            <field name="dispatch_location"/>
+                            <field name="freight_type" required="advmfg_so_active"/>
+                            <field name="cancellation_policy" required="advmfg_so_active"/>
+                            <field name="cancellation_details"/>
+                        </group>
+                        <group string="Bank, Certification and Delivery">
+                            <field name="bank_account_id" options="{'no_create': True}"/>
+                            <field name="bank_account_number"/>
+                            <field name="bank_name"/>
+                            <field name="bank_account_name"/>
+                            <field name="bank_branch_name"/>
+                            <field name="bank_ifsc_code"/>
+                            <field name="certifications_type" required="advmfg_so_active"/>
+                            <field name="tolerance_type" required="advmfg_so_active"/>
+                            <field name="module_specifications"/>
+                            <field name="material_delivery_terms"/>
+                            <field name="custom_duty_clause"/>
+                            <field name="note_custom"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Splited Reason" name="advmfg_split_reason" invisible="not rejection_reason">
+                    <field name="rejection_reason" readonly="1"/>
+                </page>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list//field[@name='price_unit']" position="before">
+                <field name="unit_price" readonly="higher_wattage" optional="show"/>
+                <field name="wattage" optional="show" readonly="1"/>
+                <field name="higher_wattage" column_invisible="1"/>
+                <field name="is_from_reference_so" optional="hide" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_sale_order_search_advmfg" model="ir.ui.view">
+        <field name="name">sale.order.search.advmfg</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_view_search_inherit_sale"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+                <filter name="splited" string="Splited" domain="[('state', '=', 'rejected')]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Product: wattage ===== -->
+    <record id="view_product_variant_wattage_advmfg" model="ir.ui.view">
+        <field name="name">product.product.wattage.advmfg</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='weight']" position="inside">
+                <field name="wattage" groups="advance_manufacturing.group_advmfg_manager"/>
+                <field name="higher_wattage" groups="advance_manufacturing.group_advmfg_manager"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Users: approval and role flags ===== -->
+    <record id="view_users_form_advmfg" model="ir.ui.view">
+        <field name="name">res.users.form.advmfg</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Manufacturing Access" name="advmfg_user_flags" groups="base.group_system">
+                    <group>
+                        <group string="Quotation Final Approval Notifications">
+                            <field name="is_quotation_final_approver"/>
+                        </group>
+                        <group string="Sales and Purchase Roles">
+                            <field name="is_purchase_manager"/>
+                            <field name="is_director_marketing"/>
+                            <field name="is_marketing_manager"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Partner: GST number on contacts ===== -->
+    <record id="view_partner_form_advmfg" model="ir.ui.view">
+        <field name="name">res.partner.form.advmfg</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="gst_number"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Bank accounts ===== -->
+    <record id="view_advmfg_bank_account_list" model="ir.ui.view">
+        <field name="name">advmfg.bank.account.list</field>
+        <field name="model">advmfg.bank.account</field>
+        <field name="arch" type="xml">
+            <list><field name="bank_name"/><field name="account_name"/><field name="account_number"/><field name="branch_name"/>
+                <field name="ifsc_code"/><field name="company_id" groups="base.group_multi_company"/>
+                <field name="active" widget="boolean_toggle"/></list>
+        </field>
+    </record>
+    <record id="view_advmfg_bank_account_form" model="ir.ui.view">
+        <field name="name">advmfg.bank.account.form</field>
+        <field name="model">advmfg.bank.account</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet><group><group><field name="bank_name"/><field name="account_name"/><field name="account_number"/></group>
+                    <group><field name="branch_name"/><field name="ifsc_code"/><field name="company_id" groups="base.group_multi_company"/>
+                        <field name="active"/></group></group></sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="view_advmfg_bank_account_search" model="ir.ui.view">
+        <field name="name">advmfg.bank.account.search</field>
+        <field name="model">advmfg.bank.account</field>
+        <field name="arch" type="xml">
+            <search><field name="account_number"/><field name="bank_name"/>
+                <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By"><filter name="g_company" string="Company" context="{'group_by': 'company_id'}"/>
+                    <filter name="g_bank" string="Bank Name" context="{'group_by': 'bank_name'}"/></group></search>
+        </field>
+    </record>
+    <record id="action_advmfg_bank_account" model="ir.actions.act_window">
+        <field name="name">Bank Account(s)</field>
+        <field name="res_model">advmfg.bank.account</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_advmfg_bank_account" name="Bank Account(s)" parent="sale.menu_sale_config"
+              action="action_advmfg_bank_account" sequence="21"/>
+
+    <!-- ===== Confirm / split windows ===== -->
+    <record id="view_advmfg_sale_confirm_wizard_form" model="ir.ui.view">
+        <field name="name">advmfg.sale.confirm.wizard.form</field>
+        <field name="model">advmfg.sale.confirm.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Manufacturing Order Control">
+                <field name="sale_order_id" invisible="1"/>
+                <field name="can_send_for_approval" invisible="1"/>
+                <field name="is_sales_admin_user" invisible="1"/>
+                <field name="confirm_sale_order" invisible="1"/>
+                <field name="mode" invisible="1"/>
+                <div class="alert alert-info" role="alert">
+                    <i class="fa fa-sliders"/> Manual Mode: type how many finished units to take from stock for each product. The rest will be manufactured.
+                </div>
+                <field name="line_ids">
+                    <list editable="bottom" create="0" delete="0">
+                        <field name="product_id"/>
+                        <field name="ordered_qty"/>
+                        <field name="available_qty"/>
+                        <field name="manual_stock_qty"/>
+                        <field name="mo_qty"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_send_for_approval" type="object" string="Send for Approval" class="btn-primary"
+                            invisible="is_sales_admin_user"/>
+                    <button name="action_confirm" type="object" string="Confirm MO/Delivery" class="btn-primary"
+                            invisible="not confirm_sale_order"/>
+                    <button name="action_move_to_confirm_order" type="object" string="Confirm Sales Order" class="btn-primary"
+                            invisible="not is_sales_admin_user or confirm_sale_order"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="view_advmfg_sale_reject_wizard_form" model="ir.ui.view">
+        <field name="name">advmfg.sale.reject.wizard.form</field>
+        <field name="model">advmfg.sale.reject.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="sale_order_id" invisible="1"/>
+                <group><field name="reason" placeholder="Why is this order being split?"/></group>
+                <footer>
+                    <button name="action_confirm_reject" type="object" string="Confirm" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

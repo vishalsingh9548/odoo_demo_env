@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_advmfg_pallet_form" model="ir.ui.view">
+        <field name="name">advmfg.pallet.form</field>
+        <field name="model">advmfg.pallet</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_add_serial" type="object" string="Add Serial" class="btn-primary"
+                            invisible="state == 'confirmed'"/>
+                    <button name="action_confirm" type="object" string="Confirm" invisible="state == 'confirmed'"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft" invisible="state == 'draft'"/>
+                    <button name="action_print" type="object" string="Print Pallet"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <h1><field name="name"/></h1>
+                    <group>
+                        <field name="production_id" readonly="1"/>
+                        <field name="unit_count"/>
+                    </group>
+                    <field name="unit_ids" readonly="1">
+                        <list>
+                            <field name="name"/>
+                            <field name="state" widget="badge"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_advmfg_pallet_list" model="ir.ui.view">
+        <field name="name">advmfg.pallet.list</field>
+        <field name="model">advmfg.pallet</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="production_id"/>
+                <field name="unit_count"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+</odoo>

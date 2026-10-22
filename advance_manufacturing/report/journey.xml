@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- The Serial Journey card: one block of light, easy-to-read cards. Used on screen and in the PDF. -->
+    <template id="journey_card">
+        <div style="background:#EEF3F8;padding:16px;border-radius:12px;font-family:Inter,system-ui,sans-serif;color:#1F2A37;display:flex;flex-direction:column;gap:14px">
+
+            <div style="background:#FFFFFF;border:1px solid #DCE5EE;border-radius:12px;padding:18px 22px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+                    <div>
+                        <div style="font-size:12px;font-weight:600;color:#5B6776;letter-spacing:.8px;text-transform:uppercase">Serial Journey</div>
+                        <div style="font-size:30px;font-weight:700;margin-top:2px"><t t-out="serial"/></div>
+                        <div style="font-size:14px;color:#5B6776"><t t-out="product"/></div>
+                    </div>
+                    <div style="background:#E8F6EF;color:#116A47;border-radius:999px;padding:6px 14px;font-size:12px;font-weight:600">
+                        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#178A62;margin-right:6px"></span>Live status · as of <t t-out="now"/>
+                    </div>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+                    <t t-foreach="chips" t-as="c">
+                        <span t-attf-style="background:#{c['bg']};color:#{c['fg']};border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600"><t t-out="c['label']"/></span>
+                    </t>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+                <t t-foreach="facts" t-as="f">
+                    <div style="flex:1 1 200px;background:#FFFFFF;border:1px solid #DCE5EE;border-radius:12px;padding:14px 16px">
+                        <div style="font-size:11px;font-weight:600;color:#5B6776;letter-spacing:.7px;text-transform:uppercase"><t t-out="f['k']"/></div>
+                        <div style="font-size:18px;font-weight:700;margin-top:4px"><t t-out="f['v']"/></div>
+                        <div style="font-size:12px;color:#5B6776;margin-top:2px"><t t-out="f['s']"/></div>
+                    </div>
+                </t>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #DCE5EE;border-radius:12px;padding:18px 22px">
+                <div style="font-size:15px;font-weight:700;margin-bottom:14px">Manufacturing progress</div>
+                <div style="display:flex">
+                    <t t-foreach="stages" t-as="s">
+                        <div style="flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;min-width:0">
+                            <div t-attf-style="position:absolute;top:15px;left:0;right:50%;height:3px;background:#{s['left']}"></div>
+                            <div t-attf-style="position:absolute;top:15px;left:50%;right:0;height:3px;background:#{s['right']}"></div>
+                            <div t-attf-style="position:relative;width:32px;height:32px;border-radius:50%;background:#{s['dot']};color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px"><t t-out="s['mark']"/></div>
+                            <div style="font-size:13px;font-weight:600;text-align:center"><t t-out="s['name']"/></div>
+                            <div style="font-size:11px;color:#5B6776;text-align:center"><t t-out="s['when']"/></div>
+                            <div t-attf-style="font-size:11px;font-weight:600;color:#{s['qc_fg']};background:#{s['qc_bg']};border-radius:999px;padding:2px 9px"><t t-out="s['qc']"/></div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start">
+                <div style="flex:1 1 320px;display:flex;flex-direction:column;gap:12px">
+                    <div style="background:#FFFFFF;border:1px solid #DCE5EE;border-radius:12px;padding:16px 20px">
+                        <div style="font-size:15px;font-weight:700;margin-bottom:8px">Where it came from</div>
+                        <t t-foreach="origin" t-as="o">
+                            <div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid #EAF0F6;font-size:13px">
+                                <span style="color:#5B6776"><t t-out="o['k']"/></span>
+                                <span style="font-weight:600;text-align:right"><t t-out="o['v']"/></span>
+                            </div>
+                        </t>
+                    </div>
+                    <div style="background:#FFFFFF;border:1px solid #DCE5EE;border-radius:12px;padding:16px 20px">
+                        <div style="font-size:15px;font-weight:700;margin-bottom:8px">Packing</div>
+                        <t t-foreach="packing" t-as="p">
+                            <div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid #EAF0F6;font-size:13px">
+                                <span style="color:#5B6776"><t t-out="p['k']"/></span>
+                                <span t-attf-style="font-weight:600;text-align:right;color:#{p['c']}"><t t-out="p['v']"/></span>
+                            </div>
+                        </t>
+                    </div>
+                    <div style="background:#FFFFFF;border:1px solid #DCE5EE;border-radius:12px;padding:16px 20px">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                            <div style="font-size:15px;font-weight:700">Delivery details</div>
+                            <span t-attf-style="background:#{delivery_badge['bg']};color:#{delivery_badge['fg']};border-radius:999px;padding:4px 10px;font-size:11px;font-weight:600"><t t-out="delivery_badge['label']"/></span>
+                        </div>
+                        <t t-foreach="delivery" t-as="d">
+                            <div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid #EAF0F6;font-size:13px">
+                                <span style="color:#5B6776"><t t-out="d['k']"/></span>
+                                <span t-attf-style="font-weight:600;text-align:right;color:#{d['c']}"><t t-out="d['v']"/></span>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+                <div style="flex:1 1 360px;background:#FFFFFF;border:1px solid #DCE5EE;border-radius:12px;padding:16px 22px">
+                    <div style="font-size:15px;font-weight:700;margin-bottom:12px">Full history</div>
+                    <t t-foreach="events" t-as="e">
+                        <div style="display:flex;gap:12px">
+                            <div style="display:flex;flex-direction:column;align-items:center">
+                                <div t-attf-style="width:12px;height:12px;border-radius:50%;background:#{e['color']};margin-top:4px"></div>
+                                <div style="width:2px;flex-grow:1;background:#E1E9F1;margin-top:2px"></div>
+                            </div>
+                            <div style="padding-bottom:12px;flex-grow:1">
+                                <div style="display:flex;justify-content:space-between;gap:10px">
+                                    <span style="font-size:13px;font-weight:600"><t t-out="e['title']"/></span>
+                                    <span style="font-size:11px;color:#5B6776;white-space:nowrap"><t t-out="e['when']"/></span>
+                                </div>
+                                <div style="font-size:12px;color:#5B6776;margin-top:1px"><t t-out="e['note']"/></div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- PDF version -->
+    <record id="action_report_advmfg_journey" model="ir.actions.report">
+        <field name="name">Serial Journey (live)</field>
+        <field name="model">advmfg.serial.journey</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">advance_manufacturing.report_advmfg_journey</field>
+        <field name="report_file">advance_manufacturing.report_advmfg_journey</field>
+        <field name="print_report_name">'Serial_Journey_%s' % object.serial_no</field>
+    </record>
+    <template id="report_advmfg_journey">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <t t-set="vals" t-value="o._journey_values()"/>
+                        <t t-call="advance_manufacturing.journey_card">
+                            <t t-set="serial" t-value="vals['serial']"/>
+                            <t t-set="product" t-value="vals['product']"/>
+                            <t t-set="chips" t-value="vals['chips']"/>
+                            <t t-set="facts" t-value="vals['facts']"/>
+                            <t t-set="stages" t-value="vals['stages']"/>
+                            <t t-set="origin" t-value="vals['origin']"/>
+                            <t t-set="packing" t-value="vals['packing']"/>
+                            <t t-set="delivery" t-value="vals['delivery']"/>
+                            <t t-set="delivery_badge" t-value="vals['delivery_badge']"/>
+                            <t t-set="events" t-value="vals['events']"/>
+                            <t t-set="now" t-value="vals['now']"/>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

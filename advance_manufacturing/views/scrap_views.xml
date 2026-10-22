@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_form_scrap_btn" model="ir.ui.view">
+        <field name="name">stock.picking.form.scrap.btn</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_scraps" type="object" class="oe_stat_button" icon="fa-trash"
+                        groups="advance_manufacturing.group_advmfg_manager" invisible="picking_type_code != 'internal' or scrap_count == 0">
+                    <field name="scrap_count" widget="statinfo" string="Scraps"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Scrap reason tags: list and form + menu -->
+    <record id="view_scrap_reason_tag_list" model="ir.ui.view">
+        <field name="name">stock.scrap.reason.tag.list</field>
+        <field name="model">stock.scrap.reason.tag</field>
+        <field name="arch" type="xml"><list><field name="sequence" widget="handle"/><field name="name"/><field name="color" widget="color_picker"/></list></field>
+    </record>
+    <record id="view_scrap_reason_tag_form" model="ir.ui.view">
+        <field name="name">stock.scrap.reason.tag.form</field>
+        <field name="model">stock.scrap.reason.tag</field>
+        <field name="arch" type="xml"><form><sheet><group><field name="name"/><field name="sequence"/><field name="color" widget="color_picker"/></group></sheet></form></field>
+    </record>
+    <record id="action_scrap_reason_tag" model="ir.actions.act_window">
+        <field name="name">Scrap Reason Tags</field>
+        <field name="res_model">stock.scrap.reason.tag</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_scrap_reason_tag" name="Scrap Reason Tags" parent="mrp.menu_mrp_configuration" action="action_scrap_reason_tag" sequence="50"/>
+
+    <!-- Scrap serial Excel report -->
+    <record id="view_scrap_serial_report_wizard_form" model="ir.ui.view">
+        <field name="name">scrap.serial.report.wizard.form</field>
+        <field name="model">scrap.serial.report.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <div class="alert alert-danger" role="alert"><h4>Scrap Serial Report</h4>
+                    Download an Excel sheet of every cancelled unit and the components that were scrapped for it.</div>
+                <div class="alert alert-light" role="alert">Included columns: Serial Number, Manufacturing Order, Scrapped Components with Quantities.<br/>
+                    Filter applied: Line State = Cancelled</div>
+                <footer><button name="action_download_report" type="object" string="Download Excel Report" class="btn-danger"/>
+                    <button string="Close" special="cancel"/></footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_scrap_serial_report" model="ir.actions.act_window">
+        <field name="name">Scrap Serial Report</field>
+        <field name="res_model">scrap.serial.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    <menuitem id="menu_scrap_serial_report" name="Scrap Serial Report" parent="stock.menu_warehouse_report"
+              action="action_scrap_serial_report" sequence="100"/>
+</odoo>

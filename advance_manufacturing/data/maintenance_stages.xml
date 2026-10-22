@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Machine maintenance stages: New Request(1) > Approval Send(2) > Approved(3) > In Progress(4) > Repairing(5) > Done(6) > Scrap(7) -->
+    <record id="stage_approval_send" model="maintenance.stage">
+        <field name="name">Approval Send</field>
+        <field name="sequence">2</field>
+    </record>
+    <record id="stage_approved" model="maintenance.stage">
+        <field name="name">Approved</field>
+        <field name="sequence">3</field>
+    </record>
+    <record id="stage_repairing" model="maintenance.stage">
+        <field name="name">Repairing</field>
+        <field name="sequence">5</field>
+    </record>
+    <!-- The standard stages are protected from plain re-definition, so rename/reorder them with direct writes. -->
+    <function model="maintenance.stage" name="write">
+        <value eval="[ref('maintenance.stage_3')]"/>
+        <value eval="{'name': 'Done', 'sequence': 6}"/>
+    </function>
+    <function model="maintenance.stage" name="write">
+        <value eval="[ref('maintenance.stage_1')]"/>
+        <value eval="{'sequence': 4}"/>
+    </function>
+    <function model="maintenance.stage" name="write">
+        <value eval="[ref('maintenance.stage_4')]"/>
+        <value eval="{'sequence': 7}"/>
+    </function>
+</odoo>

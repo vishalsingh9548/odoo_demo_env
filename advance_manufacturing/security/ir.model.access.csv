@@ -1,0 +1,54 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_advmfg_stage,advmfg.stage,model_advmfg_stage,group_advmfg_manager,1,1,1,1
+access_advmfg_unit,advmfg.unit,model_advmfg_unit,group_advmfg_manager,1,1,1,1
+access_advmfg_qc,advmfg.qc,model_advmfg_qc,group_advmfg_manager,1,1,1,1
+access_advmfg_serial,advmfg.serial,model_advmfg_serial,group_advmfg_manager,1,1,1,1
+access_advmfg_pallet,advmfg.pallet,model_advmfg_pallet,group_advmfg_manager,1,1,1,1
+access_advmfg_status_wizard,advmfg.status.wizard,model_advmfg_status_wizard,group_advmfg_manager,1,1,1,1
+access_advmfg_status_wizard_line,advmfg.status.wizard.line,model_advmfg_status_wizard_line,group_advmfg_manager,1,1,1,1
+access_advmfg_qc_fail_wizard,advmfg.qc.fail.wizard,model_advmfg_qc_fail_wizard,group_advmfg_manager,1,1,1,1
+access_advmfg_pallet_add_wizard,advmfg.pallet.add.wizard,model_advmfg_pallet_add_wizard,group_advmfg_manager,1,1,1,1
+access_advmfg_serial_prefix,advmfg.serial.prefix,model_advmfg_serial_prefix,group_advmfg_manager,1,1,1,1
+access_advmfg_qc_attachment_wizard,advmfg.qc.attachment.wizard,model_advmfg_qc_attachment_wizard,group_advmfg_manager,1,1,1,1
+access_advmfg_attachment_bulk_wizard,advmfg.attachment.bulk.wizard,model_advmfg_attachment_bulk_wizard,group_advmfg_manager,1,1,1,1
+access_advmfg_attachment_bulk_line,advmfg.attachment.bulk.line,model_advmfg_attachment_bulk_line,group_advmfg_manager,1,1,1,1
+access_mrp_bom_approval_request,mrp.bom.approval.request,model_mrp_bom_approval_request,base.group_user,1,1,1,1
+access_mrp_bom_change_wizard,mrp.bom.change.wizard,model_mrp_bom_change_wizard,base.group_user,1,1,1,1
+access_mrp_bom_change_wizard_line,mrp.bom.change.wizard.line,model_mrp_bom_change_wizard_line,base.group_user,1,1,1,1
+access_advmfg_bom_revision,advmfg.bom.revision,model_advmfg_bom_revision,group_advmfg_manager,1,1,1,1
+access_advmfg_bom_update_wizard,advmfg.bom.update.wizard,model_advmfg_bom_update_wizard,group_advmfg_manager,1,1,1,1
+access_advmfg_mrp_bom,mrp.bom advance manufacturing,mrp.model_mrp_bom,group_advmfg_manager,1,1,0,0
+access_advmfg_mrp_bom_line,mrp.bom.line advance manufacturing,mrp.model_mrp_bom_line,group_advmfg_manager,1,1,0,0
+access_advmfg_scan_wizard,advmfg.scan.wizard,model_advmfg_scan_wizard,group_advmfg_manager,1,1,1,1
+access_advmfg_serial_lookup_wizard,advmfg.serial.lookup.wizard,model_advmfg_serial_lookup_wizard,group_advmfg_manager,1,1,1,1
+access_advmfg_scrap_component_wizard,advmfg.scrap.component.wizard,model_advmfg_scrap_component_wizard,group_advmfg_manager,1,1,1,1
+access_advmfg_scrap_component_line,advmfg.scrap.component.line,model_advmfg_scrap_component_line,group_advmfg_manager,1,1,1,1
+access_advmfg_prefix_wizard,advmfg.prefix.wizard,model_advmfg_prefix_wizard,base.group_user,1,1,1,1
+access_advmfg_sale_confirm_wizard,advmfg.sale.confirm.wizard,model_advmfg_sale_confirm_wizard,base.group_user,1,1,1,1
+access_advmfg_sale_confirm_wizard_line,advmfg.sale.confirm.wizard.line,model_advmfg_sale_confirm_wizard_line,base.group_user,1,1,1,1
+access_advmfg_sale_reject_wizard,advmfg.sale.reject.wizard,model_advmfg_sale_reject_wizard,base.group_user,1,1,1,1
+access_advmfg_bank_account,advmfg.bank.account,model_advmfg_bank_account,base.group_user,1,1,1,1
+access_mr_user,material.requisition user,model_material_requisition,base.group_user,1,1,1,0
+access_mr_manager,material.requisition manager,model_material_requisition,stock.group_stock_manager,1,1,1,1
+access_mr_line_user,material.requisition.line user,model_material_requisition_line,base.group_user,1,1,1,0
+access_mr_line_manager,material.requisition.line manager,model_material_requisition_line,stock.group_stock_manager,1,1,1,1
+access_mr_master_user,approver master user,model_material_request_approver_master,base.group_user,1,0,0,0
+access_mr_master_admin,approver master admin,model_material_request_approver_master,base.group_system,1,1,1,1
+access_mr_aline_user,approver line user,model_material_request_approver_line,base.group_user,1,0,0,0
+access_mr_aline_admin,approver line admin,model_material_request_approver_line,base.group_system,1,1,1,1
+access_material_requisition_lot_wizard,material.requisition.lot.wizard,model_material_requisition_lot_wizard,base.group_user,1,1,1,1
+access_material_requisition_lot_wizard_line,material.requisition.lot.wizard.line,model_material_requisition_lot_wizard_line,base.group_user,1,1,1,1
+access_material_requisition_excel_wizard,material.requisition.excel.wizard,model_material_requisition_excel_wizard,base.group_user,1,1,1,1
+access_advmfg_receipt_qc,advmfg.receipt.qc,model_advmfg_receipt_qc,group_advmfg_manager,1,1,1,1
+access_scrap_serial_report_wizard,scrap.serial.report.wizard,model_scrap_serial_report_wizard,base.group_user,1,1,1,1
+access_advmfg_so_serial,advmfg.so.serial,model_advmfg_so_serial,base.group_user,1,1,1,1
+access_advmfg_delivery_pack,advmfg.delivery.pack,model_advmfg_delivery_pack,base.group_user,1,1,1,1
+access_advmfg_link_sale_wizard,advmfg.link.sale.wizard,model_advmfg_link_sale_wizard,base.group_user,1,1,1,1
+access_advmfg_import_serial_wizard,advmfg.import.serial.wizard,model_advmfg_import_serial_wizard,base.group_user,1,1,1,1
+access_maint_component_line,maintenance.request.component.line,model_maintenance_request_component_line,base.group_user,1,1,1,1
+access_maint_reason_line,maintenance.request.reason.line,model_maintenance_request_reason_line,base.group_user,1,1,1,1
+access_maint_component_wizard,maintenance.component.wizard,model_maintenance_component_wizard,base.group_user,1,1,1,1
+access_maint_component_wizard_line,maintenance.component.wizard.line,model_maintenance_component_wizard_line,base.group_user,1,1,1,1
+access_maint_reason_wizard,maintenance.reason.wizard,model_maintenance_reason_wizard,base.group_user,1,1,1,1
+access_maint_reason_wizard_line,maintenance.reason.wizard.line,model_maintenance_reason_wizard_line,base.group_user,1,1,1,1
+access_advmfg_serial_journey,advmfg.serial.journey,model_advmfg_serial_journey,base.group_user,1,1,1,1

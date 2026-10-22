@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="advance_manufacturing.SerialLookupInput">
+        <input type="text" class="o_input o_field_char" placeholder="Scan serial..." autofocus="autofocus"
+               t-on-change="onSerialChange"/>
+    </t>
+</templates>

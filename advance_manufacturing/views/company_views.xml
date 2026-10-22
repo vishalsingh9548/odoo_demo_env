@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Adds the on/off switch and defaults to the company form (visible to group members only). -->
+    <record id="view_company_form_advmfg" model="ir.ui.view">
+        <field name="name">res.company.form.advmfg</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Advance Manufacturing" name="advmfg" groups="advance_manufacturing.group_advmfg_manager">
+                    <group>
+                        <group string="Switch">
+                            <field name="advmfg_enabled"/>
+                        </group>
+                        <group string="Defaults">
+                            <field name="advmfg_serial_prefix"/>
+                            <field name="advmfg_combo_hsn_code"/>
+                            <field name="advmfg_max_pallet_qty"/>
+                            <field name="advmfg_packed_location_id"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

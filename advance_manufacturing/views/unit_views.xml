@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_advmfg_unit_list" model="ir.ui.view">
+        <field name="name">advmfg.unit.list</field>
+        <field name="model">advmfg.unit</field>
+        <field name="arch" type="xml">
+            <list create="0" decoration-success="state == 'completed'" decoration-danger="state == 'cancel'"
+                  decoration-info="state == 'in_progress'">
+                <field name="name"/>
+                <field name="production_id"/>
+                <field name="sale_order_id"/>
+                <field name="product_id"/>
+                <field name="stage_id"/>
+                <field name="state" widget="badge"/>
+                <field name="qc_state" widget="badge"/>
+                <field name="pallet_id"/>
+                <field name="current_location"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_advmfg_unit_form" model="ir.ui.view">
+        <field name="name">advmfg.unit.form</field>
+        <field name="model">advmfg.unit</field>
+        <field name="arch" type="xml">
+            <form create="0">
+                <header>
+                    <button name="action_start" type="object" string="Start" class="btn-primary"
+                            invisible="state != 'yet_to_start'"/>
+                    <button name="action_next_stage" type="object" string="Next Stage"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_update_status" type="object" string="Update Status"
+                            invisible="state in ('completed', 'cancel')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="yet_to_start,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="production_id"/>
+                            <field name="sale_order_id"/>
+                            <field name="product_id"/>
+                            <field name="floor_id"/>
+                        </group>
+                        <group>
+                            <field name="stage_id"/>
+                            <field name="qc_id"/>
+                            <field name="qc_state"/>
+                            <field name="pallet_id"/>
+                            <field name="current_location"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Attachments and Notes">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                            <field name="comment" placeholder="Add comment..."/>
+                        </page>
+                        <page string="Quality Checks">
+                            <field name="qc_ids" readonly="1">
+                                <list>
+                                    <field name="stage_id"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="fail_reason"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_advmfg_unit_search" model="ir.ui.view">
+        <field name="name">advmfg.unit.search</field>
+        <field name="model">advmfg.unit</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="production_id"/>
+                <field name="sale_order_id"/>
+                <filter name="in_progress" string="In Progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter name="completed" string="Completed" domain="[('state', '=', 'completed')]"/>
+                <filter name="cancel" string="Cancelled" domain="[('state', '=', 'cancel')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_mo" string="Manufacturing Order" context="{'group_by': 'production_id'}"/>
+                    <filter name="g_so" string="Sale Order" context="{'group_by': 'sale_order_id'}"/>
+                    <filter name="g_floor" string="Floor" context="{'group_by': 'floor_id'}"/>
+                    <filter name="g_stage" string="Stage" context="{'group_by': 'stage_id'}"/>
+                    <filter name="g_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- The Unit Tracker: every unit, filterable and groupable. -->
+    <record id="action_advmfg_unit" model="ir.actions.act_window">
+        <field name="name">Unit Tracker</field>
+        <field name="res_model">advmfg.unit</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Quality checks list + "Bulk Pass" action. -->
+    <record id="view_advmfg_qc_list" model="ir.ui.view">
+        <field name="name">advmfg.qc.list</field>
+        <field name="model">advmfg.qc</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" decoration-success="state == 'pass'" decoration-danger="state == 'fail'">
+                <field name="unit_id"/>
+                <field name="stage_id"/>
+                <field name="production_id"/>
+                <field name="state" widget="badge"/>
+                <field name="fail_reason"/>
+                <button name="action_pass" type="object" string="Pass" icon="fa-check" invisible="state != 'todo'"/>
+                <button name="action_fail" type="object" string="Fail" icon="fa-times" invisible="state != 'todo'"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_advmfg_qc" model="ir.actions.act_window">
+        <field name="name">Quality Checks</field>
+        <field name="res_model">advmfg.qc</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_todo': 1}</field>
+    </record>
+    <record id="view_advmfg_qc_search" model="ir.ui.view">
+        <field name="name">advmfg.qc.search</field>
+        <field name="model">advmfg.qc</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="unit_id"/>
+                <field name="production_id"/>
+                <filter name="todo" string="To Do" domain="[('state', '=', 'todo')]"/>
+                <filter name="fail" string="Failed" domain="[('state', '=', 'fail')]"/>
+            </search>
+        </field>
+    </record>
+    <record id="server_action_advmfg_bulk_pass" model="ir.actions.server">
+        <field name="name">Bulk Pass</field>
+        <field name="model_id" ref="model_advmfg_qc"/>
+        <field name="binding_model_id" ref="model_advmfg_qc"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">records.filtered(lambda q: q.state == 'todo').action_pass()</field>
+    </record>
+
+    <!-- Server action: print serial labels from the Unit Tracker list. -->
+</odoo>

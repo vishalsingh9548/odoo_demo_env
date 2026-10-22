@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- BOM form: Request Change button + approval status, production link, lines read-only for non-administrators -->
+    <record id="view_mrp_bom_form_advmfg" model="ir.ui.view">
+        <field name="name">mrp.bom.form.advmfg</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <field name="advmfg_approval_active" invisible="1"/>
+                    <button name="action_send_bom_for_approval" type="object" string="Request Change" class="btn-warning"
+                            invisible="not advmfg_approval_active or approval_state == 'pending'"/>
+                    <field name="approval_state" widget="statusbar" statusbar_visible="none,pending"
+                           invisible="not advmfg_approval_active"/>
+                </header>
+            </xpath>
+            <xpath expr="//field[@name='code']" position="after">
+                <field name="production_id" readonly="1" force_save="1" invisible="not production_id"/>
+            </xpath>
+            <xpath expr="//field[@name='bom_line_ids']" position="attributes">
+                <attribute name="readonly">advmfg_approval_active</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Approval requests -->
+    <record id="view_bom_approval_request_list" model="ir.ui.view">
+        <field name="name">mrp.bom.approval.request.list</field>
+        <field name="model">mrp.bom.approval.request</field>
+        <field name="arch" type="xml">
+            <list decoration-warning="state == 'pending'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'">
+                <field name="bom_id"/>
+                <field name="requested_by"/>
+                <field name="create_date"/>
+                <field name="state" widget="badge"/>
+                <field name="reviewed_by"/>
+                <field name="review_date"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_bom_approval_request_form" model="ir.ui.view">
+        <field name="name">mrp.bom.approval.request.form</field>
+        <field name="model">mrp.bom.approval.request</field>
+        <field name="arch" type="xml">
+            <form create="0">
+                <header>
+                    <button name="action_approve" type="object" string="✔ Approve Changes" class="btn-success"
+                            invisible="state != 'pending'" groups="base.group_system,advance_manufacturing.group_advmfg_manager"/>
+                    <button name="action_reject" type="object" string="✘ Reject" class="btn-danger"
+                            invisible="state != 'pending'" groups="base.group_system,advance_manufacturing.group_advmfg_manager"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group><field name="bom_id"/><field name="requested_by"/><field name="note"/></group>
+                        <group><field name="reviewed_by"/><field name="review_date"/></group>
+                    </group>
+                    <field name="changes_summary"/>
+                    <group string="Rejection" invisible="state != 'rejected'"><field name="reject_reason"/></group>
+                    <group string="Reject reason" invisible="state != 'pending'"><field name="reject_reason" placeholder="Fill this in before pressing Reject"/></group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_bom_approval_request" model="ir.actions.act_window">
+        <field name="name">BOM Approval Requests</field>
+        <field name="res_model">mrp.bom.approval.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_bom_approvals" name="BOM Approvals" parent="mrp.menu_mrp_root" action="action_bom_approval_request"
+              sequence="99" groups="base.group_system,advance_manufacturing.group_advmfg_manager"/>
+
+    <!-- Change-request window -->
+    <record id="view_mrp_bom_change_wizard_form" model="ir.ui.view">
+        <field name="name">mrp.bom.change.wizard.form</field>
+        <field name="model">mrp.bom.change.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <div class="alert alert-warning" role="alert">Your changes will be sent to an administrator for approval. The Bill of Materials stays locked until they decide.</div>
+                <group>
+                    <group>
+                        <field name="bom_id"/><field name="product_tmpl_id"/><field name="product_id"/>
+                        <field name="product_qty"/><field name="product_uom_id"/>
+                    </group>
+                    <group><field name="code"/><field name="type"/></group>
+                </group>
+                <field name="note" placeholder="Explain why you are changing this Bill of Materials..."/>
+                <field name="wizard_line_ids">
+                    <list editable="bottom">
+                        <field name="bom_line_id" column_invisible="1"/>
+                        <field name="product_id"/><field name="product_qty"/><field name="product_uom_id"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_submit_for_approval" type="object" string="Send for Approval" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Revision (engineering change) window and records -->
+    <record id="view_advmfg_bom_update_wizard_form" model="ir.ui.view">
+        <field name="name">advmfg.bom.update.wizard.form</field>
+        <field name="model">advmfg.bom.update.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="revision_type"/><field name="bom_id"/><field name="production_id"/>
+                    <field name="product_tmpl_id"/><field name="revision_id" readonly="1"/>
+                </group>
+                <footer>
+                    <button name="create_revision" type="object" string="Revise BOM" class="btn-primary"/>
+                    <button name="update_bom" type="object" string="Update BOM" class="btn-primary"
+                            confirm="Please update the Bill of Materials (BoM) with the required changes before confirming."/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="view_advmfg_bom_revision_form" model="ir.ui.view">
+        <field name="name">advmfg.bom.revision.form</field>
+        <field name="model">advmfg.bom.revision</field>
+        <field name="arch" type="xml">
+            <form>
+                <header><field name="state" widget="statusbar"/></header>
+                <sheet>
+                    <group>
+                        <field name="name"/><field name="product_tmpl_id"/><field name="production_id" readonly="1" force_save="1"/>
+                        <field name="bom_id"/><field name="new_bom_id"/><field name="revision_type"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="view_advmfg_bom_revision_list" model="ir.ui.view">
+        <field name="name">advmfg.bom.revision.list</field>
+        <field name="model">advmfg.bom.revision</field>
+        <field name="arch" type="xml"><list><field name="name"/><field name="production_id"/><field name="bom_id"/><field name="new_bom_id"/><field name="state"/></list></field>
+    </record>
+    <record id="action_advmfg_bom_revision" model="ir.actions.act_window">
+        <field name="name">BOM Revisions</field>
+        <field name="res_model">advmfg.bom.revision</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_advmfg_bom_revision" name="BOM Revisions" parent="mrp.menu_mrp_manufacturing"
+              action="action_advmfg_bom_revision" sequence="70" groups="advance_manufacturing.group_advmfg_manager"/>
+    <record id="action_advmfg_update_bom" model="ir.actions.act_window">
+        <field name="name">Update Bill Of Material</field>
+        <field name="res_model">advmfg.bom.update.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="mrp.model_mrp_production"/>
+        <field name="binding_view_types">list</field>
+    </record>
+    <record id="view_mrp_production_form_bom_update" model="ir.ui.view">
+        <field name="name">mrp.production.form.bom.update</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="%(action_advmfg_update_bom)d" type="action" string="Update Bill Of Material" class="oe_highlight"
+                        groups="advance_manufacturing.group_advmfg_manager" invisible="not advmfg_active"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
