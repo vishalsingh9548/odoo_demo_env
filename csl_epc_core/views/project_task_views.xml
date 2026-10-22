@@ -9,7 +9,7 @@
             <field name="inherit_id" ref="project.view_task_form2"/>
             <field name="arch" type="xml">
                 <xpath expr="//notebook" position="inside">
-                    <page name="epc_site_checklist" string="Solar Site Checklist">
+                    <page name="epc_site_checklist" string="Solar Site Checklist" groups="csl_epc_core.group_epc_user">
                         <group>
                             <group string="Civil &amp; Structure">
                                 <field name="civil_work_done"/>
