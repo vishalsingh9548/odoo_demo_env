@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Odoo translation backups and editor files
+*.po~
+*.pot~
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# local logs and scratch
+*.log
+*.dump
+*.tar.gz

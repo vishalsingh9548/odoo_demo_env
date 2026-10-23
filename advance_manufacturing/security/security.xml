@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ONE access setting for the whole module: Settings > Users > "Advance Manufacturing" dropdown.
+         Choose "Administrator" and everything in this module works for that user; leave it empty and nothing does. -->
+    <record id="module_category_advmfg" model="ir.module.category">
+        <field name="name">Advance Manufacturing</field>
+        <field name="description">Turns the whole Advance Manufacturing module on for a user.</field>
+        <field name="sequence">24</field>
+    </record>
+    <record id="group_advmfg_manager" model="res.groups">
+        <field name="name">Administrator</field>
+        <field name="category_id" ref="module_category_advmfg"/>
+        <field name="implied_ids" eval="[(4, ref('mrp.group_mrp_manager')), (4, ref('base.group_user'))]"/>
+        <field name="comment">Full access to Advance Manufacturing (only in companies where it is switched on).</field>
+    </record>
+
+    <!-- Old roles kept only so existing data and links keep working; they no longer appear in the user form. -->
+    <record id="group_advmfg_user" model="res.groups">
+        <field name="name">Advance Manufacturing (legacy)</field>
+        <field name="category_id" eval="False"/>
+    </record>
+    <record id="group_advmfg_serial_update" model="res.groups">
+        <field name="name">Serial Update Access (legacy)</field>
+        <field name="category_id" eval="False"/>
+    </record>
+    <record id="group_material_requisition_user" model="res.groups">
+        <field name="name">Material Requisition (legacy)</field>
+        <field name="category_id" eval="False"/>
+    </record>
+    <record id="group_advmfg_quality_user" model="res.groups">
+        <field name="name">Advance Manufacturing Quality User (legacy)</field>
+        <field name="category_id" eval="False"/>
+    </record>
+    <record id="group_advmfg_tab_access" model="res.groups">
+        <field name="name">Advance Manufacturing Units Tab Access (legacy)</field>
+        <field name="category_id" eval="False"/>
+    </record>
+
+    <!-- Sales approval chain: First Approval -> Second Approval -> Admin Approval (confirms the order). -->
+    <record id="module_category_sale_approval" model="ir.module.category">
+        <field name="name">Sales Approval</field>
+        <field name="description">Sales Quotation Approval Workflow</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="group_sale_first_approval" model="res.groups">
+        <field name="name">First Approval</field>
+        <field name="category_id" eval="False"/>
+    </record>
+    <record id="group_sale_second_approval" model="res.groups">
+        <field name="name">Second Approval</field>
+        <field name="category_id" eval="False"/>
+        <field name="implied_ids" eval="[(4, ref('sales_team.group_sale_salesman_all_leads'))]"/>
+    </record>
+    <record id="group_sale_admin_approval" model="res.groups">
+        <field name="name">Admin Approval</field>
+        <field name="category_id" eval="False"/>
+        <field name="implied_ids" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+    </record>
+    <record id="rule_sale_second_approval" model="ir.rule">
+        <field name="name">Sale Order - Second Approval Restriction</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="domain_force">[('approval_state', 'in', ['pending_admin', 'pending_second_approval'])] if user.has_group('advance_manufacturing.group_sale_second_approval') and not user.has_group('advance_manufacturing.group_advmfg_manager') else [(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_sale_admin_approval" model="ir.rule">
+        <field name="name">Sale Order - Admin Approval Restriction</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="domain_force">[('approval_state', 'in', ['pending_admin', 'approved'])] if user.has_group('advance_manufacturing.group_sale_admin_approval') and not user.has_group('advance_manufacturing.group_advmfg_manager') else [(1, '=', 1)]</field>
+    </record>
+
+    <!-- BOM Approver: may approve or reject Bill of Materials change requests without full administrator rights. -->
+    <record id="group_advmfg_bom_approver" model="res.groups">
+        <field name="name">BOM Approver</field>
+        <field name="category_id" eval="False"/>
+    </record>
+
+    <!-- Product Creation: only members may create products while the mode is on. -->
+    <record id="group_advmfg_product_create" model="res.groups">
+        <field name="name">Product Creation</field>
+        <field name="category_id" eval="False"/>
+    </record>
+
+    <!-- Purchase approval groups. -->
+    <record id="group_restricted_purchase_user" model="res.groups">
+        <field name="name">Restricted Purchase User</field>
+        <field name="category_id" eval="False"/>
+        <field name="implied_ids" eval="[(4, ref('purchase.group_purchase_user'))]"/>
+    </record>
+    <record id="group_purchase_approver" model="res.groups">
+        <field name="name">Purchase Approver</field>
+        <field name="category_id" eval="False"/>
+        <field name="implied_ids" eval="[(4, ref('purchase.group_purchase_user'))]"/>
+    </record>
+    <record id="group_it_approver" model="res.groups">
+        <field name="name">IT Approver</field>
+        <field name="category_id" eval="False"/>
+        <field name="implied_ids" eval="[(4, ref('purchase.group_purchase_user'))]"/>
+    </record>
+    <record id="rule_po_restricted_own" model="ir.rule">
+        <field name="name">Restricted purchaser: own orders only</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="groups" eval="[(4, ref('group_restricted_purchase_user'))]"/>
+        <field name="domain_force">[('create_uid', '=', user.id)]</field>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_po_approver_pending" model="ir.rule">
+        <field name="name">Purchase approver: orders sent for approval</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="groups" eval="[(4, ref('group_purchase_approver'))]"/>
+        <field name="domain_force">[(1, '=', 1)] if user.has_group('advance_manufacturing.group_advmfg_manager') else [('approval_state', '!=', 'none')]</field>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_po_it_pending" model="ir.rule">
+        <field name="name">IT approver: IT-channel orders</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="groups" eval="[(4, ref('group_it_approver'))]"/>
+        <field name="domain_force">[(1, '=', 1)] if user.has_group('advance_manufacturing.group_advmfg_manager') else [('approval_channel', '=', 'it')]</field>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- The demo only has the admin flow, so the admin is added to the group right away. -->
+    <record id="base.user_admin" model="res.users">
+        <field name="groups_id" eval="[(4, ref('group_advmfg_manager'))]"/>
+    </record>
+
+    <!-- Company walls: each company only sees its own stages, units, pallets etc. -->
+    <record id="rule_advmfg_stage_company" model="ir.rule">
+        <field name="name">Advance Manufacturing stage: own companies</field>
+        <field name="model_id" ref="model_advmfg_stage"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_advmfg_unit_company" model="ir.rule">
+        <field name="name">Advance Manufacturing unit: own companies</field>
+        <field name="model_id" ref="model_advmfg_unit"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_advmfg_qc_company" model="ir.rule">
+        <field name="name">Advance Manufacturing QC: own companies</field>
+        <field name="model_id" ref="model_advmfg_qc"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_advmfg_serial_company" model="ir.rule">
+        <field name="name">Advance Manufacturing serial: own companies</field>
+        <field name="model_id" ref="model_advmfg_serial"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_advmfg_pallet_company" model="ir.rule">
+        <field name="name">Advance Manufacturing pallet: own companies</field>
+        <field name="model_id" ref="model_advmfg_pallet"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <!-- Administrator also carries the approval roles (defined above), so one setting is enough. -->
+    <record id="group_advmfg_manager" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_sale_first_approval')), (4, ref('group_sale_second_approval')),
+            (4, ref('group_sale_admin_approval')), (4, ref('group_purchase_approver')), (4, ref('group_it_approver')),
+            (4, ref('group_advmfg_bom_approver')), (4, ref('group_advmfg_product_create'))]"/>
+    </record>
+</odoo>

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ===== Sale order: serial numbers button, Generate Serials, combo columns ===== -->
+    <record id="view_sale_order_form_advmfg_serials" model="ir.ui.view">
+        <field name="name">sale.order.form.advmfg.serials</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_advmfg_so_serials" type="object" class="oe_stat_button" icon="fa-barcode"
+                        groups="advance_manufacturing.group_advmfg_manager"
+                        invisible="advmfg_so_serial_count == 0">
+                    <field name="advmfg_so_serial_count" widget="statinfo" string="Serial Numbers"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='product_uom_qty']" position="after">
+                <field name="is_combo" optional="hide"/>
+                <field name="display_hsn_code" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_advmfg_so_serial_list" model="ir.ui.view">
+        <field name="name">advmfg.so.serial.list</field>
+        <field name="model">advmfg.so.serial</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="sale_order_id"/>
+                <field name="product_id"/>
+                <field name="production_id"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_advmfg_so_serial_form" model="ir.ui.view">
+        <field name="name">advmfg.so.serial.form</field>
+        <field name="model">advmfg.so.serial</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="sale_order_id"/>
+                        <field name="product_id"/>
+                        <field name="production_id"/>
+                        <field name="state"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ===== Manufacturing order: link, import/export, notes from sale order ===== -->
+    <record id="view_mrp_production_form_advmfg_more" model="ir.ui.view">
+        <field name="name">mrp.production.form.advmfg.more</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_advmfg_link_sale_order" type="object" string="Link to Sale Order"
+                        groups="advance_manufacturing.group_advmfg_manager"
+                        invisible="not advmfg_active or state in ('done', 'cancel')"/>
+            </xpath>
+            <xpath expr="//page[@name='advmfg_serials']" position="before">
+                <page string="Additional Notes from SO" name="advmfg_so_note" groups="advance_manufacturing.group_advmfg_manager"
+                      invisible="not advmfg_active or not advmfg_sale_note">
+                    <field name="advmfg_sale_note" readonly="1"/>
+                </page>
+            </xpath>
+            <xpath expr="//page[@name='advmfg_serials']" position="inside">
+                <div class="mb-2" invisible="state in ('done', 'cancel')">
+                    <button name="action_advmfg_export_serials" type="object" string="Download Excel" class="btn-secondary me-2"/>
+                    <button name="action_advmfg_import_serials" type="object" string="Import Serials" class="btn-secondary"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_advmfg_link_sale_wizard_form" model="ir.ui.view">
+        <field name="name">advmfg.link.sale.wizard.form</field>
+        <field name="model">advmfg.link.sale.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="production_id" invisible="1"/>
+                    <field name="sale_order_id" options="{'no_create': True}"/>
+                </group>
+                <footer>
+                    <button name="action_link" type="object" string="Link" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_advmfg_import_serial_wizard_form" model="ir.ui.view">
+        <field name="name">advmfg.import.serial.wizard.form</field>
+        <field name="model">advmfg.import.serial.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="production_id" invisible="1"/>
+                    <field name="excel_file" filename="excel_filename"/>
+                    <field name="excel_filename" invisible="1"/>
+                </group>
+                <footer>
+                    <button name="action_import" type="object" string="Import" class="btn-primary"/>
+                    <button name="action_download_format" type="object" string="Download Excel Format" class="btn-secondary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ===== Delivery: tracking details, packs, pack status ===== -->
+    <record id="view_picking_form_advmfg" model="ir.ui.view">
+        <field name="name">stock.picking.form.advmfg</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="advmfg_active" invisible="1"/>
+                <button name="action_advmfg_print_packs" type="object" string="Print Packs"
+                        invisible="not advmfg_active or not advmfg_pack_ids"/>
+            </xpath>
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="advmfg_pack_status" invisible="not advmfg_active or advmfg_pack_status == 'none'"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Delivery Tracking" name="advmfg_tracking" invisible="not advmfg_active">
+                    <group>
+                        <group>
+                            <field name="advmfg_vehicle_name" readonly="state in ('done', 'cancel')"/>
+                            <field name="advmfg_vehicle_number" readonly="state in ('done', 'cancel')"/>
+                            <field name="advmfg_estimated_arrival" readonly="state in ('done', 'cancel')"/>
+                        </group>
+                        <group>
+                            <field name="advmfg_driver_name" readonly="state in ('done', 'cancel')"/>
+                            <field name="advmfg_driver_contact" readonly="state in ('done', 'cancel')"/>
+                            <field name="advmfg_dispatch_time"/>
+                            <field name="advmfg_delivered_on" readonly="state in ('done', 'cancel')"/>
+                            <field name="advmfg_received_by"/>
+                        </group>
+                        <group string="Delivered To">
+                            <field name="advmfg_ship_to" nolabel="1" readonly="1"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Generated Packs" name="advmfg_packs" invisible="not advmfg_active">
+                    <field name="advmfg_pack_ids" readonly="state in ('done', 'cancel')">
+                        <list editable="bottom" decoration-success="state == 'confirmed'">
+                            <field name="name"/>
+                            <field name="pallet_ids" widget="many2many_tags"
+                                   domain="[('state', '=', 'confirmed'), ('delivery_pack_ids', '=', False), '|', ('production_id.sale_order_id', '=', parent.sale_id), ('production_id.origin', '=', parent.origin)]" options="{'no_create': True}"
+                                   readonly="state == 'confirmed'"/>
+                            <field name="unit_count"/>
+                            <field name="state" widget="badge"/>
+                            <button name="action_confirm" type="object" string="Confirm" icon="fa-check" invisible="state == 'confirmed'"/>
+                            <button name="action_draft" type="object" string="Reopen" icon="fa-undo" invisible="state == 'draft'"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Purchase: approval category flag, label ===== -->
+    <record id="view_purchase_order_form_advmfg" model="ir.ui.view">
+        <field name="name">purchase.order.form.advmfg</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_ref']" position="after">
+                <field name="advmfg_active" invisible="1"/>
+                <field name="advmfg_label" invisible="not advmfg_active"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Partners: quick Customers / Vendors filters ===== -->
+    <record id="view_partner_search_advmfg" model="ir.ui.view">
+        <field name="name">res.partner.search.advmfg</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="before">
+                <filter string="Customers (with sales)" name="advmfg_customers" domain="[('customer_rank', '>', 0)]"/>
+                <filter string="Vendors (with purchases)" name="advmfg_vendors" domain="[('supplier_rank', '>', 0)]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

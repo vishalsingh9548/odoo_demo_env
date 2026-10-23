@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Numbers for pallets: PALLET0001, PALLET0002 ... -->
+    <record id="seq_advmfg_pallet" model="ir.sequence">
+        <field name="name">Advance Manufacturing Pallet</field>
+        <field name="code">advmfg.pallet</field>
+        <field name="prefix">PALLET</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+    <!-- Running number used to build serial numbers (prefix + this number). -->
+    <record id="seq_advmfg_serial" model="ir.sequence">
+        <field name="name">Advance Manufacturing Serial</field>
+        <field name="code">advmfg.serial</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+    <!-- Requisition numbers: MR/2026/00001 -->
+    <record id="seq_material_requisition" model="ir.sequence">
+        <field name="name">Material Requisition</field>
+        <field name="code">material.requisition.sequence</field>
+        <field name="prefix">MR/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+    <!-- Delivery pack numbers: PACK0001... -->
+    <record id="seq_advmfg_delivery_pack" model="ir.sequence">
+        <field name="name">Advance Manufacturing Delivery Pack</field>
+        <field name="code">advmfg.delivery.pack</field>
+        <field name="prefix">PACK</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

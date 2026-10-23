@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_advmfg_stage_list" model="ir.ui.view">
+        <field name="name">advmfg.stage.list</field>
+        <field name="model">advmfg.stage</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" default_order="sequence, id">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="parent_id"/>
+                <field name="qc_required"/>
+                <field name="attachment_required"/>
+                <field name="show_grade"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_advmfg_stage" model="ir.actions.act_window">
+        <field name="name">Process Stages</field>
+        <field name="res_model">advmfg.stage</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

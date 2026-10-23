@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_advmfg_status_wizard_form" model="ir.ui.view">
+        <field name="name">advmfg.status.wizard.form</field>
+        <field name="model">advmfg.status.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="unit_id" invisible="1"/>
+                <field name="show_grade" invisible="1"/>
+                <group>
+                    <field name="stage_id" readonly="1"/>
+                    <field name="grade" required="show_grade" invisible="not show_grade"/>
+                    <field name="previous_stage_id" invisible="grade != 'B'" required="grade == 'B'"/>
+                </group>
+                <field name="line_ids" invisible="grade not in ('B', 'C')">
+                    <list editable="bottom">
+                        <field name="product_id"/>
+                        <field name="quantity"/>
+                        <field name="tracking" column_invisible="True"/>
+                        <field name="lot_id" optional="show"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

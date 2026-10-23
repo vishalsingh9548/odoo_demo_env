@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_advmfg_receipt_qc_list" model="ir.ui.view">
+        <field name="name">advmfg.receipt.qc.list</field>
+        <field name="model">advmfg.receipt.qc</field>
+        <field name="arch" type="xml">
+            <list create="0" decoration-success="state == 'pass'" decoration-danger="state == 'fail'">
+                <field name="picking_id"/><field name="purchase_id"/><field name="product_id"/><field name="sample_count"/>
+                <field name="state" widget="badge"/>
+                <button name="action_pass" type="object" string="Pass" icon="fa-check" invisible="state != 'todo'"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_advmfg_receipt_qc_form" model="ir.ui.view">
+        <field name="name">advmfg.receipt.qc.form</field>
+        <field name="model">advmfg.receipt.qc</field>
+        <field name="arch" type="xml">
+            <form create="0">
+                <header>
+                    <button name="action_pass" type="object" string="Pass" class="btn-primary" invisible="state != 'todo'"/>
+                    <button name="action_fail" type="object" string="Fail" invisible="state != 'todo'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet><group><group><field name="picking_id"/><field name="purchase_id"/><field name="product_id"/></group>
+                    <group><field name="sample_count"/><field name="fail_reason"/></group></group>
+                    <field name="note" placeholder="What was inspected? If failing, write the reason here."/></sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_advmfg_receipt_qc" model="ir.actions.act_window">
+        <field name="name">Incoming Quality Checks</field>
+        <field name="res_model">advmfg.receipt.qc</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_todo': 1}</field>
+    </record>
+    <record id="view_advmfg_receipt_qc_search" model="ir.ui.view">
+        <field name="name">advmfg.receipt.qc.search</field>
+        <field name="model">advmfg.receipt.qc</field>
+        <field name="arch" type="xml"><search><field name="picking_id"/><field name="product_id"/>
+            <filter name="todo" string="To Do" domain="[('state', '=', 'todo')]"/></search></field>
+    </record>
+    <menuitem id="menu_advmfg_receipt_qc" name="Incoming Quality Checks" parent="mrp.menu_mrp_manufacturing"
+              action="action_advmfg_receipt_qc" sequence="65" groups="advance_manufacturing.group_advmfg_manager"/>
+
+    <record id="view_picking_form_receipt_qc" model="ir.ui.view">
+        <field name="name">stock.picking.form.receipt.qc</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_receipt_qcs" type="object" class="oe_stat_button" icon="fa-check-square-o"
+                        groups="advance_manufacturing.group_advmfg_manager" invisible="receipt_qc_count == 0">
+                    <field name="receipt_qc_count" widget="statinfo" string="Quality Checks"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_product_template_qc_sample" model="ir.ui.view">
+        <field name="name">product.template.qc.sample</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='group_general']" position="inside">
+                <field name="qc_sample_count" groups="advance_manufacturing.group_advmfg_manager"/>
+                <field name="is_miscellaneous_product" groups="advance_manufacturing.group_advmfg_manager"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

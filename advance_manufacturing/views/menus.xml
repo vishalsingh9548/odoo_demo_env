@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menus: visible only to members of the Advance Manufacturing group. -->
+    <menuitem id="menu_advmfg_tracker" name="Unit Tracker" parent="mrp.menu_mrp_reporting"
+              action="action_advmfg_unit" sequence="50" groups="advance_manufacturing.group_advmfg_manager"/>
+    <menuitem id="menu_advmfg_qc" name="Quality Checks" parent="mrp.menu_mrp_manufacturing"
+              action="action_advmfg_qc" sequence="60" groups="advance_manufacturing.group_advmfg_manager"/>
+    <menuitem id="menu_advmfg_stage" name="Process Stages" parent="mrp.menu_mrp_configuration"
+              action="action_advmfg_stage" sequence="60" groups="advance_manufacturing.group_advmfg_manager"/>
+    <menuitem id="menu_advmfg_prefix_root" name="Serial Number Prefix Config" parent="sale.menu_sale_config"
+              sequence="90" groups="base.group_erp_manager"/>
+    <menuitem id="menu_advmfg_prefix" name="Serial Number Prefix Config" parent="menu_advmfg_prefix_root"
+              action="action_advmfg_serial_prefix" sequence="1" groups="base.group_erp_manager"/>
+</odoo>

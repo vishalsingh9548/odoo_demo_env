@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ===== Serial Scan station ===== -->
+    <record id="view_advmfg_scan_wizard_form" model="ir.ui.view">
+        <field name="name">advmfg.scan.wizard.form</field>
+        <field name="model">advmfg.scan.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <div class="advmfg_box advmfg_scan">
+                    <div class="advmfg_head">
+                        <div class="advmfg_badge"><i class="fa fa-barcode"/></div>
+                        <div class="advmfg_titles">
+                            <div class="advmfg_title">Scan Serial</div>
+                            <div class="advmfg_sub">Update a panel on the line: quality check, grade and next stage</div>
+                        </div>
+                        <button special="cancel" class="advmfg_x" string="×" aria-label="Close"/>
+                    </div>
+                    <div class="advmfg_body">
+                        <div class="advmfg_label">Serial number</div>
+                        <field name="serial_number" widget="advmfg_serial_lookup_input" nolabel="1"/>
+                        <div class="advmfg_hint">Point the scanner at the sticker, or type the serial and press Enter.</div>
+                        <div class="advmfg_steps">
+                            <div class="advmfg_step"><div class="advmfg_n">1</div><div><div class="advmfg_st">Scan</div><div class="advmfg_sd">Opens the unit on its current stage</div></div></div>
+                            <div class="advmfg_step"><div class="advmfg_n">2</div><div><div class="advmfg_st">Check quality</div><div class="advmfg_sd">Pass or Fail the open check</div></div></div>
+                            <div class="advmfg_step"><div class="advmfg_n">3</div><div><div class="advmfg_st">Update status</div><div class="advmfg_sd">Set the grade and move to the next stage</div></div></div>
+                        </div>
+                    </div>
+                </div>
+                <footer>
+                    <span class="advmfg_foot_note">Finished serials show a short message. Use Serial Track for their full history.</span>
+                    <button string="Close" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_advmfg_scan_wizard" model="ir.actions.act_window">
+        <field name="name">Scan Serial</field>
+        <field name="res_model">advmfg.scan.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    <menuitem id="menu_advmfg_scan_root" name="Serial Scan" web_icon="advance_manufacturing,static/description/icon_scan.png"
+              groups="advance_manufacturing.group_advmfg_manager" sequence="85"/>
+    <menuitem id="menu_advmfg_scan" name="Scan Serial Number" parent="menu_advmfg_scan_root"
+              action="action_advmfg_scan_wizard" sequence="1"/>
+
+    <record id="view_advmfg_serial_lookup_wizard_form" model="ir.ui.view">
+        <field name="name">advmfg.serial.lookup.wizard.form</field>
+        <field name="model">advmfg.serial.lookup.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Scrap Movement">
+                <field name="unit_id" invisible="1"/>
+                <field name="show_grade" invisible="1"/>
+                <field name="qc_applicable" invisible="1"/>
+                <field name="qc_state" invisible="1"/>
+                <field name="attachment_applicable" invisible="1"/>
+                <h1><field name="serial_no"/></h1>
+                <group>
+                    <group>
+                        <field name="current_stage_id"/>
+                        <field name="next_stage_id"/>
+                        <field name="linked_child_stage_names" invisible="not linked_child_stage_names"/>
+                        <field name="quality_status" invisible="not show_grade" required="show_grade"/>
+                        <field name="previous_stage_id" invisible="quality_status != 'B'" required="quality_status == 'B'"
+                               options="{'no_create': True, 'no_open': True}"/>
+                        <field name="scrap_reason_ids" widget="many2many_tags" invisible="quality_status not in ('B', 'C')"/>
+                    </group>
+                    <group string="Related Documents">
+                        <field name="current_sale_order_id" readonly="1"/>
+                        <field name="current_mo_id" readonly="1"/>
+                        <button name="action_open_sale_order" type="object" string="Open Sale Order" class="btn-link"/>
+                        <button name="action_open_manufacturing_order" type="object" string="Open Manufacturing Order" class="btn-link"/>
+                    </group>
+                </group>
+                <group invisible="not attachment_applicable"><field name="attachment_ids" widget="many2many_binary"/></group>
+                <group><field name="comment"/></group>
+                <footer>
+                    <button name="create_quality_check_wiz" type="object" string="Create QC"
+                            invisible="not qc_applicable or qc_state"/>
+                    <button name="quality_scan_pass" type="object" string="Pass" class="btn-success"
+                            invisible="not qc_applicable or qc_state != 'todo'"/>
+                    <button name="quality_scan_fail" type="object" string="Fail" class="btn-danger"
+                            invisible="not qc_applicable or qc_state != 'todo'"/>
+                    <button name="action_update_status" type="object" string="Update Status" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="view_advmfg_scrap_component_wizard_form" model="ir.ui.view">
+        <field name="name">advmfg.scrap.component.wizard.form</field>
+        <field name="model">advmfg.scrap.component.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="lookup_id" invisible="1"/>
+                <div class="alert alert-danger" role="alert">Grade C - Scrap: All components are selected by default. Uncheck any component you do not want to scrap.</div>
+                <field name="line_ids">
+                    <list editable="bottom" create="0" delete="0">
+                        <field name="scrap"/><field name="product_id" readonly="1"/><field name="quantity"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_confirm_scrap" type="object" string="Confirm Scrap" class="btn-danger"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Serial Journey report -->
+    <record id="action_report_advmfg_serial_journey" model="ir.actions.report">
+        <field name="name">Serial Journey</field>
+        <field name="model">advmfg.serial.lookup.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">advance_manufacturing.report_advmfg_serial_journey</field>
+        <field name="report_file">advance_manufacturing.report_advmfg_serial_journey</field>
+        <field name="print_report_name">'Serial_Journey_%s' % object.serial_no</field>
+        <field name="binding_model_id" ref="model_advmfg_serial_lookup_wizard"/>
+        <field name="binding_type">report</field>
+    </record>
+    <template id="report_advmfg_serial_journey">
+        <t t-call="web.html_container"><t t-foreach="docs" t-as="o"><t t-call="web.external_layout"><div class="page">
+            <h2>Serial Journey: <span t-field="o.serial_no"/></h2>
+            <table class="table table-sm">
+                <thead><tr><th>Date</th><th>Manufacturing Order</th><th>Sales Order</th><th>Status</th><th>Quality Status</th></tr></thead>
+                <tbody><t t-foreach="o.history_ids" t-as="h"><tr>
+                    <td><span t-field="h.create_date"/></td><td><span t-field="h.production_id.name"/></td><td><span t-field="h.sale_order_id.name"/></td>
+                    <td><span t-field="h.stage_id.name"/> (<span t-field="h.state"/>)</td><td><span t-field="h.grade"/></td>
+                </tr></t></tbody>
+            </table>
+        </div></t></t></t>
+    </template>
+
+    <!-- Serial prefix change on orders (button on the order + action on the list) -->
+    <record id="view_advmfg_prefix_wizard_form" model="ir.ui.view">
+        <field name="name">advmfg.prefix.wizard.form</field>
+        <field name="model">advmfg.prefix.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group><field name="name"/></group>
+                <footer>
+                    <button name="update_mo_serial_prefix" type="object" string="Update Prefix" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_advmfg_prefix_wizard" model="ir.actions.act_window">
+        <field name="name">Update Serial Number Prefix</field>
+        <field name="res_model">advmfg.prefix.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="mrp.model_mrp_production"/>
+        <field name="binding_view_types">list</field>
+    </record>
+    <record id="view_mrp_production_form_prefix" model="ir.ui.view">
+        <field name="name">mrp.production.form.prefix</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="%(action_advmfg_prefix_wizard)d" type="action" string="Update Serial Number Prefix"
+                        class="oe_highlight" groups="advance_manufacturing.group_advmfg_manager" invisible="not advmfg_active"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Serial Track app: scan a serial, see its whole live lifecycle ===== -->
+    <record id="view_advmfg_track_wizard_form" model="ir.ui.view">
+        <field name="name">advmfg.track.wizard.form</field>
+        <field name="model">advmfg.track.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <div class="advmfg_box advmfg_track">
+                    <div class="advmfg_head">
+                        <div class="advmfg_badge"><i class="fa fa-road"/></div>
+                        <div class="advmfg_titles">
+                            <div class="advmfg_title">Serial Track</div>
+                            <div class="advmfg_sub">See the full live journey of any serial number</div>
+                        </div>
+                        <button special="cancel" class="advmfg_x" string="×" aria-label="Close"/>
+                    </div>
+                    <div class="advmfg_body">
+                        <div class="advmfg_label">Serial number</div>
+                        <field name="serial_number" widget="advmfg_serial_lookup_input" nolabel="1"/>
+                        <div class="advmfg_hint">Works for any serial: in manufacturing, packed, delivered or scrapped.</div>
+                        <div class="advmfg_label">You will see</div>
+                        <div class="advmfg_chips">
+                            <span class="advmfg_chip"><i style="background:#2F7FD1"/>Where it is now</span>
+                            <span class="advmfg_chip"><i style="background:#178A62"/>Stages and quality checks</span>
+                            <span class="advmfg_chip"><i style="background:#C77A12"/>Grade</span>
+                            <span class="advmfg_chip"><i style="background:#C77A12"/>Pallet and pack</span>
+                            <span class="advmfg_chip"><i style="background:#2F7FD1"/>Delivery, vehicle and driver</span>
+                            <span class="advmfg_chip"><i style="background:#9AA8B7"/>Full history</span>
+                            <span class="advmfg_chip"><i style="background:#9AA8B7"/>Printable report</span>
+                        </div>
+                    </div>
+                </div>
+                <footer>
+                    <span class="advmfg_live"><i/>Live data, read fresh every time</span>
+                    <button string="Close" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_advmfg_track_wizard" model="ir.actions.act_window">
+        <field name="name">Serial Track</field>
+        <field name="res_model">advmfg.track.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    <menuitem id="menu_advmfg_track_root" name="Serial Track" web_icon="advance_manufacturing,static/description/icon_track.png"
+              groups="advance_manufacturing.group_advmfg_manager" sequence="86"/>
+    <menuitem id="menu_advmfg_track" name="Track Serial Number" parent="menu_advmfg_track_root"
+              action="action_advmfg_track_wizard" sequence="1"/>
+
+    <!-- Live Serial Journey screen -->
+    <record id="view_advmfg_serial_journey_form" model="ir.ui.view">
+        <field name="name">advmfg.serial.journey.form</field>
+        <field name="model">advmfg.serial.journey</field>
+        <field name="arch" type="xml">
+            <form string="Serial Journey" create="0" edit="0">
+                <field name="unit_id" invisible="1"/>
+                <field name="can_update" invisible="1"/>
+                <field name="journey_html" nolabel="1" readonly="1"/>
+                <footer>
+                    <button name="action_refresh" type="object" string="Refresh" class="btn-secondary"/>
+                    <button name="action_update_status" type="object" string="Update Status" class="btn-primary" invisible="not can_update"/>
+                    <button name="action_print" type="object" string="Print Report" class="btn-secondary"/>
+                    <button string="Close" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Custom Purchase Order -->
+    <record id="action_report_custom_purchase_order" model="ir.actions.report">
+        <field name="name">Custom Purchase Order</field>
+        <field name="model">purchase.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">advance_manufacturing.report_custom_purchase_order</field>
+        <field name="report_file">advance_manufacturing.report_custom_purchase_order</field>
+        <field name="print_report_name">'Purchase Order - %s' % object.name</field>
+        <field name="binding_model_id" ref="purchase.model_purchase_order"/>
+        <field name="binding_type">report</field>
+    </record>
+    <template id="report_custom_purchase_order">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="po">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Purchase Order <span t-field="po.name"/></h2>
+                        <table class="table table-sm">
+                            <tr><td>Date</td><td><span t-field="po.date_order" t-options='{"widget": "date"}'/></td>
+                                <td>Ship Date</td><td><span t-field="po.date_approve" t-options='{"widget": "date"}'/></td></tr>
+                            <tr><td>Ship Via</td><td><span t-field="po.partner_id.name"/></td>
+                                <td>Payment Terms</td><td><span t-field="po.payment_term_id.name"/></td></tr>
+                            <tr><td>Expected Arrival</td><td><span t-field="po.date_planned"/></td>
+                                <td>Approved By</td><td><span t-field="po.approved_by_id.name"/></td></tr>
+                        </table>
+                        <div class="row">
+                            <div class="col-4"><strong>BILL TO</strong><br/><span t-field="po.company_id.partner_id" t-options='{"widget": "contact", "fields": ["address", "name", "vat"], "no_marker": True}'/></div>
+                            <div class="col-4"><strong>SUPPLIER</strong><br/><span t-field="po.partner_id" t-options='{"widget": "contact", "fields": ["address", "name", "vat"], "no_marker": True}'/></div>
+                            <div class="col-4"><strong>SHIP TO</strong><br/>
+                                <t t-if="po.picking_type_id.warehouse_id.partner_id"><span t-field="po.picking_type_id.warehouse_id.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/></t>
+                                <t t-else="">No Warehouse Defined</t></div>
+                        </div>
+                        <table class="table table-sm mt-3">
+                            <thead><tr><th>Sl.No</th><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
+                            <tbody>
+                                <t t-set="n" t-value="0"/>
+                                <t t-foreach="po.order_line.filtered(lambda l: not l.display_type)" t-as="line">
+                                    <t t-set="n" t-value="n + 1"/>
+                                    <tr><td><t t-esc="n"/></td><td><span t-field="line.name"/></td>
+                                        <td><span t-field="line.product_qty"/> <span t-field="line.product_uom.name"/></td>
+                                        <td><span t-field="line.price_unit"/></td><td><span t-field="line.price_subtotal"/></td></tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        <div class="text-end">
+                            <div>Subtotal: <span t-field="po.amount_untaxed"/></div>
+                            <div>Tax: <span t-field="po.amount_tax"/></div>
+                            <div><strong>TOTAL: <span t-field="po.amount_total"/></strong></div>
+                        </div>
+                        <div t-if="po.notes"><strong>Terms and Conditions</strong><div t-field="po.notes"/></div>
+                        <p class="text-muted mt-4">This is a system generated document.</p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Custom Sale Order and Custom Quotation share one body -->
+    <record id="action_report_custom_sale_order" model="ir.actions.report">
+        <field name="name">Custom Sale Order</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">advance_manufacturing.report_custom_sale_order</field>
+        <field name="report_file">advance_manufacturing.report_custom_sale_order</field>
+        <field name="print_report_name">'Sale Order - %s' % object.name</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+    <record id="action_report_custom_quotation" model="ir.actions.report">
+        <field name="name">Custom Quotation</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">advance_manufacturing.report_custom_quotation</field>
+        <field name="report_file">advance_manufacturing.report_custom_quotation</field>
+        <field name="print_report_name">'Quotation - %s' % object.name</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+    <template id="report_custom_sale_body">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="so">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2><t t-esc="title"/> <span t-field="so.name"/></h2>
+                        <table class="table table-sm">
+                            <tr><td>Date</td><td><span t-field="so.date_order" t-options='{"widget": "date"}'/></td>
+                                <td>Validity Date</td><td><span t-field="so.validity_date"/></td></tr>
+                            <tr><td>Customer</td><td colspan="3"><span t-field="so.partner_id.name"/></td></tr>
+                            <tr t-if="so.picking_ids"><td>Deliveries</td><td colspan="3"><t t-esc="', '.join(so.picking_ids.mapped('name'))"/></td></tr>
+                        </table>
+                        <div class="row">
+                            <div class="col-6"><strong>Billing</strong><br/><span t-field="so.partner_invoice_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/><div t-if="so.billing_gst_number">GSTIN: <span t-field="so.billing_gst_number"/></div></div>
+                            <div class="col-6"><strong>Shipping</strong><br/><span t-field="so.partner_shipping_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/><div t-if="so.shipping_gst_number">GSTIN: <span t-field="so.shipping_gst_number"/></div></div>
+                        </div>
+                        <table class="table table-sm mt-3">
+                            <thead><tr><th>Sl.No</th><th>Description</th><th>HSN/SAC</th><th>Qty</th><th>Unit Price</th><th>Taxes</th><th>Amount</th></tr></thead>
+                            <tbody>
+                                <t t-set="n" t-value="0"/>
+                                <t t-foreach="rows(so)" t-as="r">
+                                    <t t-set="n" t-value="n + 1"/>
+                                    <tr><td><t t-esc="n"/></td><td><t t-esc="r['name']"/></td><td><t t-esc="r['hsn']"/></td>
+                                        <td><t t-esc="r['qty']"/> <t t-esc="r['uom']"/></td>
+                                        <td><t t-esc="'%.2f' % r['price']"/></td><td><t t-esc="r['tax']"/></td><td><t t-esc="'%.2f' % r['amount']"/></td></tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        <div class="text-end">
+                            <div>Untaxed: <span t-field="so.amount_untaxed"/></div>
+                            <div>Taxes: <span t-field="so.amount_tax"/></div>
+                            <div t-if="so.lc_amount"><t t-esc="so.lc_total_label"/>: <span t-field="so.lc_total_amount"/></div>
+                            <div t-if="so.advance_payment">Advance Payment: <span t-field="so.advance_payment"/></div>
+                            <div t-if="so.outstanding_payment">Outstanding Payment: <span t-field="so.outstanding_payment"/></div>
+                            <div><strong>Total: <span t-field="so.remaining_amount"/></strong></div>
+                        </div>
+                        <h5 class="mt-3">Terms and Conditions</h5>
+                        <table class="table table-sm">
+                            <tr t-if="so.payment_type"><td>Payment Type</td><td><span t-field="so.payment_type"/> <span t-field="so.payment_terms_description"/></td></tr>
+                            <tr t-if="so.warranty_type"><td>Warranty</td><td><span t-field="so.warranty_type"/> <span t-field="so.warranty_details"/></td></tr>
+                            <tr t-if="so.delivery_type"><td>Delivery</td><td><span t-field="so.delivery_type"/> <span t-field="so.dispatch_location"/></td></tr>
+                            <tr t-if="so.freight_type"><td>Freight</td><td><span t-field="so.freight_type"/></td></tr>
+                            <tr t-if="so.cancellation_policy"><td>Cancellation</td><td><span t-field="so.cancellation_policy"/> <span t-field="so.cancellation_details"/></td></tr>
+                            <tr t-if="so.bank_account_id"><td>Bank</td><td><span t-field="so.bank_name"/>, A/c <span t-field="so.bank_account_number"/>, <span t-field="so.bank_branch_name"/>, IFSC <span t-field="so.bank_ifsc_code"/></td></tr>
+                            <tr t-if="so.certifications_type"><td>Certifications</td><td><span t-field="so.certifications_type"/></td></tr>
+                            <tr t-if="so.tolerance_type"><td>Tolerance</td><td><span t-field="so.tolerance_type"/></td></tr>
+                            <tr t-if="so.module_specifications"><td>Module Specifications</td><td><span t-field="so.module_specifications"/></td></tr>
+                            <tr t-if="so.material_delivery_terms"><td>Material Delivery Terms</td><td><span t-field="so.material_delivery_terms"/></td></tr>
+                            <tr t-if="so.custom_duty_clause"><td>Custom Duty Clause</td><td><span t-field="so.custom_duty_clause"/></td></tr>
+                            <tr t-if="so.note_custom"><td>Additional Notes</td><td><span t-field="so.note_custom"/></td></tr>
+                        </table>
+                        <p class="text-muted">This is a system generated document.</p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+    <template id="report_custom_sale_order"><t t-call="advance_manufacturing.report_custom_sale_body"/></template>
+    <template id="report_custom_quotation"><t t-call="advance_manufacturing.report_custom_sale_body"/></template>
+</odoo>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_advmfg_qc_fail_wizard_form" model="ir.ui.view">
+        <field name="name">advmfg.qc.fail.wizard.form</field>
+        <field name="model">advmfg.qc.fail.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="qc_id" invisible="1"/>
+                <group><field name="reason" placeholder="Why did this check fail?"/></group>
+                <footer>
+                    <button name="action_confirm" type="object" string="Confirm Fail" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
