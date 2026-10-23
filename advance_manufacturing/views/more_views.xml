@@ -6,11 +6,6 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//header" position="inside">
-                <button name="action_advmfg_generate_serials" type="object" string="Generate Serials"
-                        groups="advance_manufacturing.group_advmfg_manager"
-                        invisible="not advmfg_so_active or state in ('cancel', 'rejected')"/>
-            </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_view_advmfg_so_serials" type="object" class="oe_stat_button" icon="fa-barcode"
                         groups="advance_manufacturing.group_advmfg_manager"

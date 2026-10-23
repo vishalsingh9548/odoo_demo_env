@@ -11,9 +11,11 @@
                 <field name="approval_state" invisible="1"/>
                 <field name="can_send_for_approval" invisible="1"/>
                 <field name="is_sales_admin_user" invisible="1"/>
+                <!-- Split button disabled for now:
                 <button name="action_reject" type="object" string="Split" class="btn-danger"
                         confirm="Are you sure you want to Split this sale order?"
                         invisible="not advmfg_so_active or state not in ('confirm_order', 'sale')"/>
+                -->
             </xpath>
             <xpath expr="//button[@id='action_confirm']" position="attributes">
                 <attribute name="invisible">advmfg_so_active and state not in ('draft', 'sent', 'confirm_order') or not advmfg_so_active and state not in ['sent']</attribute>
