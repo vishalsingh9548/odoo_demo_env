@@ -7,6 +7,7 @@ class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
     feasibility_count = fields.Integer(
+        groups='csl_epc_core.group_epc_user',
         string='Feasibility Study Count', compute='_compute_feasibility_count',
         help="How many Technical Feasibility studies exist for this lead.",
     )
@@ -17,6 +18,6 @@ class CrmLead(models.Model):
             lead.feasibility_count = len(lead.feasibility_ids)
 
     feasibility_ids = fields.One2many(
-        'epc.feasibility', 'lead_id', string='Feasibility Studies',
+        'epc.feasibility', 'lead_id', groups='csl_epc_core.group_epc_user', string='Feasibility Studies',
         help="All Technical Feasibility studies done for this lead.",
     )

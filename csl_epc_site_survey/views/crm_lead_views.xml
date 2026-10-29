@@ -9,6 +9,7 @@
                 <xpath expr="//div[@name='button_box']" position="inside">
                     <button name="action_view_site_surveys" type="object"
                             class="oe_stat_button" icon="fa-map-marker"
+                            groups="csl_epc_core.group_epc_user"
                             invisible="site_survey_count == 0">
                         <field name="site_survey_count" widget="statinfo" string="Surveys"/>
                     </button>

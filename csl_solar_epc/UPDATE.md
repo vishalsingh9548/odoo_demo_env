@@ -114,3 +114,11 @@ The bar charts now have headings on their axes (Pipeline Activity: "Open items" 
 ### Update 9 (2026-10-21) — "Contract Value" tile is now clickable
 **Problem:** the *Contract Value* tile on the Solar Dashboard did nothing when clicked, unlike the other tiles.
 **Fix:** it now opens the list of projects it adds up (every project that has a BOQ, 15 at the moment), and that list has **BOQ**, **System Capacity** and **Contract Value** columns with a **Total** at the foot equal to the tile. The figure itself is unchanged: the sell price of the BOQ linked to each project. Files: `models/epc_dashboard.py`, `static/src/xml/epc_dashboard.xml`; the list columns are in `csl_epc_boq` (see its Update 16). Upgrade: `-u csl_epc_boq,csl_solar_epc`.
+
+### Update 10 (2026-10-29) — CRM access error fixed (changes are in the sub-modules)
+**Problem:** a user without any Solar EPC group got an *Access Error* on `epc.site.survey` when opening CRM, caused by the survey, feasibility and BOQ counts added to the CRM lead.
+**Fix:** those fields are now restricted to `csl_epc_core.group_epc_user` (see Update 13 in `csl_epc_site_survey`, Update 14 in `csl_epc_feasibility` and Update 17 in `csl_epc_boq`). No change in this module itself.
+
+**Also (database clean-up on `solar_epc_v2`):** the stale module `csl_ai_assistant` (not in the addons path) was uninstalled, because its leftover Settings view referenced the missing field `csl_ai_sqft_per_kw` and crashed the Settings page.
+
+Upgrade: `-u csl_epc_site_survey,csl_epc_feasibility,csl_epc_boq`, then restart the server.

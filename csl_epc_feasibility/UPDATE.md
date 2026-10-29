@@ -90,3 +90,8 @@ The Feasibility Studies list now has a **Specific Yield (kWh/kWp)** column (esti
 ### Update 13 (2026-10-21) — "Survey to feasibility" tile opens all surveys
 **Problem:** the tile showed 61.3% (19 of 31 surveys studied) but opened only the 19 surveys that have a feasibility study, so the 12 behind the rest of the percentage were missing.
 **Fix:** the tile now opens every site survey (31), and the Site Surveys list has a new **Feasibility Studies** column (how many studies were created from each survey; 0 = not studied yet). Surveys with a number above 0 are the 19 in the tile. Files: `models/epc_stage_dashboard.py`, `views/epc_site_survey_views.xml`. Upgrade: `-u csl_epc_feasibility`.
+
+### Update 14 (2026-10-29) — CRM no longer fails for users without Solar EPC access
+**Problem:** a user without any Solar EPC group (for example a plain Sales user) got an *Access Error* ("You are not allowed to access 'Solar Site Survey' (epc.site.survey) records") when opening CRM, because the Feasibility count and link added to the CRM lead was computed for every user and read a model they have no access to.
+**Fix:** `feasibility_count` and `feasibility_ids` on `crm.lead` now carry `groups='csl_epc_core.group_epc_user'`, so they are not read for other users. File: `models/crm_lead.py`. Users with the Solar EPC *Field User* group (or higher) see no difference; everyone else can open CRM normally.
+Upgrade: `-u csl_epc_feasibility`, then restart the server.

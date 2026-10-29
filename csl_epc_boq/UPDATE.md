@@ -123,3 +123,8 @@ A BOQ that was revised from an earlier one now has an **Older Versions** smart b
 
 ### Update 16 (2026-10-21) — Projects list shows the BOQ, capacity and contract value
 The Projects list (also opened from the Solar Dashboard's *Contract Value*, *Active Projects* and *Completed Projects* tiles) now has **BOQ**, **System Capacity** and **Contract Value** columns, the last two with a **Total** at the foot. Contract Value is the sell price of the BOQ linked to the project. File: `views/project_project_views.xml`. Upgrade: `-u csl_epc_boq`.
+
+### Update 17 (2026-10-29) — CRM no longer fails for users without Solar EPC access
+**Problem:** a user without any Solar EPC group (for example a plain Sales user) got an *Access Error* ("You are not allowed to access 'Solar Site Survey' (epc.site.survey) records") when opening CRM, because the BOQ count and link added to the CRM lead was computed for every user and read a model they have no access to.
+**Fix:** `boq_count` and `boq_ids` on `crm.lead` now carry `groups='csl_epc_core.group_epc_user'`, so they are not read for other users. File: `models/crm_lead.py`. Users with the Solar EPC *Field User* group (or higher) see no difference; everyone else can open CRM normally.
+Upgrade: `-u csl_epc_boq`, then restart the server.

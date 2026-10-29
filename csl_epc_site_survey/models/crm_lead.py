@@ -7,6 +7,7 @@ class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
     site_survey_count = fields.Integer(
+        groups='csl_epc_core.group_epc_user',
         string='Site Survey Count', compute='_compute_site_survey_count',
         help="How many Site Survey records exist for this lead.",
     )
@@ -17,7 +18,7 @@ class CrmLead(models.Model):
             lead.site_survey_count = len(lead.site_survey_ids)
 
     site_survey_ids = fields.One2many(
-        'epc.site.survey', 'lead_id', string='Site Surveys',
+        'epc.site.survey', 'lead_id', groups='csl_epc_core.group_epc_user', string='Site Surveys',
         help="All Site Survey visits scheduled or completed for this lead.",
     )
     # Opens (or creates, if none exist yet) a Site Survey for this lead, called from
