@@ -7,6 +7,7 @@ class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
     boq_count = fields.Integer(
+        groups='csl_epc_core.group_epc_user',
         string='BOQ Count', compute='_compute_boq_count',
         help="How many Bill of Quantities (BOQ) records exist for this lead.",
     )
@@ -18,6 +19,6 @@ class CrmLead(models.Model):
             lead.boq_count = len(lead.boq_ids)
 
     boq_ids = fields.One2many(
-        'epc.boq', 'lead_id', string='BOQs',
+        'epc.boq', 'lead_id', groups='csl_epc_core.group_epc_user', string='BOQs',
         help="All Bill of Quantities (costing sheets) prepared for this lead.",
     )

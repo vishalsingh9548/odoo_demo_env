@@ -97,3 +97,8 @@ Every bar, line and scatter chart on this dashboard now shows a heading on each 
 ### Update 12 (2026-10-21) — Survey list shows the columns the charts count
 **Problem:** clicking a bar of *Site type mix* (or *Grid readiness*) opened the right surveys, but the list had no *Site type*, *Grid access* or *Transformer* column, so the reason a survey was in the list could not be seen.
 **Fix:** the Site Surveys list now has **Site Type**, **Grid Access** and **Existing Transformer** columns (shown by default, can be hidden from the column picker). Files: `views/epc_site_survey_views.xml`. Upgrade: `-u csl_epc_site_survey`.
+
+### Update 13 (2026-10-29) — CRM no longer fails for users without Solar EPC access
+**Problem:** a user without any Solar EPC group (for example a plain Sales user) got an *Access Error* ("You are not allowed to access 'Solar Site Survey' (epc.site.survey) records") when opening CRM, because the Site Survey count and link added to the CRM lead was computed for every user and read a model they have no access to.
+**Fix:** `site_survey_count` and `site_survey_ids` on `crm.lead` now carry `groups='csl_epc_core.group_epc_user'`, and the *Surveys* smart button is limited to the same group (the *Schedule Site Survey* button already was). Files: `models/crm_lead.py`, `views/crm_lead_views.xml`. Users with the Solar EPC *Field User* group (or higher) see no difference; everyone else can open CRM normally.
+Upgrade: `-u csl_epc_site_survey`, then restart the server.
