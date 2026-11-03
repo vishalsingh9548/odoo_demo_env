@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- SEARCH VIEW -->
+    <record id="view_inventory_soh_report_search" model="ir.ui.view">
+        <field name="name">inventory.soh.report.search</field>
+        <field name="model">inventory.soh.report</field>
+        <field name="arch" type="xml">
+            <search string="Search Inventory SOH Report">
+
+                <field name="product_id" string="Product"
+                       filter_domain="[('product_id.name', 'ilike', self)]"/>
+                <field name="sku" string="SKU"/>
+                <field name="product_type" string="Product Type"/>
+                <field name="categ_id" string="Category"/>
+
+                <separator/>
+
+                <filter string="Storable Products"
+                        name="filter_storable"
+                        domain="[('product_type', '=', 'product')]"/>
+                <filter string="Consumables"
+                        name="filter_consumable"
+                        domain="[('product_type', '=', 'consu')]"/>
+
+                <separator/>
+
+                <filter string="Retail"
+                        name="filter_type_retail"
+                        domain="[('product_category_type', '=', 'Retail')]"/>
+                <filter string="Finished Good"
+                        name="filter_type_finished_good"
+                        domain="[('product_category_type', '=', 'Finished Good')]"/>
+                <filter string="Raw Material"
+                        name="filter_type_raw_material"
+                        domain="[('product_category_type', '=', 'Raw Material')]"/>
+
+                <separator/>
+
+                <filter string="Has Variance"
+                        name="filter_has_variance"
+                        domain="[('variance', '!=', 0)]"/>
+                <filter string="Out of Stock"
+                        name="filter_out_of_stock"
+                        domain="[('qty_on_hand', '&lt;=', 0)]"/>
+                <filter string="Negative Actual SOH"
+                        name="filter_negative_soh"
+                        domain="[('actual_soh', '&lt;', 0)]"/>
+                <filter string="Outgoing Inventory"
+                        name="filter_outgoing_inventory"
+                        domain="[('qty_consumption', '!=', 0)]"/>
+
+                <separator/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Type of Product"
+                            name="groupby_product_category_type"
+                            context="{'group_by': 'product_category_type'}"/>
+                    <filter string="Product Category"
+                            name="groupby_categ"
+                            context="{'group_by': 'categ_id'}"/>
+                </group>
+
+            </search>
+        </field>
+    </record>
+
+
+    <!-- LIST VIEW -->
+    <record id="view_inventory_soh_report_list" model="ir.ui.view">
+        <field name="name">inventory.soh.report.list</field>
+        <field name="model">inventory.soh.report</field>
+        <field name="arch" type="xml">
+            <list string="Inventory SOH Report"
+                  create="false"
+                  edit="false"
+                  delete="false"
+                  default_order="product_id asc">
+                
+                <field name="sku"
+                       string="SKU"
+                       optional="show"/>
+
+                <field name="product_id"
+                       string="Product"
+                       optional="show"/>
+
+                <field name="categ_id"
+                       string="Category"
+                       optional="show"/>
+
+                <field name="product_category_type"
+                       string="Type of Product"
+                       optional="show"
+                       decoration-success="product_category_type == 'Finished Good'"
+                       decoration-warning="product_category_type == 'Raw Material'"/>
+
+                <field name="uom_id"
+                       string="UoM"
+                       optional="hide"/>
+
+                <field name="qty_on_hand"
+                       string="Current On Hand"
+                       optional="show"
+                       decoration-danger="qty_on_hand &lt;= 0"
+                       decoration-success="qty_on_hand &gt; 0"
+                       options="{'digits': [16, 3]}"
+                       sum="Total On Hand"/>
+
+                <field name="qty_inward"
+                       string="Purchased Qty"
+                       optional="show"
+                       options="{'digits': [16, 3]}"
+                       sum="Total Purchased"/>
+
+                <field name="qty_consumption"
+                       string="Consumption"
+                       optional="show"
+                       options="{'digits': [16, 3]}"
+                       sum="Total Consumption"/>
+
+                <field name="qty_return"
+                       string="Return"
+                       optional="show"
+                       options="{'digits': [16, 3]}"
+                       sum="Total Returns"/>
+
+                <field name="qty_wastage"
+                       string="Wastage"
+                       optional="show"
+                       decoration-danger="qty_wastage &gt; 0"
+                       options="{'digits': [16, 3]}"
+                       sum="Total Wastage"/>
+
+                <field name="ideal_soh"
+                       string="Ideal SOH"
+                       optional="show"
+                       options="{'digits': [16, 3]}"
+                       sum="Total Ideal SOH"/>
+
+                <field name="actual_soh"
+                       string="Actual SOH"
+                       optional="show"
+                       decoration-danger="actual_soh &lt; 0"
+                       decoration-success="actual_soh &gt;= 0"
+                       options="{'digits': [16, 3]}"
+                       sum="Total Actual SOH"/>
+
+                <field name="variance"
+                       string="Variance"
+                       optional="show"
+                       decoration-danger="variance &gt; 0"
+                       decoration-muted="variance == 0"
+                       options="{'digits': [16, 3]}"
+                       sum="Total Variance"/>
+
+                <field name="variance_value"
+                       string="Value"
+                       optional="show"
+                       decoration-danger="variance_value &gt; 0"
+                       decoration-muted="variance_value == 0"
+                       options="{'digits': [16, 3]}"
+                       sum="Total Value"/>
+
+            </list>
+        </field>
+    </record>
+
+
+    <!-- ACTION -->
+    <record id="action_inventory_soh_report" model="ir.actions.act_window">
+        <field name="name">Inventory SOH Report</field>
+        <field name="res_model">inventory.soh.report</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_inventory_soh_report_list"/>
+        <field name="search_view_id" ref="view_inventory_soh_report_search"/>
+        <field name="context">{'visible_group_export': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No inventory data found.
+            </p>
+            <p>
+                This report shows a consolidated view of your inventory including
+                on-hand stock, purchased qty, consumption, returns, wastage,
+                ideal SOH, actual SOH, variance and variance value.
+            </p>
+        </field>
+    </record>
+
+</odoo>

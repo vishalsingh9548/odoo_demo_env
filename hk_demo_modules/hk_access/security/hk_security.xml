@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_home_kouzina" model="ir.module.category">
+        <field name="name">Home Kouzina</field>
+        <field name="description">Access to the Home Kouzina custom functionality.</field>
+        <field name="sequence">25</field>
+    </record>
+
+    <!-- The single group that gates every Home Kouzina custom menu, field, tab, button, filter, wizard and report -->
+    <record id="group_hk_access" model="res.groups">
+        <field name="name">Home Kouzina Access</field>
+        <field name="category_id" ref="module_category_home_kouzina"/>
+        <field name="comment">Users in this group can see and use all Home Kouzina custom functionality: menus, reports, wizards and the extra fields, tabs and buttons added to standard Odoo screens.</field>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>

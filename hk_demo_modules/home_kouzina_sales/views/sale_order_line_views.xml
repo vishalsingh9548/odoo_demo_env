@@ -1,0 +1,21 @@
+<odoo>
+    <record id="view_order_form_inherit_package" model="ir.ui.view">
+        <field name="name">sale.order.form.package.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Adding the package field inside order lines tree -->
+            <xpath expr="//field[@name='order_line']/list/field[@name='product_uom_qty']" position="after">
+                <field groups="hk_access.group_hk_access" name="package_ids" widget="many2many_tags"/>
+                <field groups="hk_access.group_hk_access" name="regional_language_name"/>
+                <field groups="hk_access.group_hk_access" name="cog_price"/>
+                <field groups="hk_access.group_hk_access" name="product_sale_price"/>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <t groups="hk_access.group_hk_access">
+                    <field name="print_lot_no"/>
+                </t>
+            </xpath>
+        </field>
+    </record>
+</odoo>
