@@ -71,7 +71,8 @@ class MrpProduction(models.Model):
     def _compute_advmfg_counts(self):
         """Total live units and finished units, shown on the order."""
         for mo in self:
-            live = mo.advmfg_unit_ids.filtered(lambda u: u.state != 'cancel')
+            # sudo: plain MO users (no Advance Manufacturing group) still load this order, so reading units must not raise an access error.
+            live = mo.sudo().advmfg_unit_ids.filtered(lambda u: u.state != 'cancel')
             mo.advmfg_unit_count = len(live)
             mo.advmfg_done_unit_count = len(live.filtered(lambda u: u.state == 'completed'))
 
@@ -99,7 +100,8 @@ class MrpProduction(models.Model):
     def _compute_uncompleted_lines_count(self):
         """Count units that are actually being worked on."""
         for mo in self:
-            mo.uncompleted_lines_count = len(mo.advmfg_unit_ids.filtered(lambda u: u.state == 'in_progress'))
+            # sudo: this field sits in the MO form for every user, so it must not need access to advmfg.unit.
+            mo.uncompleted_lines_count = len(mo.sudo().advmfg_unit_ids.filtered(lambda u: u.state == 'in_progress'))
 
     @api.onchange('advmfg_unit_ids')
     def _onchange_units_qty_producing(self):
@@ -111,7 +113,7 @@ class MrpProduction(models.Model):
     def _compute_scrap_count_units(self):
         """Number of scrap records created for the units of this order."""
         for mo in self:
-            mo.scrap_count_units = len(mo.advmfg_unit_ids.mapped('scrap_ids'))
+            mo.scrap_count_units = len(mo.sudo().advmfg_unit_ids.mapped('scrap_ids'))
 
     def _compute_is_quality_user_only(self):
         """True when the user only has the Quality role (no admin role, no Units-tab access)."""

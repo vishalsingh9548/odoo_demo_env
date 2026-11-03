@@ -82,6 +82,10 @@ A fresh database needs these installed first: `purchase`, `wk_wizard_messages`, 
 This folder is a copy of the Home Kouzina modules (source repo: `home-kouzina/home_kouzina`), made without the
 inner `.git` so it can be tracked in the demo environment repo.
 
+### Manufacturing approval is only enforced for FMGC Access users
+`mrp_retail_skip_approval` blocks **Confirm** on a Manufacturing Order of a non-retail product until its approval status is *Approved* (Submit for Approval, then a user ticked *Manufacture Approver* clicks Approve). The Submit/Approve buttons are only shown to FMGC Access users, so the block used to trap every other user (for example in the Manufacturing Expo company), who could not request approval at all.
+Now `action_confirm` in `mrp_retail_skip_approval/models/mrp_production.py` applies the approval rule only when the user is in `hk_access.group_hk_access`; everyone else confirms with standard Odoo behaviour. Retail products still skip approval for everyone.
+
 Two root-level files from the source repo are intentionally **not** included here:
 - `jan.py`: a one-off `odoo shell` script that backfills cancelled Shopify orders (Jul 2025 to Jun 2026) on the live
   system. It is a data-fix job, not a module.
