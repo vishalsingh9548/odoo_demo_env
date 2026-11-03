@@ -1,10 +1,10 @@
 {
-    'name': 'Home Kouzina Access',
+    'name': 'FMGC Access',
     'version': '18.0.1.0.0',
-    'summary': 'Single access group that switches on all Home Kouzina custom functionality',
+    'summary': 'Single access group that switches on all FMGC custom functionality',
     'description': """
-Defines one group, "Home Kouzina Access". Menus, fields, tabs, buttons, filters,
-list columns, wizards and reports added by the Home Kouzina custom modules are
+Defines one group, "FMGC Access". Menus, fields, tabs, buttons, filters,
+list columns, wizards and reports added by the FMGC custom modules are
 only available to users who are members of this group.
     """,
     'category': 'Hidden',

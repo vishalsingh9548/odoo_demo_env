@@ -272,3 +272,8 @@ Scope agreed with the user: emails, WhatsApp and cron jobs are excluded; dead/br
 
 ## 26. Pallets tab: Add a line
 - Removed the **New Pallet** button from the manufacturing order header. On the Pallets tab a pallet is now added with **Add a line**; serial numbers are picked on the line itself (only completed, un-palleted units of this order are offered; removing a tag takes it off while the pallet is a draft). Scan Serial, Confirm and Print icons stay on the saved row. New field `unit_pick_ids` on the pallet.
+
+## 27. Plain MO users no longer hit an access error on Confirm
+- Problem: a user without the Advance Manufacturing group (e.g. in a company where the mode is off, like Recycle Batteries) got "You are not allowed to access 'Manufacturing Unit' (advmfg.unit) records" when pressing Confirm on a manufacturing order. The hidden field `uncompleted_lines_count` sits in the MO form for everyone and is calculated by reading the unit records, which only group members may read.
+- Fix (`models/mrp_production.py`): the three calculations that read units (`_compute_advmfg_counts`, `_compute_uncompleted_lines_count`, `_compute_scrap_count_units`) now read them with system rights (`sudo()`). Nothing is shown to non-members that was hidden before: the Units, Serial Pool and Pallets tabs and the smart buttons keep their group and company switch checks.
+- Impact: standard manufacturing for users/companies outside this module works as before; behaviour for Advance Manufacturing users is unchanged.

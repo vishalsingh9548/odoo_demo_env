@@ -10,7 +10,7 @@ patch(CogMenu.prototype, {
     setup() {
         super.setup();
         this.action = useService("action");
-        // "Inventory Stock Update" is only offered to the Home Kouzina Access group
+        // "Inventory Stock Update" is only offered to the FMGC Access group
         this.hkAccess = false;
         onWillStart(async () => {
             this.hkAccess = await user.hasGroup("hk_access.group_hk_access");

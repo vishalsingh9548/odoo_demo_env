@@ -13,6 +13,11 @@ class MrpProduction(models.Model):
     )
 
     def action_confirm(self):
+        # The Submit for Approval / Approve buttons only exist for FMGC Access users,
+        # so everyone else must not be blocked by an approval they cannot request.
+        if not self.env.user.has_group('hk_access.group_hk_access'):
+            return super().action_confirm()
+
         for production in self:
             if not production.is_retail_product and production.approval_status != 'approved':
                 raise UserError(_(
