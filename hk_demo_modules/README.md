@@ -1,15 +1,15 @@
 # home_kouzina_uat
 
-## Access control: one group, "Home Kouzina Access"
+## Access control: one group, "FMGC Access"
 
-All Home Kouzina custom functionality is switched on by **one** group:
+All FMGC custom functionality is switched on by **one** group:
 
 | | |
 |---|---|
-| Group | `hk_access.group_hk_access` — **Home Kouzina Access** |
-| Category | Home Kouzina |
+| Group | `hk_access.group_hk_access` — **FMGC Access** |
+| Category | FMGC |
 | Defined in | new module `hk_access` (`hk_access/security/hk_security.xml`) |
-| Enable per user | Settings > Users > (user) > Access Rights > **Home Kouzina** section |
+| Enable per user | Settings > Users > (user) > Access Rights > **FMGC** section |
 | Default members | `base.user_root`, `base.user_admin` |
 
 Install `hk_access` first. Every gated module lists `hk_access` in its `depends`.

@@ -17,7 +17,7 @@
         <field name="comment">Can confirm, export, and reconcile inventory variations.</field>
     </record>
 
-    <!-- Members of the single Home Kouzina Access group get full Inventory Variation rights -->
+    <!-- Members of the single FMGC Access group get full Inventory Variation rights -->
     <record id="hk_access.group_hk_access" model="res.groups">
         <field name="implied_ids" eval="[(4, ref('group_inventory_variation_manager'))]"/>
     </record>

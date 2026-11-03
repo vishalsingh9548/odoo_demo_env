@@ -12,7 +12,7 @@ export class SaleListController extends ListController {
         this.orm = useService("orm");
         this.actionService = useService("action");
         this.notification = useService("notification");
-        // Buttons below are only shown to members of the Home Kouzina Access group
+        // Buttons below are only shown to members of the FMGC Access group
         this.hkAccess = false;
         onWillStart(async () => {
             this.hkAccess = await user.hasGroup("hk_access.group_hk_access");
