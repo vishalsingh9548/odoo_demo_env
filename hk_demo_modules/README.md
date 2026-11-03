@@ -76,3 +76,13 @@ where `<t>` is not allowed, i.e. list, search, pivot and tabs)
 ### Known install-order gaps (already present, not from this change)
 A fresh database needs these installed first: `purchase`, `wk_wizard_messages`, and `home_kouzina_sales` before
 `mo_raw_material_consumption` (they use models or fields they do not declare in `depends`).
+
+## Demo copy notes
+
+This folder is a copy of the Home Kouzina modules (source repo: `home-kouzina/home_kouzina`), made without the
+inner `.git` so it can be tracked in the demo environment repo.
+
+Two root-level files from the source repo are intentionally **not** included here:
+- `jan.py`: a one-off `odoo shell` script that backfills cancelled Shopify orders (Jul 2025 to Jun 2026) on the live
+  system. It is a data-fix job, not a module.
+- `shopify_ept.zip`: a 40 MB zip duplicating the `shopify_ept/` folder that is already in this directory.
