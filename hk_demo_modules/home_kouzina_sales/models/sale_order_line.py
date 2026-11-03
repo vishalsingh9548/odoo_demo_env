@@ -1,0 +1,96 @@
+from odoo import api, fields, models
+
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    sale_date = fields.Datetime(
+        string='Sale Date',
+        related='order_id.date_order',
+        store=True,
+        readonly=True,
+        help='Sale Order date',
+    )
+    cogs_unit_price = fields.Float(
+        string='COGS Unit Price',
+        store=True,
+        readonly=True,
+        copy=False,
+        digits='Product Price',
+        help='Frozen COGS per unit at the time of sale.',
+    )
+
+    @api.depends(
+        'product_id',
+        'order_id.date_order',
+        'order_id.company_id',
+        'product_id.labelled_product',
+        'product_id.packaging_product',
+    )
+    def _compute_cogs_unit_price(self):
+        for line in self:
+            line.cogs_unit_price = line._get_frozen_cogs_unit_price()
+
+    def _get_frozen_cogs_unit_price(self):
+        self.ensure_one()
+        if not self.product_id:
+            return 0.0
+
+        company = self.order_id.company_id or self.env.company
+        sale_date = self.order_id.date_order or fields.Datetime.now()
+
+        def _template_cost(product_template):
+            if not product_template:
+                return 0.0
+
+            history = self.env['product.cost.history'].search([
+                ('product_tmpl_id', '=', product_template.id),
+                ('company_id', '=', company.id),
+                ('effective_date', '<=', sale_date),
+            ], order='effective_date desc, id desc', limit=1)
+            if history:
+                return history.cost_price or 0.0
+
+            product_variant = product_template.product_variant_id
+            if product_variant:
+                return product_variant.with_company(company).standard_price or 0.0
+            return 0.0
+
+        total_cost = _template_cost(self.product_id.product_tmpl_id)
+        total_cost += _template_cost(self.product_id.labelled_product)
+        total_cost += _template_cost(self.product_id.packaging_product)
+        return total_cost
+
+    cog_price = fields.Float(
+        "COG Price",
+        compute="_compute_cog_price",
+        store=True,
+        copy=False,
+    )
+
+    product_sale_price = fields.Float(
+        "Product ACV",
+        compute="_compute_product_sale_price",
+        store=True,
+        digits='Product Price',
+    )
+
+    @api.depends('product_id')
+    def _compute_product_sale_price(self):
+        for line in self:
+            line.product_sale_price = line.product_id.lst_price or 0.0
+
+    @api.depends('product_id')
+    def _compute_cog_price(self):
+        for line in self:
+            line.cog_price = line.product_id.cog_before_sale or 0.0
+
+    def _register_hook(self):
+        super()._register_hook()
+        self.env.cr.execute("""
+            UPDATE sale_order_line sol
+            SET cog_price = pp.cog_before_sale
+            FROM product_product pp
+            WHERE pp.id = sol.product_id
+              AND sol.cog_price IS NULL
+        """)
