@@ -33,7 +33,8 @@ class ResUsersAdvmfgCleanup(models.Model):
                 hidden = self.env['res.groups']
                 for xid in ('group_advmfg_user', 'group_advmfg_serial_update', 'group_material_requisition_user',
                             'group_advmfg_quality_user', 'group_advmfg_tab_access', 'group_advmfg_bom_approver',
-                            'group_advmfg_product_create'):
+                            'group_advmfg_product_create', 'group_sale_first_approval', 'group_sale_second_approval',
+                            'group_sale_admin_approval', 'group_purchase_approver', 'group_it_approver'):
                     hidden |= self.env.ref('advance_manufacturing.' + xid, raise_if_not_found=False) or hidden
                 for user in self.filtered(lambda u: main not in u.groups_id and (u.groups_id & hidden)):
                     super(ResUsersAdvmfgCleanup, user).write({'groups_id': [(3, g.id) for g in (user.groups_id & hidden)]})
