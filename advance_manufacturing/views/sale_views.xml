@@ -31,6 +31,9 @@
             <xpath expr="//group[@name='order_details']" position="inside">
                 <field name="confirm_sale_order" invisible="not advmfg_so_active" readonly="state == 'sale'"
                        groups="advance_manufacturing.group_advmfg_manager"/>
+            </xpath>
+            <!-- Left column (under Customer) so both columns are balanced -->
+            <xpath expr="//group[@name='partner_details']" position="inside">
                 <field name="shipping_same_as_billing" invisible="not advmfg_so_active"/>
                 <field name="billing_gst_number" invisible="not advmfg_so_active"/>
                 <field name="shipping_gst_number" invisible="not advmfg_so_active"/>
