@@ -284,3 +284,7 @@ Scope agreed with the user: emails, WhatsApp and cron jobs are excluded; dead/br
 - Fix 2 (`models/switch.py`): the clean-up of hidden roles now also removes First Approval, Second Approval, Admin Approval, Purchase Approver and IT Approver from a user who has no Advance Manufacturing / Administrator, so these no longer linger. It runs when that user's groups are changed next, so an existing leftover is cleared the next time their groups are saved.
 - Note: a user who was given one of these five groups on their own, without Advance Manufacturing / Administrator, will lose it on their next group change. They are hidden groups and normally come only from the Administrator setting.
 - Upgrade `advance_manufacturing` to load the rule changes.
+
+## 29. Sale order form: fields balanced under Customer
+- The Customer column had only the address while the right column held everything else, so the form looked uneven. **Shipping same as billing**, **Billing GSTIN**, **GST Number**, **Advance Payment** and **Outstanding Payment** now sit in the left column under Customer (`group partner_details`). Order Date, Pricelist, Payment Terms, Reference PI, Confirm MO/Delivery, LC Interest (%) and Pending Amount stay on the right.
+- Files: `views/sale_views.xml`, `views/purchase_sale_views.xml`. View change only; upgrade `advance_manufacturing` to load it.

@@ -6,9 +6,11 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='order_details']" position="inside">
+            <xpath expr="//group[@name='partner_details']" position="inside">
                 <field name="advance_payment" invisible="not advmfg_so_active"/>
                 <field name="outstanding_payment" invisible="not advmfg_so_active"/>
+            </xpath>
+            <xpath expr="//group[@name='order_details']" position="inside">
                 <field name="lc_amount" invisible="not advmfg_so_active"/>
                 <field name="lc_total_label" invisible="1"/>
                 <field name="remaining_amount" invisible="not advmfg_so_active"/>
