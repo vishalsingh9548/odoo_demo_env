@@ -59,7 +59,7 @@
     <record id="rule_sale_second_approval" model="ir.rule">
         <field name="name">Sale Order - Second Approval Restriction</field>
         <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="domain_force">[('approval_state', 'in', ['pending_admin', 'pending_second_approval'])] if user.has_group('advance_manufacturing.group_sale_second_approval') and not user.has_group('advance_manufacturing.group_advmfg_manager') else [(1, '=', 1)]</field>
+        <field name="domain_force">['|', ('company_id.advmfg_enabled', '=', False), ('approval_state', 'in', ['pending_admin', 'pending_second_approval'])] if user.has_group('advance_manufacturing.group_sale_second_approval') and not user.has_group('advance_manufacturing.group_advmfg_manager') else [(1, '=', 1)]</field>
         <field name="perm_read" eval="True"/>
         <field name="perm_write" eval="False"/>
         <field name="perm_create" eval="False"/>
@@ -68,7 +68,7 @@
     <record id="rule_sale_admin_approval" model="ir.rule">
         <field name="name">Sale Order - Admin Approval Restriction</field>
         <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="domain_force">[('approval_state', 'in', ['pending_admin', 'approved'])] if user.has_group('advance_manufacturing.group_sale_admin_approval') and not user.has_group('advance_manufacturing.group_advmfg_manager') else [(1, '=', 1)]</field>
+        <field name="domain_force">['|', ('company_id.advmfg_enabled', '=', False), ('approval_state', 'in', ['pending_admin', 'approved'])] if user.has_group('advance_manufacturing.group_sale_admin_approval') and not user.has_group('advance_manufacturing.group_advmfg_manager') else [(1, '=', 1)]</field>
     </record>
 
     <!-- BOM Approver: may approve or reject Bill of Materials change requests without full administrator rights. -->
