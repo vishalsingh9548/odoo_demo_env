@@ -133,11 +133,11 @@ class MrpWorkorder(models.Model):
     """A work order cannot start while components are insufficient."""
     _inherit = 'mrp.workorder'
 
-    def button_start(self):
+    def button_start(self, *args, **kwargs):
         """Start is refused while raw materials are insufficient."""
         for wo in self:
             wo.production_id._advmfg_check_raw_materials(_('Cannot start this Work Order'))
-        return super().button_start()
+        return super().button_start(*args, **kwargs)
 
 
 class MaterialRequisitionLotWizard(models.TransientModel):
