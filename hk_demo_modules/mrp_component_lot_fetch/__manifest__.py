@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'MRP Component Lot Fetch',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.0.1',
     'summary': 'Fetch the FIFO stock lot/serial number for MO component lines',
     'description': """
 Adds an "Assign Component Lots" button on confirmed Manufacturing Orders.
