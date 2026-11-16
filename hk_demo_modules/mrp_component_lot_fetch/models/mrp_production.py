@@ -29,7 +29,10 @@ class MrpProduction(models.Model):
         under the standard 'Transfers' smart button. Left in draft for the
         user to edit the destination location and validate. Skips MOs that
         already have one (e.g. a backorder re-triggering this)."""
-        for production in self:
+        # Valeo Products Limited (company id 5 on csl-demo) does not want
+        # these extra Stock -> Stock transfers for its finished products.
+        productions = self.filtered(lambda p: p.company_id.id != 5)
+        for production in productions:
             warehouse = production.picking_type_id.warehouse_id
             picking_type = warehouse.int_type_id
 
