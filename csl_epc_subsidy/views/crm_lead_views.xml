@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="crm_lead_view_form_epc_subsidy" model="ir.ui.view">
+            <field name="name">crm.lead.form.epc.subsidy</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="csl_epc_core.crm_lead_view_form_epc"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='epc_solar_details']" position="inside">
+                    <group string="Subsidy (suggestion)" name="epc_subsidy">
+                        <field name="suggested_subsidy_scheme_id"/>
+                        <field name="expected_subsidy_amount"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

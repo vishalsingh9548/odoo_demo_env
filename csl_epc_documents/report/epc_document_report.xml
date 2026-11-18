@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_report_epc_document" model="ir.actions.report">
+            <field name="name">Auto-filled Document Form</field>
+            <field name="model">epc.project.document</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">csl_epc_documents.report_epc_document_form</field>
+            <field name="report_file">csl_epc_documents.report_epc_document_form</field>
+            <field name="print_report_name">'%s - %s' % (object.name, object.project_id.name)</field>
+            <field name="binding_model_id" ref="model_epc_project_document"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <template id="report_epc_document_form">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout">
+                        <t t-set="project" t-value="doc.project_id"/>
+                        <t t-set="lead" t-value="project.lead_id"/>
+                        <div class="page">
+                            <h2 class="text-center"><t t-esc="doc.name"/></h2>
+                            <p class="text-center text-muted">Details below are filled in automatically from the project.</p>
+                            <table class="table table-sm table-bordered mt-4">
+                                <tbody>
+                                    <tr><th style="width:35%">Applicant name</th><td><t t-esc="project.partner_id.name"/></td></tr>
+                                    <tr><th>Contact</th><td><t t-esc="project.partner_id.phone or project.partner_id.mobile"/> <t t-esc="project.partner_id.email"/></td></tr>
+                                    <tr><th>Site address</th><td><t t-esc="project.site_address or project.partner_id.contact_address"/></td></tr>
+                                    <tr><th>DISCOM</th><td><t t-esc="project.discom_id.name"/></td></tr>
+                                    <tr><th>Consumer number</th><td><t t-esc="project.consumer_number"/></td></tr>
+                                    <tr><th>Connection type</th><td><t t-esc="lead.connection_type"/></td></tr>
+                                    <tr><th>Sanctioned load (kW)</th><td><t t-esc="lead.sanctioned_load_kw"/></td></tr>
+                                    <tr><th>Proposed solar capacity (kWp)</th><td><t t-esc="project.capacity_kw or lead.proposed_capacity_kw"/></td></tr>
+                                    <tr><th>Project</th><td><t t-esc="project.name"/></td></tr>
+                                    <tr><th>Date</th><td><t t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/></td></tr>
+                                </tbody>
+                            </table>
+                            <div class="row mt-5 pt-5">
+                                <div class="col-6">Signature of applicant: ______________________</div>
+                                <div class="col-6 text-end">Signature of installer: ______________________</div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

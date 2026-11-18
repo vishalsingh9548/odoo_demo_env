@@ -1,0 +1,22 @@
+{
+    'name': 'CSL Solar EPC - Government Document Pack',
+    'version': '18.0.1.0.0',
+    'category': 'Industries',
+    'summary': 'Checklist of government / compliance papers created when an order is confirmed, with status, signed scans and auto-filled print forms.',
+    'author': 'Cloud Science Labs',
+    'website': 'https://cloudsciencelabs.com',
+    'license': 'LGPL-3',
+    'depends': ['csl_epc_dealer', 'csl_epc_commissioning'],
+    'data': [
+        'security/ir.model.access.csv',
+        'data/document_template_data.xml',
+        'report/epc_document_report.xml',
+        'views/epc_document_template_views.xml',
+        'views/epc_project_document_views.xml',
+        'views/project_project_views.xml',
+        'views/res_config_settings_views.xml',
+        'views/epc_menus.xml',
+    ],
+    'application': False,
+    'installable': True,
+}

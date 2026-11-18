@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="project_view_form_epc_net_meter" model="ir.ui.view">
+            <field name="name">project.view.form.epc.net.meter</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="csl_epc_core.project_view_form_epc"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_net_meter" type="object" class="oe_stat_button" icon="fa-tachometer"
+                            groups="csl_epc_core.group_epc_user">
+                        <field name="net_meter_count" widget="statinfo" string="Net Metering"/>
+                    </button>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

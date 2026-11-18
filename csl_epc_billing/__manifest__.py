@@ -1,0 +1,21 @@
+{
+    'name': 'CSL Solar EPC - Milestone Billing',
+    'version': '18.0.1.0.0',
+    'category': 'Industries',
+    'summary': 'Stage-wise payment plan (advance to retention) that raises draft invoices automatically when the project reaches each stage.',
+    'author': 'Cloud Science Labs',
+    'website': 'https://cloudsciencelabs.com',
+    'license': 'LGPL-3',
+    'depends': ['csl_epc_commissioning', 'csl_epc_handover'],
+    'data': [
+        'security/ir.model.access.csv',
+        'data/payment_plan_data.xml',
+        'data/billing_cron.xml',
+        'views/epc_payment_plan_views.xml',
+        'views/epc_order_milestone_views.xml',
+        'views/sale_order_views.xml',
+        'views/epc_menus.xml',
+    ],
+    'application': False,
+    'installable': True,
+}

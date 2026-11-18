@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="epc_feasibility_view_form_design" model="ir.ui.view">
+            <field name="name">epc.feasibility.form.design</field>
+            <field name="model">epc.feasibility</field>
+            <field name="inherit_id" ref="csl_epc_feasibility.epc_feasibility_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='approval_state']" position="before">
+                    <button name="action_create_design" string="Create Design" type="object"
+                            class="oe_highlight" invisible="approval_state != 'approved' or design_count &gt; 0"/>
+                </xpath>
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_design" type="object" class="oe_stat_button"
+                            icon="fa-sitemap" invisible="design_count == 0">
+                        <field name="design_count" widget="statinfo" string="Designs"/>
+                    </button>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

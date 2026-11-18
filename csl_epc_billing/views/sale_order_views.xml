@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_order_view_form_epc_billing" model="ir.ui.view">
+            <field name="name">sale.order.form.epc.billing</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="csl_epc_core.sale_order_view_form_epc"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page name="epc_milestones" string="Milestone Billing" groups="csl_epc_core.group_epc_user">
+                        <group>
+                            <group>
+                                <field name="payment_plan_id" readonly="state not in ('draft', 'sent')"/>
+                                <button name="action_load_milestones" type="object" string="Load Stages from Plan"
+                                        class="btn-secondary" invisible="not payment_plan_id or state not in ('draft', 'sent')"/>
+                            </group>
+                            <group>
+                                <field name="milestone_total_percent"/>
+                                <field name="milestone_billed_amount"/>
+                            </group>
+                        </group>
+                        <field name="milestone_ids">
+                            <list editable="bottom">
+                                <field name="sequence" widget="handle"/>
+                                <field name="name"/>
+                                <field name="percentage" sum="Total"/>
+                                <field name="amount"/>
+                                <field name="trigger"/>
+                                <field name="days_after"/>
+                                <field name="due_date"/>
+                                <field name="invoice_id"/>
+                                <field name="payment_state" widget="badge"/>
+                                <field name="state" widget="badge"/>
+                                <field name="currency_id" column_invisible="1"/>
+                                <button name="action_raise_invoice" type="object" string="Raise Invoice" icon="fa-file-text-o"
+                                        invisible="state == 'invoiced' or parent.state not in ('sale', 'done')"/>
+                            </list>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

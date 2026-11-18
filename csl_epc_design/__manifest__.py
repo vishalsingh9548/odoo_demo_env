@@ -1,0 +1,22 @@
+{
+    'name': 'CSL Solar EPC - System Design',
+    'version': '18.0.1.0.0',
+    'category': 'Industries',
+    'summary': 'System Design stage (panels, inverter, strings, DC/AC capacity, SLD) with approval, between Feasibility and BOQ.',
+    'author': 'Cloud Science Labs',
+    'website': 'https://cloudsciencelabs.com',
+    'license': 'LGPL-3',
+    'depends': ['csl_epc_boq'],
+    'data': [
+        'security/ir.model.access.csv',
+        'security/epc_rules.xml',
+        'data/design_sequence_data.xml',
+        'views/epc_design_views.xml',
+        'views/epc_feasibility_views.xml',
+        'views/epc_boq_views.xml',
+        'views/res_config_settings_views.xml',
+        'views/epc_menus.xml',
+    ],
+    'application': False,
+    'installable': True,
+}

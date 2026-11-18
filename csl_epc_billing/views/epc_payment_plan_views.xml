@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="epc_payment_plan_view_list" model="ir.ui.view">
+            <field name="name">epc.payment.plan.list</field>
+            <field name="model">epc.payment.plan</field>
+            <field name="arch" type="xml">
+                <list string="Payment Plans"><field name="name"/><field name="total_percent"/></list>
+            </field>
+        </record>
+        <record id="epc_payment_plan_view_form" model="ir.ui.view">
+            <field name="name">epc.payment.plan.form</field>
+            <field name="model">epc.payment.plan</field>
+            <field name="arch" type="xml">
+                <form string="Payment Plan">
+                    <sheet>
+                        <div class="oe_title"><h1><field name="name" placeholder="e.g. 30-40-20-10"/></h1></div>
+                        <field name="line_ids">
+                            <list editable="bottom">
+                                <field name="sequence" widget="handle"/>
+                                <field name="name"/>
+                                <field name="percentage" sum="Total"/>
+                                <field name="trigger"/>
+                                <field name="days_after"/>
+                            </list>
+                        </field>
+                        <group><field name="total_percent"/></group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="epc_payment_plan_action" model="ir.actions.act_window">
+            <field name="name">Payment Plans</field>
+            <field name="res_model">epc.payment.plan</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Create a payment plan</p>
+                <p>For example: 30% advance, 40% on delivery, 20% on commissioning, 10% retention 90 days after handover.</p>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form_epc_net_meter" model="ir.ui.view">
+            <field name="name">res.config.settings.form.epc.net.meter</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="csl_epc_core.res_config_settings_view_form_epc"/>
+            <field name="arch" type="xml">
+                <xpath expr="//block[@name='epc_approvals_block']" position="after">
+                    <block title="Net Metering" name="epc_net_meter_block">
+                        <setting string="Handover Needs Net-Meter Sync"
+                                 help="A handover can only be approved once any open net-metering application is synced.">
+                            <field name="epc_handover_require_net_meter"/>
+                        </setting>
+                        <setting string="Stuck After (days)"
+                                 help="A to-do is created when a net-metering application does not move for this many days.">
+                            <field name="epc_netmeter_stuck_days"/>
+                        </setting>
+                    </block>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

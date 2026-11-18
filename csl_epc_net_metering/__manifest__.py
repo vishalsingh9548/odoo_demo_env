@@ -1,0 +1,21 @@
+{
+    'name': 'CSL Solar EPC - Net Metering',
+    'version': '18.0.1.0.0',
+    'category': 'Industries',
+    'summary': 'Net-metering application tracking with the electricity board (DISCOM), stuck-application reminders and an optional handover check.',
+    'author': 'Cloud Science Labs',
+    'website': 'https://cloudsciencelabs.com',
+    'license': 'LGPL-3',
+    'depends': ['csl_epc_documents', 'csl_epc_commissioning', 'csl_epc_handover'],
+    'data': [
+        'security/ir.model.access.csv',
+        'data/net_meter_sequence_data.xml',
+        'data/net_meter_cron.xml',
+        'views/epc_net_meter_views.xml',
+        'views/project_project_views.xml',
+        'views/res_config_settings_views.xml',
+        'views/epc_menus.xml',
+    ],
+    'application': False,
+    'installable': True,
+}

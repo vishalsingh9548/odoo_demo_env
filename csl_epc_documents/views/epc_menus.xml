@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem id="menu_epc_documents_root" name="Project Documents"
+                  web_icon="csl_epc_documents,static/description/icon.png"
+                  groups="csl_epc_core.group_epc_user" sequence="49"/>
+        <menuitem id="menu_epc_documents" name="Project Documents"
+                  parent="menu_epc_documents_root" action="epc_project_document_action"
+                  sequence="10"/>
+        <menuitem id="menu_epc_config_document_template" name="Document Templates"
+                  parent="csl_epc_core.menu_epc_configuration" action="epc_document_template_action"
+                  sequence="30"/>
+    </data>
+</odoo>

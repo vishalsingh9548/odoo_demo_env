@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="epc_subsidy_application_view_list" model="ir.ui.view">
+            <field name="name">epc.subsidy.application.list</field>
+            <field name="model">epc.subsidy.application</field>
+            <field name="arch" type="xml">
+                <list string="Subsidy Applications">
+                    <field name="name"/>
+                    <field name="project_id"/>
+                    <field name="scheme_id"/>
+                    <field name="portal_number" optional="show"/>
+                    <field name="claimed_amount" sum="Total"/>
+                    <field name="approved_amount" sum="Total"/>
+                    <field name="disbursed_amount" sum="Total"/>
+                    <field name="days_pending" optional="show"/>
+                    <field name="state" widget="badge"
+                           decoration-success="state == 'disbursed'" decoration-danger="state == 'rejected'"
+                           decoration-info="state in ('applied', 'approved')"/>
+                </list>
+            </field>
+        </record>
+        <record id="epc_subsidy_application_view_form" model="ir.ui.view">
+            <field name="name">epc.subsidy.application.form</field>
+            <field name="model">epc.subsidy.application</field>
+            <field name="arch" type="xml">
+                <form string="Subsidy Application">
+                    <header>
+                        <button name="action_docs_ready" string="Documents Ready" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                        <button name="action_apply" string="Mark Applied" type="object" class="oe_highlight" invisible="state != 'docs_ready'"/>
+                        <button name="action_approve" string="Mark Approved" type="object" class="oe_highlight" invisible="state != 'applied'"/>
+                        <button name="action_disburse" string="Mark Disbursed" type="object" class="oe_highlight" invisible="state != 'approved'"/>
+                        <button name="action_reject" string="Reject" type="object" invisible="state not in ('applied', 'approved')"/>
+                        <button name="action_reset" string="Reset to Draft" type="object" invisible="state in ('draft', 'disbursed')"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,docs_ready,applied,approved,disbursed"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                        <group>
+                            <group string="Application">
+                                <field name="project_id"/>
+                                <field name="partner_id"/>
+                                <field name="scheme_id"/>
+                                <field name="capacity_kw"/>
+                                <field name="portal_number"/>
+                                <field name="currency_id" invisible="1"/>
+                            </group>
+                            <group string="Money">
+                                <field name="expected_amount"/>
+                                <field name="claimed_amount"/>
+                                <field name="approved_amount"/>
+                                <field name="disbursed_amount"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Dates">
+                                <field name="applied_date"/>
+                                <field name="approved_date"/>
+                                <field name="disbursed_date"/>
+                                <field name="days_pending"/>
+                            </group>
+                            <group string="Remarks"><field name="remarks" nolabel="1"/></group>
+                        </group>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+        <record id="epc_subsidy_application_view_search" model="ir.ui.view">
+            <field name="name">epc.subsidy.application.search</field>
+            <field name="model">epc.subsidy.application</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="project_id"/>
+                    <field name="portal_number"/>
+                    <filter name="open" string="Money Not Received" domain="[('state', 'not in', ('disbursed', 'rejected'))]"/>
+                    <group expand="0" string="Group By">
+                        <filter name="g_state" string="Status" context="{'group_by': 'state'}"/>
+                        <filter name="g_scheme" string="Scheme" context="{'group_by': 'scheme_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="epc_subsidy_application_action" model="ir.actions.act_window">
+            <field name="name">Subsidy Applications</field>
+            <field name="res_model">epc.subsidy.application</field>
+            <field name="view_mode">list,form,pivot</field>
+        </record>
+        <record id="epc_subsidy_application_view_pivot" model="ir.ui.view">
+            <field name="name">epc.subsidy.application.pivot</field>
+            <field name="model">epc.subsidy.application</field>
+            <field name="arch" type="xml">
+                <pivot string="Subsidy">
+                    <field name="state" type="row"/>
+                    <field name="claimed_amount" type="measure"/>
+                    <field name="approved_amount" type="measure"/>
+                    <field name="disbursed_amount" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+    </data>
+</odoo>

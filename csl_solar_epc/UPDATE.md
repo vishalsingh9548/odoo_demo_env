@@ -122,3 +122,67 @@ The bar charts now have headings on their axes (Pipeline Activity: "Open items" 
 **Also (database clean-up on `solar_epc_v2`):** the stale module `csl_ai_assistant` (not in the addons path) was uninstalled, because its leftover Settings view referenced the missing field `csl_ai_sqft_per_kw` and crashed the Settings page.
 
 Upgrade: `-u csl_epc_site_survey,csl_epc_feasibility,csl_epc_boq`, then restart the server.
+
+
+---
+
+# UPDATE — csl_solar_epc (Solar Dashboard) — gap modules added
+
+> 2026-11-18. Summary of the whole "gap closing" round (competitor comparison with Entrivis Solar EPC). Details are in each new module's own `UPDATE.md`.
+
+## What was changed in THIS folder
+- ~~`__manifest__.py`: six modules added to `depends`~~ **REVERTED (see Uninstall below)**: six modules had been added to `depends` (`csl_epc_dealer`, `csl_epc_design`, `csl_epc_documents`, `csl_epc_subsidy`, `csl_epc_net_metering`, `csl_epc_billing`).
+  - **Why:** so a fresh install of "Solar Dashboard" installs the whole set.
+  - **Impact:** none on a running database until `csl_solar_epc` is upgraded; then Odoo installs any of the six still missing. On `solar_epc_v2` they are already installed.
+- Nothing else in this module (views, dashboard, reports, demo data) was touched.
+
+## New modules (all additive, no existing file edited)
+| Module | Closes gap | Existing behaviour touched |
+|---|---|---|
+| csl_epc_dealer | DISCOM, consumer number, dealer / sub-dealer | none (new fields by view inheritance) |
+| csl_epc_design | System Design stage | none unless switch *Require Approved Design Before BOQ* is turned on |
+| csl_epc_documents | Government document pack | extends order confirmation (adds documents) and, only with its switch on, commissioning submit |
+| csl_epc_subsidy | Subsidy schemes and applications | extends order confirmation (adds a Draft application when a scheme fits) |
+| csl_epc_net_metering | Net-metering tracking | handover approval check only with its switch on; one daily reminder job |
+| csl_epc_billing | Stage-wise payment plan and draft invoices | only orders that have a Payment Plan |
+
+No file in `csl_epc_core`, `csl_epc_boq`, `csl_epc_feasibility`, `csl_epc_commissioning`, `csl_epc_handover` etc. was edited. New code hooks into them by Odoo inheritance and always calls the original method first.
+
+## How it was verified
+1. Full database backup before starting: `/home/csl/Desktop/odoo_18/backups/solar_epc_v2_before_gap_modules.sql.gz`.
+2. Installed on a throw-away copy of `solar_epc_v2` first, then ran a full scenario there: lead with DISCOM/dealer → survey → feasibility → design (with warnings) → BOQ → quotation → confirm → project, 8 documents, subsidy application, advance draft invoice → documents flow and printable form → subsidy flow → net metering flow → installation / commissioning / handover triggering invoices → retention scheduled 90 days and raised by the daily job → delivery trigger on a stock order → a plain order with no plan stays untouched.
+3. Installed on `solar_epc_v2` with no errors; the running server reloaded and the login page answers 200. The test copy was deleted.
+
+## Things found while testing and what was done
+- The *Overdue* filter on Project Documents used an unsearchable field → fixed (uses the due date directly).
+- Dealer full-name field now declared recursive (removes a framework warning).
+- *Customer pays after subsidy* is now never below zero.
+- Your existing **Strict BOQ Check** (on in `solar_epc_v2`) needs a product on every BOQ line. A BOQ created from a design has the lines but no products, so the engineer must pick them before *Create Quotation* — expected, not a bug.
+- Your existing commissioning / handover requirement switches still apply (customer approval, certificate, handover documents); the new modules do not bypass them.
+- Not covered by an automatic test: screens were not clicked through in a browser (only models, flows and view validation on install).
+
+## Rollback
+Uninstall the six modules from Apps (newest first: billing, net metering, subsidy, documents, design, dealer), or restore the backup above. Removing them deletes only their own data and fields.
+
+## Icons and home-screen tiles for the six new modules (2026-11-18)
+Each new module has `static/description/icon.png` and its own top-level menu (tiles: Dealers & DISCOM, System Design, Project Documents, Subsidy, Net Metering, Milestone Billing), matching the existing stage modules. Menus and icons only, no behaviour change. The six modules were upgraded on `solar_epc_v2` so Apps and the home screen show the icons.
+
+
+## Uninstall of the six new modules (2026-11-18) — manual install later
+The owner asked to uninstall all six and install them one by one by hand.
+- The `depends` edit above was **reverted**, so Solar Dashboard no longer pulls the new modules in and they are fully optional.
+- **Incident:** uninstalling the six also uninstalled `csl_solar_epc` itself, because the database had already recorded the edited dependency list. It was reinstalled straight away. Verified against the pre-install backup: record counts of leads, orders, projects, tasks, milestones, surveys, feasibility, BOQs, material requests, DPRs, quality checks, commissioning, handovers, AMC contracts, partners, invoices, pickings, views, menus and actions are identical. Only internal reference-table counts of base/mail modules differ slightly (Odoo reload metadata, harmless).
+- All tables and columns of the six modules are gone (`epc_design`, `epc_dealer`, `epc_discom`, `epc_subsidy_*`, `epc_net_meter`, `epc_order_milestone`, `epc_project_document`, `epc_payment_plan*`, and the new fields on the lead). Nothing had been entered in them (only rolled-back tests).
+- The module folders, code and `UPDATE.md` files are kept for installing later.
+- Lesson: do not add optional modules to a parent's `depends` on a running database.
+
+## Install order (one by one, from Apps; remove the "Apps" filter and search "CSL Solar EPC")
+1. CSL Solar EPC - DISCOM & Dealer (`csl_epc_dealer`)
+2. CSL Solar EPC - System Design (`csl_epc_design`) — independent, can go anywhere
+3. CSL Solar EPC - Government Document Pack (`csl_epc_documents`) — needs 1
+4. CSL Solar EPC - Subsidy (`csl_epc_subsidy`) — needs 3
+5. CSL Solar EPC - Net Metering (`csl_epc_net_metering`) — needs 3
+6. CSL Solar EPC - Milestone Billing (`csl_epc_billing`) — independent, can go anywhere
+
+## Starter data added inside the optional modules (2026-11-18)
+DISCOM list (`csl_epc_dealer`), PM Surya Ghar scheme (`csl_epc_subsidy`), two payment plans (`csl_epc_billing`) and 4 extra document templates (`csl_epc_documents`) now ship in each module's `data/` folder and load on install. See each module's UPDATE.md. Rule from the owner: modules are installed by the owner on their own instance; nothing is installed or upgraded on it by the assistant.

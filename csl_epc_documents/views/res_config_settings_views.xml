@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form_epc_documents" model="ir.ui.view">
+            <field name="name">res.config.settings.form.epc.documents</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="csl_epc_core.res_config_settings_view_form_epc"/>
+            <field name="arch" type="xml">
+                <xpath expr="//block[@name='epc_approvals_block']" position="after">
+                    <block title="Government Documents" name="epc_documents_block">
+                        <setting string="Documents Block Commissioning"
+                                 help="Commissioning cannot be submitted while mandatory project documents are still pending.">
+                            <field name="epc_docs_block_commissioning"/>
+                        </setting>
+                    </block>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

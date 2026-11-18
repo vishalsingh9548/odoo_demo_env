@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_order_view_form_epc_subsidy" model="ir.ui.view">
+            <field name="name">sale.order.form.epc.subsidy</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="csl_epc_core.sale_order_view_form_epc"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='epc_terms']" position="inside">
+                    <group string="Subsidy (information only, does not change the total)" name="epc_order_subsidy">
+                        <field name="epc_subsidy_scheme_id"/>
+                        <field name="epc_expected_subsidy"/>
+                        <field name="epc_customer_pays"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

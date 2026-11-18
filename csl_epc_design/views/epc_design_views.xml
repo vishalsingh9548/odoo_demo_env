@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="epc_design_view_list" model="ir.ui.view">
+            <field name="name">epc.design.list</field>
+            <field name="model">epc.design</field>
+            <field name="arch" type="xml">
+                <list string="System Designs">
+                    <field name="name"/>
+                    <field name="lead_id"/>
+                    <field name="partner_id"/>
+                    <field name="dc_capacity_kw" sum="Total"/>
+                    <field name="ac_capacity_kw" sum="Total"/>
+                    <field name="dc_ac_ratio"/>
+                    <field name="annual_generation_kwh" sum="Total" optional="show"/>
+                    <field name="approval_state" widget="badge"
+                           decoration-success="approval_state == 'approved'"
+                           decoration-danger="approval_state == 'rejected'"
+                           decoration-info="approval_state == 'submitted'"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="epc_design_view_form" model="ir.ui.view">
+            <field name="name">epc.design.form</field>
+            <field name="model">epc.design</field>
+            <field name="arch" type="xml">
+                <form string="System Design">
+                    <header>
+                        <button name="action_submit" string="Submit for Approval" type="object"
+                                class="oe_highlight" invisible="approval_state != 'to_submit'"/>
+                        <button name="action_approve" string="Approve" type="object"
+                                class="oe_highlight" groups="csl_epc_core.group_epc_manager"
+                                invisible="approval_state != 'submitted'"/>
+                        <button name="action_open_reject_wizard" string="Reject" type="object"
+                                groups="csl_epc_core.group_epc_manager"
+                                invisible="approval_state != 'submitted'"/>
+                        <button name="action_reset_to_submit" string="Reset to Draft" type="object"
+                                invisible="approval_state not in ('submitted', 'rejected')"/>
+                        <button name="action_reset_to_submit" string="Reopen (Reset to Draft)" type="object"
+                                groups="csl_epc_core.group_epc_manager" invisible="approval_state != 'approved'"/>
+                        <button name="action_create_boq" string="Create BOQ" type="object"
+                                class="oe_highlight" invisible="approval_state != 'approved' or boq_count &gt; 0"/>
+                        <field name="approval_state" widget="statusbar"
+                               statusbar_visible="to_submit,submitted,approved"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_boq" type="object" class="oe_stat_button"
+                                    icon="fa-calculator" invisible="boq_count == 0">
+                                <field name="boq_count" widget="statinfo" string="BOQs"/>
+                            </button>
+                        </div>
+                        <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                        <div class="alert alert-warning" role="alert" invisible="not design_warning">
+                            <field name="design_warning" readonly="1"/>
+                        </div>
+                        <group>
+                            <group string="Reference">
+                                <field name="feasibility_id"/>
+                                <field name="lead_id"/>
+                                <field name="partner_id"/>
+                            </group>
+                            <group string="Result (calculated)">
+                                <field name="dc_capacity_kw"/>
+                                <field name="ac_capacity_kw"/>
+                                <field name="dc_ac_ratio"/>
+                                <field name="annual_generation_kwh"/>
+                                <field name="annual_savings"/>
+                                <field name="payback_years"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Panels &amp; Inverter" name="equipment">
+                                <group>
+                                    <group string="Panels">
+                                        <field name="panel_make"/>
+                                        <field name="panel_watt"/>
+                                        <field name="panel_count"/>
+                                        <field name="panel_vmp"/>
+                                        <field name="panel_voc"/>
+                                    </group>
+                                    <group string="Inverter">
+                                        <field name="inverter_make"/>
+                                        <field name="inverter_kw"/>
+                                        <field name="inverter_count"/>
+                                        <field name="mppt_min_voltage"/>
+                                        <field name="mppt_max_voltage"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Strings &amp; Mounting" name="strings">
+                                <group>
+                                    <group>
+                                        <field name="string_count"/>
+                                        <field name="panels_per_string"/>
+                                        <field name="mounting_type"/>
+                                    </group>
+                                    <group>
+                                        <field name="string_voltage_vmp"/>
+                                        <field name="string_voltage_voc"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Drawings" name="drawings">
+                                <group>
+                                    <field name="layout_drawing" filename="layout_drawing_filename"/>
+                                    <field name="layout_drawing_filename" invisible="1"/>
+                                    <field name="sld_drawing" filename="sld_drawing_filename"/>
+                                    <field name="sld_drawing_filename" invisible="1"/>
+                                </group>
+                            </page>
+                            <page string="Estimates" name="estimates">
+                                <group>
+                                    <field name="specific_yield"/>
+                                    <field name="tariff_per_unit"/>
+                                    <field name="estimated_system_cost"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </group>
+                            </page>
+                            <page string="Approval" name="approval">
+                                <group>
+                                    <field name="submitted_by" readonly="1"/>
+                                    <field name="submitted_date" readonly="1"/>
+                                    <field name="approved_by" readonly="1"/>
+                                    <field name="approved_date" readonly="1"/>
+                                    <field name="rejection_reason"
+                                           invisible="approval_state not in ('submitted', 'rejected')"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="epc_design_action" model="ir.actions.act_window">
+            <field name="name">System Designs</field>
+            <field name="res_model">epc.design</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Create your first System Design</p>
+                <p>Pick panels, inverter and strings after an approved Feasibility Study.</p>
+            </field>
+        </record>
+    </data>
+</odoo>

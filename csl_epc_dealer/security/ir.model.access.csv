@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_epc_discom_user,epc.discom.user,model_epc_discom,csl_epc_core.group_epc_user,1,0,0,0
+access_epc_discom_manager,epc.discom.manager,model_epc_discom,csl_epc_core.group_epc_manager,1,1,1,1
+access_epc_dealer_user,epc.dealer.user,model_epc_dealer,csl_epc_core.group_epc_user,1,0,0,0
+access_epc_dealer_manager,epc.dealer.manager,model_epc_dealer,csl_epc_core.group_epc_manager,1,1,1,1

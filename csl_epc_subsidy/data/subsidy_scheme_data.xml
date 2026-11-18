@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Starter subsidy scheme for residential rooftop solar. noupdate: once loaded,
+         admins can change the rates in the screen and upgrades will not overwrite them.
+         CHECK THE CURRENT RATES ON THE OFFICIAL PORTAL BEFORE GO-LIVE; schemes change. -->
+    <data noupdate="1">
+        <record id="subsidy_scheme_pm_surya_ghar" model="epc.subsidy.scheme">
+            <field name="name">PM Surya Ghar: Muft Bijli Yojana (Residential)</field>
+            <field name="authority">Ministry of New and Renewable Energy (MNRE), Government of India</field>
+            <field name="segment">residential</field>
+            <field name="max_capacity_kw">10</field>
+            <field name="amount_type">per_kw</field>
+            <field name="amount">30000</field>
+            <field name="max_amount">78000</field>
+            <field name="valid_to">2027-03-31</field>
+            <field name="document_template_ids" eval="[(6, 0, [
+                ref('csl_epc_documents.doc_tmpl_id_proof'),
+                ref('csl_epc_documents.doc_tmpl_electricity_bill'),
+                ref('csl_epc_documents.doc_tmpl_bank_details'),
+                ref('csl_epc_documents.doc_tmpl_subsidy_form'),
+            ])]"/>
+            <field name="notes">Central assistance of about 30,000 per kW up to 2 kW, then 18,000 for the third kW, capped at 78,000 for 3 kW and above. This starter record uses 30,000 per kW with a 78,000 cap, which gives the same result. Verify the current rates and validity on the official PM Surya Ghar portal before using it, and edit the record here if they changed.</field>
+        </record>
+    </data>
+</odoo>
