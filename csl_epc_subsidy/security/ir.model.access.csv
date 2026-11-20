@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_epc_subsidy_scheme_user,epc.subsidy.scheme.user,model_epc_subsidy_scheme,csl_epc_core.group_epc_user,1,0,0,0
+access_epc_subsidy_scheme_manager,epc.subsidy.scheme.manager,model_epc_subsidy_scheme,csl_epc_core.group_epc_manager,1,1,1,1
+access_epc_subsidy_application_user,epc.subsidy.application.user,model_epc_subsidy_application,csl_epc_core.group_epc_user,1,1,1,0
+access_epc_subsidy_application_manager,epc.subsidy.application.manager,model_epc_subsidy_application,csl_epc_core.group_epc_manager,1,1,1,1

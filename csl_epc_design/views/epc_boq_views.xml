@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="epc_boq_view_form_design" model="ir.ui.view">
+            <field name="name">epc.boq.form.design</field>
+            <field name="model">epc.boq</field>
+            <field name="inherit_id" ref="csl_epc_boq.epc_boq_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='feasibility_id']" position="after">
+                    <field name="design_id" groups="csl_epc_core.group_epc_admin" invisible="not design_id"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

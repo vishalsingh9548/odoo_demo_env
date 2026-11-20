@@ -14,12 +14,16 @@ class SaleOrder(models.Model):
         string='Warranty Type',
         help="What kind of warranty is being offered on this system.",
     )
-    delivery_type = fields.Selection(
-        [('immediate', 'Immediate'), ('scheduled', 'Scheduled'), ('as_discussed', 'As Per Discussion')],
+    # Own field names (epc_*): advance_manufacturing defines sale.order.delivery_type and
+    # freight_type with different options, and two modules sharing one field made Odoo keep only
+    # one list and reject the other module's values. Separate fields let the Solar EPC group and
+    # the Advance Manufacturing group each work independently, with their own options.
+    epc_delivery_type = fields.Selection(
+        [('immediate', 'Immediate'), ('scheduled', 'Scheduled')],
         string='Delivery Terms',
         help="When the equipment will be delivered to site.",
     )
-    freight_type = fields.Selection(
+    epc_freight_type = fields.Selection(
         [('extra', 'Freight Extra'), ('included', 'Freight Included')],
         string='Freight Terms',
         help="Whether transport/freight cost is already included in the quoted price.",
@@ -40,7 +44,7 @@ class SaleOrder(models.Model):
         string='Certifications',
         help="Which product certifications apply to the equipment being supplied.",
     )
-    tolerance_type = fields.Selection(
+    epc_tolerance_type = fields.Selection(
         [('positive', 'Positive Tolerance'), ('range', '± Range Tolerance')],
         string='Wattage Tolerance',
         help="The manufacturing tolerance allowed on the rated wattage of the modules supplied.",

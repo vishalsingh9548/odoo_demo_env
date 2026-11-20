@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Starter subsidy scheme for residential rooftop solar. noupdate: once loaded,
+         admins can change the rates in the screen and upgrades will not overwrite them.
+         CHECK THE CURRENT RATES ON THE OFFICIAL PORTAL BEFORE GO-LIVE; schemes change. -->
+    <data noupdate="1">
+        <record id="subsidy_scheme_pm_surya_ghar" model="epc.subsidy.scheme">
+            <field name="name">PM Surya Ghar: Muft Bijli Yojana (Residential)</field>
+            <field name="authority">Ministry of New and Renewable Energy (MNRE), Government of India</field>
+            <field name="segment">residential</field>
+            <field name="max_capacity_kw">10</field>
+            <field name="amount_type">per_kw</field>
+            <field name="amount">30000</field>
+            <field name="max_amount">78000</field>
+            <field name="valid_to">2027-03-31</field>
+            <field name="document_template_ids" eval="[(6, 0, [
+                ref('csl_epc_documents.doc_tmpl_id_proof'),
+                ref('csl_epc_documents.doc_tmpl_electricity_bill'),
+                ref('csl_epc_documents.doc_tmpl_bank_details'),
+                ref('csl_epc_documents.doc_tmpl_subsidy_form'),
+            ])]"/>
+            <field name="notes">Central assistance of about 30,000 per kW up to 2 kW, then 18,000 for the third kW, capped at 78,000 for 3 kW and above. This starter record uses 30,000 per kW with a 78,000 cap, which gives the same result. Verify the current rates and validity on the official PM Surya Ghar portal before using it, and edit the record here if they changed.</field>
+        </record>
+
+        <!-- Extra schemes so the suggestion works for larger and non-residential systems.
+             Same noupdate rules as above. The rates below are STARTER / SAMPLE values for
+             testing and must be checked and edited (Subsidy Schemes screen) before go-live. -->
+        <record id="subsidy_scheme_pm_surya_ghar_society" model="epc.subsidy.scheme">
+            <field name="name">PM Surya Ghar: Group Housing Society / RWA (Common Facilities)</field>
+            <field name="authority">Ministry of New and Renewable Energy (MNRE), Government of India</field>
+            <field name="segment">residential</field>
+            <field name="max_capacity_kw">500</field>
+            <field name="amount_type">per_kw</field>
+            <field name="amount">18000</field>
+            <field name="valid_to">2027-03-31</field>
+            <field name="notes">Starter record: about 18,000 per kW for common-facility solar of housing societies / resident welfare associations, up to 500 kW (3 kW per house). Verify the current rates and limits on the official PM Surya Ghar portal.</field>
+        </record>
+
+        <record id="subsidy_scheme_sample_state_residential" model="epc.subsidy.scheme">
+            <field name="name">Sample: State Top-up Subsidy (Residential)</field>
+            <field name="authority">State nodal agency (sample)</field>
+            <field name="segment">residential</field>
+            <field name="max_capacity_kw">10</field>
+            <field name="amount_type">flat</field>
+            <field name="amount">10000</field>
+            <field name="valid_to">2027-03-31</field>
+            <field name="notes">SAMPLE record for testing only: a flat 10,000 state top-up. Replace with the real state scheme or deactivate.</field>
+        </record>
+
+        <record id="subsidy_scheme_sample_commercial" model="epc.subsidy.scheme">
+            <field name="name">Sample: Commercial Capital Subsidy</field>
+            <field name="authority">State nodal agency (sample)</field>
+            <field name="segment">commercial</field>
+            <field name="max_capacity_kw">500</field>
+            <field name="amount_type">per_kw</field>
+            <field name="amount">8000</field>
+            <field name="max_amount">2000000</field>
+            <field name="valid_to">2027-03-31</field>
+            <field name="notes">SAMPLE record for testing only: 8,000 per kW up to 500 kW, capped at 20,00,000. Replace with the real scheme or deactivate.</field>
+        </record>
+
+        <record id="subsidy_scheme_sample_industrial" model="epc.subsidy.scheme">
+            <field name="name">Sample: Industrial Capital Subsidy</field>
+            <field name="authority">State nodal agency (sample)</field>
+            <field name="segment">industrial</field>
+            <field name="max_capacity_kw">1000</field>
+            <field name="amount_type">per_kw</field>
+            <field name="amount">6000</field>
+            <field name="max_amount">5000000</field>
+            <field name="valid_to">2027-03-31</field>
+            <field name="notes">SAMPLE record for testing only: 6,000 per kW up to 1,000 kW, capped at 50,00,000. Replace with the real scheme or deactivate.</field>
+        </record>
+
+        <record id="subsidy_scheme_sample_all_percent" model="epc.subsidy.scheme">
+            <field name="name">Sample: Rooftop Solar Incentive (All Customers, % of cost)</field>
+            <field name="authority">State nodal agency (sample)</field>
+            <field name="segment">all</field>
+            <field name="max_capacity_kw">0</field>
+            <field name="amount_type">percent</field>
+            <field name="amount">10</field>
+            <field name="max_amount">300000</field>
+            <field name="valid_to">2027-03-31</field>
+            <field name="notes">SAMPLE record for testing only: 10% of project cost, capped at 3,00,000, for any customer type and size. A percentage scheme is worked out on the quotation, so the lead shows 0 for it.</field>
+        </record>
+    </data>
+</odoo>

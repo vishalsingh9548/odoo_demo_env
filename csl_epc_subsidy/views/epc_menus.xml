@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem id="menu_epc_subsidy_root" name="Subsidy"
+                  web_icon="csl_epc_subsidy,static/description/icon.png"
+                  groups="csl_epc_core.group_epc_admin" sequence="50"/>
+        <menuitem id="menu_epc_subsidy_application" name="Subsidy Applications"
+                  parent="menu_epc_subsidy_root" action="epc_subsidy_application_action"
+                  sequence="10"/>
+        <menuitem id="menu_epc_config_subsidy_scheme" name="Subsidy Schemes"
+                  parent="csl_epc_core.menu_epc_configuration" action="epc_subsidy_scheme_action"
+                  sequence="40"/>
+    </data>
+</odoo>

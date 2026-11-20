@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_epc_payment_plan_user,epc.payment.plan.user,model_epc_payment_plan,csl_epc_core.group_epc_user,1,0,0,0
+access_epc_payment_plan_manager,epc.payment.plan.manager,model_epc_payment_plan,csl_epc_core.group_epc_manager,1,1,1,1
+access_epc_payment_plan_line_user,epc.payment.plan.line.user,model_epc_payment_plan_line,csl_epc_core.group_epc_user,1,0,0,0
+access_epc_payment_plan_line_manager,epc.payment.plan.line.manager,model_epc_payment_plan_line,csl_epc_core.group_epc_manager,1,1,1,1
+access_epc_order_milestone_user,epc.order.milestone.user,model_epc_order_milestone,csl_epc_core.group_epc_user,1,1,1,1
+access_epc_order_milestone_manager,epc.order.milestone.manager,model_epc_order_milestone,csl_epc_core.group_epc_manager,1,1,1,1

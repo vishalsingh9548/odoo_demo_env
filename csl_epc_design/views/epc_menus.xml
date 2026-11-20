@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem id="menu_epc_design_root" name="System Design"
+                  web_icon="csl_epc_design,static/description/icon.png"
+                  groups="csl_epc_core.group_epc_admin" sequence="48"/>
+        <menuitem id="menu_epc_design_list" name="System Designs"
+                  parent="menu_epc_design_root" action="epc_design_action"
+                  sequence="10"/>
+    </data>
+</odoo>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem id="menu_epc_net_meter_root" name="Net Metering"
+                  web_icon="csl_epc_net_metering,static/description/icon.png"
+                  groups="csl_epc_core.group_epc_admin" sequence="51"/>
+        <menuitem id="menu_epc_net_meter" name="Net Metering"
+                  parent="menu_epc_net_meter_root" action="epc_net_meter_action"
+                  sequence="10"/>
+    </data>
+</odoo>

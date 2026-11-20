@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Starting list of papers. Edit, add or switch off any of them in
+         Solar Dashboard > Configuration > Document Templates. -->
+    <data noupdate="1">
+        <record id="doc_tmpl_id_proof" model="epc.document.template">
+            <field name="name">ID proof of the applicant</field><field name="category">kyc</field><field name="sequence">10</field>
+        </record>
+        <record id="doc_tmpl_electricity_bill" model="epc.document.template">
+            <field name="name">Latest electricity bill</field><field name="category">kyc</field><field name="sequence">20</field>
+        </record>
+        <record id="doc_tmpl_property_proof" model="epc.document.template">
+            <field name="name">Ownership / NOC for the roof</field><field name="category">kyc</field><field name="sequence">30</field>
+        </record>
+        <record id="doc_tmpl_bank_details" model="epc.document.template">
+            <field name="name">Bank account details (cancelled cheque)</field><field name="category">subsidy</field><field name="sequence">40</field>
+        </record>
+        <record id="doc_tmpl_subsidy_form" model="epc.document.template">
+            <field name="name">Subsidy application form</field><field name="category">subsidy</field><field name="sequence">50</field>
+        </record>
+        <record id="doc_tmpl_net_meter_form" model="epc.document.template">
+            <field name="name">Net-metering application form</field><field name="category">net_metering</field><field name="sequence">60</field>
+        </record>
+        <record id="doc_tmpl_structure_cert" model="epc.document.template">
+            <field name="name">Structure stability certificate</field><field name="category">structure</field><field name="sequence">70</field>
+        </record>
+        <record id="doc_tmpl_comm_cert" model="epc.document.template">
+            <field name="name">Commissioning certificate</field><field name="category">commissioning</field><field name="sequence">80</field>
+        </record>
+        <record id="doc_tmpl_photo" model="epc.document.template">
+            <field name="name">Passport-size photograph of the applicant</field><field name="category">kyc</field><field name="sequence">15</field>
+        </record>
+        <record id="doc_tmpl_site_photo" model="epc.document.template">
+            <field name="name">Geo-tagged photos of the installed system</field><field name="category">commissioning</field><field name="sequence">75</field>
+        </record>
+        <record id="doc_tmpl_dcr_cert" model="epc.document.template">
+            <field name="name">DCR / module and inverter test certificates</field><field name="category">subsidy</field><field name="sequence">55</field>
+        </record>
+        <record id="doc_tmpl_gst_company" model="epc.document.template">
+            <field name="name">Company registration / GST certificate</field><field name="category">kyc</field><field name="sequence">12</field>
+            <field name="segment">commercial</field><field name="mandatory" eval="False"/>
+        </record>
+    </data>
+</odoo>

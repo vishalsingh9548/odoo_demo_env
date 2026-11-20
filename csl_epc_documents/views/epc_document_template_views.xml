@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="epc_document_template_view_list" model="ir.ui.view">
+            <field name="name">epc.document.template.list</field>
+            <field name="model">epc.document.template</field>
+            <field name="arch" type="xml">
+                <list string="Document Templates" editable="bottom">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="category"/>
+                    <field name="segment"/>
+                    <field name="mandatory"/>
+                    <field name="auto_create"/>
+                </list>
+            </field>
+        </record>
+        <record id="epc_document_template_action" model="ir.actions.act_window">
+            <field name="name">Document Templates</field>
+            <field name="res_model">epc.document.template</field>
+            <field name="view_mode">list</field>
+        </record>
+    </data>
+</odoo>

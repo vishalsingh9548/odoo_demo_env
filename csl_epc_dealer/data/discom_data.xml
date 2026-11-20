@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Electricity boards (DISCOMs). Safe for production. noupdate: later edits made by users are never overwritten. -->
+    <data noupdate="1">
+        <record id="discom_msedcl" model="epc.discom">
+            <field name="name">MSEDCL</field>
+            <field name="state_id" ref="base.state_in_mh"/>
+        </record>
+        <record id="discom_adani_electricity_mumbai_aeml" model="epc.discom">
+            <field name="name">Adani Electricity Mumbai (AEML)</field>
+            <field name="state_id" ref="base.state_in_mh"/>
+        </record>
+        <record id="discom_tata_power_mumbai" model="epc.discom">
+            <field name="name">Tata Power Mumbai</field>
+            <field name="state_id" ref="base.state_in_mh"/>
+        </record>
+        <record id="discom_best_undertaking" model="epc.discom">
+            <field name="name">BEST Undertaking</field>
+            <field name="state_id" ref="base.state_in_mh"/>
+        </record>
+        <record id="discom_bses_rajdhani_brpl" model="epc.discom">
+            <field name="name">BSES Rajdhani (BRPL)</field>
+            <field name="state_id" ref="base.state_in_dl"/>
+        </record>
+        <record id="discom_bses_yamuna_bypl" model="epc.discom">
+            <field name="name">BSES Yamuna (BYPL)</field>
+            <field name="state_id" ref="base.state_in_dl"/>
+        </record>
+        <record id="discom_tata_power_ddl" model="epc.discom">
+            <field name="name">Tata Power-DDL</field>
+            <field name="state_id" ref="base.state_in_dl"/>
+        </record>
+        <record id="discom_ugvcl" model="epc.discom">
+            <field name="name">UGVCL</field>
+            <field name="state_id" ref="base.state_in_gj"/>
+        </record>
+        <record id="discom_dgvcl" model="epc.discom">
+            <field name="name">DGVCL</field>
+            <field name="state_id" ref="base.state_in_gj"/>
+        </record>
+        <record id="discom_mgvcl" model="epc.discom">
+            <field name="name">MGVCL</field>
+            <field name="state_id" ref="base.state_in_gj"/>
+        </record>
+        <record id="discom_pgvcl" model="epc.discom">
+            <field name="name">PGVCL</field>
+            <field name="state_id" ref="base.state_in_gj"/>
+        </record>
+        <record id="discom_torrent_power_ahmedabad_surat" model="epc.discom">
+            <field name="name">Torrent Power (Ahmedabad / Surat)</field>
+            <field name="state_id" ref="base.state_in_gj"/>
+        </record>
+        <record id="discom_bescom" model="epc.discom">
+            <field name="name">BESCOM</field>
+            <field name="state_id" ref="base.state_in_ka"/>
+        </record>
+        <record id="discom_mescom" model="epc.discom">
+            <field name="name">MESCOM</field>
+            <field name="state_id" ref="base.state_in_ka"/>
+        </record>
+        <record id="discom_hescom" model="epc.discom">
+            <field name="name">HESCOM</field>
+            <field name="state_id" ref="base.state_in_ka"/>
+        </record>
+        <record id="discom_gescom" model="epc.discom">
+            <field name="name">GESCOM</field>
+            <field name="state_id" ref="base.state_in_ka"/>
+        </record>
+        <record id="discom_cesc_mysore" model="epc.discom">
+            <field name="name">CESC Mysore</field>
+            <field name="state_id" ref="base.state_in_ka"/>
+        </record>
+        <record id="discom_tnpdcl_tangedco" model="epc.discom">
+            <field name="name">TNPDCL (TANGEDCO)</field>
+            <field name="state_id" ref="base.state_in_tn"/>
+        </record>
+        <record id="discom_kseb" model="epc.discom">
+            <field name="name">KSEB</field>
+            <field name="state_id" ref="base.state_in_kl"/>
+        </record>
+        <record id="discom_tgspdcl" model="epc.discom">
+            <field name="name">TGSPDCL</field>
+            <field name="state_id" ref="base.state_in_ts"/>
+        </record>
+        <record id="discom_tgnpdcl" model="epc.discom">
+            <field name="name">TGNPDCL</field>
+            <field name="state_id" ref="base.state_in_ts"/>
+        </record>
+        <record id="discom_apspdcl" model="epc.discom">
+            <field name="name">APSPDCL</field>
+            <field name="state_id" ref="base.state_in_ap"/>
+        </record>
+        <record id="discom_apepdcl" model="epc.discom">
+            <field name="name">APEPDCL</field>
+            <field name="state_id" ref="base.state_in_ap"/>
+        </record>
+        <record id="discom_apcpdcl" model="epc.discom">
+            <field name="name">APCPDCL</field>
+            <field name="state_id" ref="base.state_in_ap"/>
+        </record>
+        <record id="discom_dvvnl" model="epc.discom">
+            <field name="name">DVVNL</field>
+            <field name="state_id" ref="base.state_in_up"/>
+        </record>
+        <record id="discom_mvvnl" model="epc.discom">
+            <field name="name">MVVNL</field>
+            <field name="state_id" ref="base.state_in_up"/>
+        </record>
+        <record id="discom_pvvnl" model="epc.discom">
+            <field name="name">PVVNL</field>
+            <field name="state_id" ref="base.state_in_up"/>
+        </record>
+        <record id="discom_puvvnl" model="epc.discom">
+            <field name="name">PuVVNL</field>
+            <field name="state_id" ref="base.state_in_up"/>
+        </record>
+        <record id="discom_kesco" model="epc.discom">
+            <field name="name">KESCO</field>
+            <field name="state_id" ref="base.state_in_up"/>
+        </record>
+        <record id="discom_npcl_noida" model="epc.discom">
+            <field name="name">NPCL (Noida)</field>
+            <field name="state_id" ref="base.state_in_up"/>
+        </record>
+        <record id="discom_jvvnl" model="epc.discom">
+            <field name="name">JVVNL</field>
+            <field name="state_id" ref="base.state_in_rj"/>
+        </record>
+        <record id="discom_avvnl" model="epc.discom">
+            <field name="name">AVVNL</field>
+            <field name="state_id" ref="base.state_in_rj"/>
+        </record>
+        <record id="discom_jdvvnl" model="epc.discom">
+            <field name="name">JdVVNL</field>
+            <field name="state_id" ref="base.state_in_rj"/>
+        </record>
+        <record id="discom_mp_paschim_kshetra_vvcl_indore" model="epc.discom">
+            <field name="name">MP Paschim Kshetra VVCL (Indore)</field>
+            <field name="state_id" ref="base.state_in_mp"/>
+        </record>
+        <record id="discom_mp_madhya_kshetra_vvcl_bhopal" model="epc.discom">
+            <field name="name">MP Madhya Kshetra VVCL (Bhopal)</field>
+            <field name="state_id" ref="base.state_in_mp"/>
+        </record>
+        <record id="discom_mp_poorv_kshetra_vvcl_jabalpur" model="epc.discom">
+            <field name="name">MP Poorv Kshetra VVCL (Jabalpur)</field>
+            <field name="state_id" ref="base.state_in_mp"/>
+        </record>
+        <record id="discom_cspdcl" model="epc.discom">
+            <field name="name">CSPDCL</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+        <record id="discom_pspcl" model="epc.discom">
+            <field name="name">PSPCL</field>
+            <field name="state_id" ref="base.state_in_pb"/>
+        </record>
+        <record id="discom_uhbvn" model="epc.discom">
+            <field name="name">UHBVN</field>
+            <field name="state_id" ref="base.state_in_hr"/>
+        </record>
+        <record id="discom_dhbvn" model="epc.discom">
+            <field name="name">DHBVN</field>
+            <field name="state_id" ref="base.state_in_hr"/>
+        </record>
+        <record id="discom_upcl" model="epc.discom">
+            <field name="name">UPCL</field>
+            <field name="state_id" ref="base.state_in_uk"/>
+        </record>
+        <record id="discom_hpsebl" model="epc.discom">
+            <field name="name">HPSEBL</field>
+            <field name="state_id" ref="base.state_in_hp"/>
+        </record>
+        <record id="discom_jbvnl" model="epc.discom">
+            <field name="name">JBVNL</field>
+            <field name="state_id" ref="base.state_in_jh"/>
+        </record>
+        <record id="discom_nbpdcl" model="epc.discom">
+            <field name="name">NBPDCL</field>
+            <field name="state_id" ref="base.state_in_br"/>
+        </record>
+        <record id="discom_sbpdcl" model="epc.discom">
+            <field name="name">SBPDCL</field>
+            <field name="state_id" ref="base.state_in_br"/>
+        </record>
+        <record id="discom_wbsedcl" model="epc.discom">
+            <field name="name">WBSEDCL</field>
+            <field name="state_id" ref="base.state_in_wb"/>
+        </record>
+        <record id="discom_cesc_kolkata" model="epc.discom">
+            <field name="name">CESC Kolkata</field>
+            <field name="state_id" ref="base.state_in_wb"/>
+        </record>
+        <record id="discom_tpcodl" model="epc.discom">
+            <field name="name">TPCODL</field>
+            <field name="state_id" ref="base.state_in_or"/>
+        </record>
+        <record id="discom_tpnodl" model="epc.discom">
+            <field name="name">TPNODL</field>
+            <field name="state_id" ref="base.state_in_or"/>
+        </record>
+        <record id="discom_tpsodl" model="epc.discom">
+            <field name="name">TPSODL</field>
+            <field name="state_id" ref="base.state_in_or"/>
+        </record>
+        <record id="discom_tpwodl" model="epc.discom">
+            <field name="name">TPWODL</field>
+            <field name="state_id" ref="base.state_in_or"/>
+        </record>
+        <record id="discom_apdcl" model="epc.discom">
+            <field name="name">APDCL</field>
+            <field name="state_id" ref="base.state_in_as"/>
+        </record>
+        <record id="discom_goa_electricity_department" model="epc.discom">
+            <field name="name">Goa Electricity Department</field>
+            <field name="state_id" ref="base.state_in_ga"/>
+        </record>
+        <record id="discom_puducherry_electricity_department" model="epc.discom">
+            <field name="name">Puducherry Electricity Department</field>
+            <field name="state_id" ref="base.state_in_py"/>
+        </record>
+        <record id="discom_jkpdd" model="epc.discom">
+            <field name="name">JKPDD</field>
+            <field name="state_id" ref="base.state_in_jk"/>
+        </record>
+    </data>
+
+    <!-- Starter dealers (placeholders: rename them, change phone / commission, or archive them in
+         Dealers & DISCOM > Dealers). Kept in this file on purpose: it is already in the module's
+         file list, so an Upgrade loads them without restarting the server. noupdate: your edits are kept. -->
+    <data noupdate="1">
+        <record id="dealer_north" model="epc.dealer">
+            <field name="name">Sample Dealer - North Region</field>
+            <field name="phone">9800000001</field>
+            <field name="commission_percent">2.0</field>
+        </record>
+        <record id="dealer_west" model="epc.dealer">
+            <field name="name">Sample Dealer - West Region</field>
+            <field name="phone">9800000002</field>
+            <field name="commission_percent">2.0</field>
+        </record>
+        <record id="dealer_south" model="epc.dealer">
+            <field name="name">Sample Dealer - South Region</field>
+            <field name="phone">9800000003</field>
+            <field name="commission_percent">2.5</field>
+        </record>
+        <record id="dealer_east" model="epc.dealer">
+            <field name="name">Sample Dealer - East Region</field>
+            <field name="phone">9800000004</field>
+            <field name="commission_percent">2.5</field>
+        </record>
+        <record id="sub_dealer_north_1" model="epc.dealer">
+            <field name="name">Sample Sub-dealer - North 1</field>
+            <field name="parent_id" ref="dealer_north"/>
+            <field name="phone">9800000011</field>
+            <field name="commission_percent">1.0</field>
+        </record>
+        <record id="sub_dealer_west_1" model="epc.dealer">
+            <field name="name">Sample Sub-dealer - West 1</field>
+            <field name="parent_id" ref="dealer_west"/>
+            <field name="phone">9800000012</field>
+            <field name="commission_percent">1.0</field>
+        </record>
+    </data>
+</odoo>

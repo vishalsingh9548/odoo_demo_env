@@ -1,0 +1,23 @@
+{
+    'name': 'CSL Solar EPC - DISCOM & Dealer',
+    'version': '18.0.1.0.0',
+    'category': 'Industries',
+    'summary': 'DISCOM (electricity board) and consumer number, plus dealer / sub-dealer, captured on the lead and carried to the order and project.',
+    'author': 'Cloud Science Labs',
+    'website': 'https://cloudsciencelabs.com',
+    'license': 'LGPL-3',
+    'depends': ['csl_epc_core'],
+    'data': [
+        'security/ir.model.access.csv',
+        'data/discom_data.xml',
+        'views/epc_discom_views.xml',
+        'views/epc_dealer_views.xml',
+        'views/crm_lead_views.xml',
+        'views/sale_order_views.xml',
+        'views/project_project_views.xml',
+        'views/epc_menus.xml',
+        'views/epc_dashboard_views.xml',
+    ],
+    'application': False,
+    'installable': True,
+}

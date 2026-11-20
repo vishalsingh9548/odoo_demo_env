@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_order_view_form_epc_dealer" model="ir.ui.view">
+            <field name="name">sale.order.form.epc.dealer</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="csl_epc_core.sale_order_view_form_epc"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='epc_terms']" position="inside">
+                    <group>
+                        <group string="Electricity Connection (from the lead)" name="epc_order_discom" groups="csl_epc_core.group_epc_admin">
+                            <field name="epc_discom_id"/>
+                            <field name="epc_consumer_number"/>
+                        </group>
+                        <group string="Dealer (from the lead)" name="epc_order_dealer" groups="csl_epc_core.group_epc_admin">
+                            <field name="epc_dealer_id"/>
+                            <field name="epc_sub_dealer_id"/>
+                        </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

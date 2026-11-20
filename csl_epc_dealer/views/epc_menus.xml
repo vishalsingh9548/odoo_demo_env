@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem id="menu_epc_dealer_root" name="Dealers &amp; DISCOM"
+                  web_icon="csl_epc_dealer,static/description/icon.png"
+                  groups="csl_epc_core.group_epc_admin" sequence="47"/>
+        <menuitem id="menu_epc_config_dealer" name="Dealers"
+                  parent="menu_epc_dealer_root" action="epc_dealer_action"
+                  sequence="10"/>
+        <menuitem id="menu_epc_config_discom" name="DISCOMs"
+                  parent="menu_epc_dealer_root" action="epc_discom_action"
+                  sequence="20"/>
+    </data>
+</odoo>
