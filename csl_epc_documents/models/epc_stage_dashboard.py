@@ -28,7 +28,7 @@ class EpcStageDashboard(models.AbstractModel):
         submitted = docs.filtered(lambda d: d.submitted_date)
         avg_submit = round(sum(max((d.submitted_date - d.create_date.date()).days, 0) for d in submitted) / len(submitted), 1) if submitted else 0.0
         projects = docs.mapped('project_id')
-        ready_projects = projects.filtered(lambda p: not p.document_pending_mandatory)
+        ready_projects = projects.filtered(lambda p: not p.epc_document_pending_mandatory)
         projects_with_pending = pending.mapped('project_id')
 
         kpis = [
@@ -55,7 +55,7 @@ class EpcStageDashboard(models.AbstractModel):
         for project in recent:
             cells = []
             for key, _label in CATEGORIES:
-                group = project.document_ids.filtered(lambda d, k=key: d.category == k)
+                group = project.epc_document_ids.filtered(lambda d, k=key: d.category == k)
                 cells.append(bool(group) and all(d.state in DONE for d in group))
             matrix_rows.append({'id': project.id, 'label': project.display_name, 'cells': cells})
         state_l, state_c, state_d = self._group_selection('epc.project.document', 'state')

@@ -75,7 +75,7 @@ class EpcSubsidyApplication(models.Model):
     # The papers this scheme needs, as they exist on the project
     def _scheme_documents(self):
         self.ensure_one()
-        return self.project_id.document_ids.filtered(
+        return self.project_id.epc_document_ids.filtered(
             lambda d: d.template_id in self.scheme_id.document_template_ids)
 
     def action_docs_ready(self):

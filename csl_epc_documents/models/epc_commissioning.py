@@ -10,7 +10,7 @@ class EpcCommissioning(models.Model):
     def action_submit(self):
         if self.env['epc.config'].flag('docs_block_commissioning'):
             for commissioning in self:
-                pending = commissioning.project_id.document_pending_mandatory
+                pending = commissioning.project_id.epc_document_pending_mandatory
                 if pending:
                     raise UserError(
                         "%s mandatory document(s) of this project are not submitted yet. "
