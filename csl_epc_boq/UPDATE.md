@@ -128,3 +128,19 @@ The Projects list (also opened from the Solar Dashboard's *Contract Value*, *Act
 **Problem:** a user without any Solar EPC group (for example a plain Sales user) got an *Access Error* ("You are not allowed to access 'Solar Site Survey' (epc.site.survey) records") when opening CRM, because the BOQ count and link added to the CRM lead was computed for every user and read a model they have no access to.
 **Fix:** `boq_count` and `boq_ids` on `crm.lead` now carry `groups='csl_epc_core.group_epc_user'`, so they are not read for other users. File: `models/crm_lead.py`. Users with the Solar EPC *Field User* group (or higher) see no difference; everyone else can open CRM normally.
 Upgrade: `-u csl_epc_boq`, then restart the server.
+
+## Update (2026-11-19) — BOQ unit cost auto-fill and starter products
+- New `data/boq_product_data.xml`: 13 starter products (module 550 Wp, inverters 100/50/10 kW, mounting per kWp, DC/AC cable, LT panel, earthing, civil work, labour, logistics, overheads). Their **Cost** is the BOQ Unit Cost; the values are samples, edit them on the product (noupdate, so upgrades never overwrite them).
+- A BOQ line with a category but no product and no unit cost (e.g. the lines made from a System Design) now takes the category's usual product and that product's cost. Choosing a category on a blank manual line does the same. The Unit Cost stays editable on every line.
+- `csl_epc_design`: the mounting-structure line created from a design now has quantity = DC kWp (was 1), so the per-kWp cost multiplies correctly.
+
+## Update (2026-11-19, later) — product categories for the design dropdowns
+- `data/boq_product_data.xml` now also creates the categories *Solar EPC*, *Solar EPC / Solar Modules* and *Solar EPC / Inverters* and puts the starter module and the three inverters into them (via a direct write, so it also works on a database where the products already existed). The System Design's Panel / Inverter dropdowns use these categories.
+- **Impact:** only product categories on the starter products; edit or add products in these categories freely.
+
+## Fix (2026-11-19) — starter goods were not stock-tracked ("None of these lines have any stock on hand yet to issue")
+- **Cause:** the starter goods in `data/boq_product_data.xml` were created without **Track Inventory** (`is_storable`). A validated purchase receipt therefore created no stock, and *Material Request > Issue to Project* found nothing on hand even though the PO and its receipt were done.
+- **Fix:** the goods records now set `is_storable`; version raised to 18.0.1.0.1 with `migrations/18.0.1.0.1/post-migrate.py`, which turns Track Inventory on for the already-existing starter goods (done with SQL because Odoo blocks changing it through the ORM once a product was used). Services stay untracked.
+- **Stock repair on `solar_epc_v2`:** the receipt P00100 (820 modules, 4 inverters, 451 kWp mounting) that had put nothing in stock was added to WH/Stock by hand once, so MR/2026/00044 can be issued.
+- **Impact:** only these starter products. Receipts validated before the fix on other databases need the same one-off stock repair.
+- **Tested:** after the fix all three lines of MR/2026/00044 are issuable and *Issue to Project* runs.

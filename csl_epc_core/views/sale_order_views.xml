@@ -21,8 +21,8 @@
                         <group>
                             <group string="Commercial Terms">
                                 <field name="warranty_type"/>
-                                <field name="delivery_type"/>
-                                <field name="freight_type"/>
+                                <field name="epc_delivery_type"/>
+                                <field name="epc_freight_type"/>
                                 <field name="payment_terms_type"/>
                             </group>
                             <group string="Compliance">

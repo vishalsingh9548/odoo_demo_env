@@ -49,3 +49,12 @@ Odoo reads a module's file list only when the server starts. The DISCOM data fil
 
 ## Six starter dealers (added 2026-11-18)
 At the owner's request the module now ships 4 placeholder dealers (North / West / South / East region) and 2 sub-dealers. They are in `data/discom_data.xml` (not a new file) because that file is already in the manifest, so an Upgrade loads them without a server restart. They are `noupdate`: rename or edit them freely and upgrades will not overwrite. **Replace the placeholder names, phones and commission rates with your real ones before go-live.** (The CSV import template that was briefly offered was deleted by the owner; to bulk-load dealers later, use the standard Import records feature on the Dealers list.)
+
+## Dashboard (added 2026-11-19)
+- **What:** a live **Dashboard** screen for this module, the first entry of its menu, in the same look as the Commissioning and Handover dashboards (design was approved from a preview first). It uses the shared screen in `csl_epc_core`, so this module ships no JavaScript: only `models/epc_stage_dashboard.py` (method `_dashboard_dealer`), `views/epc_dashboard_views.xml` (screen entry and menu) and one line in `models/__init__.py` and in the manifest.
+- **Shows:** Active dealers, share of this year's leads that came through dealers, order value and commission payable on confirmed orders (order value x the dealer's commission %, credited to the lead's dealer), lead data completeness (DISCOM and consumer number filled), top dealer. Charts: leads by dealer, commission by dealer, dealer / sub-dealer / direct, leads by DISCOM, leads per month by channel. Table: dealer leaderboard.
+- **Clicking** a tile or a chart bar opens the list of exactly the records that were counted. Numbers are read with the logged-in user's own access rights.
+- **Reads from:** crm.lead / sale.order / epc.dealer. No new fields, no data changes.
+- **Impact:** adds one menu entry ("Dashboard") and one client action. Nothing existing is changed; uninstalling the module removes it.
+- **Tested:** on a throw-away copy of the database (never on the live one): each dashboard was built empty and with a full scenario, and its result checked to be sendable to the browser. Not yet viewed in a browser.
+- **Install / upgrade notes:** the manifest changed, so **restart the Odoo server first**, then *Upgrade* this module (the server keeps each module's file list in memory until it restarts).

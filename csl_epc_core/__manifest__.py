@@ -1,6 +1,6 @@
 {
     'name': 'CSL Solar EPC - Core',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.0.1',
     'category': 'Industries',
     'summary': 'Shared foundation: access groups, approval workflow, Solar EPC root menu, CRM lead solar qualification, Sales Order terms, Project and Task extensions.',
     'author': 'Cloud Science Labs',

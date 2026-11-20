@@ -47,3 +47,12 @@ The *Overdue* filter compares the due date directly. Verified: 8 documents creat
 - **How it loads:** from the module's `data/` folder when the module is installed. The records are `noupdate`, so anything edited later in the screens is never overwritten by an upgrade.
 - **Impact:** only adds master records. No existing record or behaviour is changed. If a record with the same name was typed by hand before installing, delete or rename it first, because names must be unique for DISCOMs.
 - **Status:** files checked for correct XML only; not yet installed anywhere (install is done by the owner).
+
+## Dashboard (added 2026-11-19)
+- **What:** a live **Dashboard** screen for this module, the first entry of its menu, in the same look as the Commissioning and Handover dashboards (design was approved from a preview first). It uses the shared screen in `csl_epc_core`, so this module ships no JavaScript: only `models/epc_stage_dashboard.py` (method `_dashboard_documents`), `views/epc_dashboard_views.xml` (screen entry and menu) and one line in `models/__init__.py` and in the manifest.
+- **Shows:** Share of papers submitted or accepted, mandatory papers pending, overdue, sent back by the authority, average days to submit, projects with every mandatory paper submitted. Charts: paper checklist by project (tick = every paper of that kind submitted or accepted), status mix, pending by category, submitted per week, overdue by project. Table: overdue papers.
+- **Clicking** a tile or a chart bar opens the list of exactly the records that were counted. Numbers are read with the logged-in user's own access rights.
+- **Reads from:** epc.project.document. No new fields, no data changes.
+- **Impact:** adds one menu entry ("Dashboard") and one client action. Nothing existing is changed; uninstalling the module removes it.
+- **Tested:** on a throw-away copy of the database (never on the live one): each dashboard was built empty and with a full scenario, and its result checked to be sendable to the browser. Not yet viewed in a browser.
+- **Install / upgrade notes:** the manifest changed, so **restart the Odoo server first**, then *Upgrade* this module (the server keeps each module's file list in memory until it restarts).

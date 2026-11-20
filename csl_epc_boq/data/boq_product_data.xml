@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Starter product catalogue for the BOQ. A BOQ line with a category but no product
+         and no unit cost picks the product below for its category and takes that product's
+         Cost as the Unit Cost (the user can still overwrite the Unit Cost on the line).
+         The prices are sample values in the company currency: edit them on the product
+         (Cost field). noupdate: upgrades never overwrite edited prices. -->
+    <data noupdate="1">
+        <record id="product_categ_epc" model="product.category">
+            <field name="name">Solar EPC</field>
+        </record>
+        <record id="product_categ_solar_modules" model="product.category">
+            <field name="name">Solar Modules</field>
+            <field name="parent_id" ref="product_categ_epc"/>
+        </record>
+        <record id="product_categ_inverters" model="product.category">
+            <field name="name">Inverters</field>
+            <field name="parent_id" ref="product_categ_epc"/>
+        </record>
+        <record id="boq_product_solar_module_550" model="product.product">
+            <field name="name">Solar Module 550 Wp Mono PERC</field>
+            <field name="default_code">EPC-MOD-550</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="list_price">160.0</field>
+            <field name="standard_price">120.0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+        <record id="boq_product_inverter_100kw" model="product.product">
+            <field name="name">String Inverter 100 kW (3-phase)</field>
+            <field name="default_code">EPC-INV-100</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="list_price">8200.0</field>
+            <field name="standard_price">6500.0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+        <record id="boq_product_inverter_50kw" model="product.product">
+            <field name="name">String Inverter 50 kW (3-phase)</field>
+            <field name="default_code">EPC-INV-050</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="list_price">4400.0</field>
+            <field name="standard_price">3500.0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+        <record id="boq_product_inverter_10kw" model="product.product">
+            <field name="name">String Inverter 10 kW (3-phase)</field>
+            <field name="default_code">EPC-INV-010</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="list_price">1250.0</field>
+            <field name="standard_price">950.0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+        <record id="boq_product_mounting_structure" model="product.product">
+            <field name="name">Mounting Structure - Galvanised (per kWp)</field>
+            <field name="default_code">EPC-MNT-KWP</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="list_price">70.0</field>
+            <field name="standard_price">55.0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+        <record id="boq_product_dc_cable" model="product.product">
+            <field name="name">DC Solar Cable 4 sq.mm (per metre)</field>
+            <field name="default_code">EPC-DCC-4</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="list_price">1.4</field>
+            <field name="standard_price">0.9</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+        <record id="boq_product_ac_cable" model="product.product">
+            <field name="name">AC Cable 3.5C x 240 sq.mm Al Armoured (per metre)</field>
+            <field name="default_code">EPC-ACC-240</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="list_price">30.0</field>
+            <field name="standard_price">22.0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+        <record id="boq_product_lt_panel" model="product.product">
+            <field name="name">LT Panel / ACDB (set)</field>
+            <field name="default_code">EPC-LTP-SET</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="list_price">650.0</field>
+            <field name="standard_price">450.0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+        <record id="boq_product_earthing" model="product.product">
+            <field name="name">Earthing Kit incl. Pits &amp; Lightning Arrester (set)</field>
+            <field name="default_code">EPC-ERT-SET</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="list_price">480.0</field>
+            <field name="standard_price">350.0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+        <record id="boq_product_civil_work" model="product.product">
+            <field name="name">Civil Work - Foundations &amp; Cable Trench (per kWp)</field>
+            <field name="default_code">EPC-CIV-KWP</field>
+            <field name="type">service</field>
+            <field name="list_price">35.0</field>
+            <field name="standard_price">25.0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+        <record id="boq_product_manpower" model="product.product">
+            <field name="name">Installation &amp; Commissioning Labour (per kWp)</field>
+            <field name="default_code">EPC-LAB-KWP</field>
+            <field name="type">service</field>
+            <field name="list_price">45.0</field>
+            <field name="standard_price">30.0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+        <record id="boq_product_logistics" model="product.product">
+            <field name="name">Logistics &amp; Transport (per kWp)</field>
+            <field name="default_code">EPC-LOG-KWP</field>
+            <field name="type">service</field>
+            <field name="list_price">15.0</field>
+            <field name="standard_price">10.0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+        <record id="boq_product_overheads" model="product.product">
+            <field name="name">Project Overheads (per kWp)</field>
+            <field name="default_code">EPC-OVH-KWP</field>
+            <field name="type">service</field>
+            <field name="list_price">20.0</field>
+            <field name="standard_price">12.0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+    </data>
+
+    <!-- Link the starter products to their category with a direct write: a normal record would
+         be skipped on upgrade because the products above are noupdate and already exist. -->
+    <data noupdate="0">
+        <function model="product.product" name="write"
+                  eval="[[ref('boq_product_solar_module_550')], {'categ_id': ref('product_categ_solar_modules')}]"/>
+        <function model="product.product" name="write"
+                  eval="[[ref('boq_product_inverter_100kw'), ref('boq_product_inverter_50kw'), ref('boq_product_inverter_10kw')], {'categ_id': ref('product_categ_inverters')}]"/>
+    </data>
+</odoo>

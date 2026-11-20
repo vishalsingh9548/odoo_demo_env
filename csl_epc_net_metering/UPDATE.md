@@ -31,3 +31,12 @@ Install after `csl_epc_documents`. No data migration.
 - Own top-level menu **Net Metering** with `static/description/icon.png` (140x140, navy background like the other Solar EPC icons), so it shows as its own tile on the home screen, like Site Surveys or BOQ & Costing. This replaces the first version, where the menus sat under *Solar Dashboard* and no tile appeared. Setup screens that belong to Configuration (templates, schemes, payment plans) stay under *Solar Dashboard → Configuration*.
 - The module icon in Apps was blank because Odoo saves the icon path when a module is installed or upgraded, and the file did not exist yet at install time. Fixed by upgrading the module (`-u`).
 - **Impact:** menus and icons only; no data or behaviour change. Upgrade needed to see them.
+
+## Dashboard (added 2026-11-19)
+- **What:** a live **Dashboard** screen for this module, the first entry of its menu, in the same look as the Commissioning and Handover dashboards (design was approved from a preview first). It uses the shared screen in `csl_epc_core`, so this module ships no JavaScript: only `models/epc_stage_dashboard.py` (method `_dashboard_net_metering`), `views/epc_dashboard_views.xml` (screen entry and menu) and one line in `models/__init__.py` and in the manifest.
+- **Shows:** Open applications, stuck over N days (N is the existing *Net-Metering Stuck After* setting, default 15; shows how many already got a reminder to-do), average days to sync, meter fitted but not synced, synced this month (vs last month), rejected. Charts: pipeline, average days in current status, open applications by DISCOM, synced per month, days-to-sync trend. Table: applications not moving.
+- **Clicking** a tile or a chart bar opens the list of exactly the records that were counted. Numbers are read with the logged-in user's own access rights.
+- **Reads from:** epc.net.meter. No new fields, no data changes.
+- **Impact:** adds one menu entry ("Dashboard") and one client action. Nothing existing is changed; uninstalling the module removes it.
+- **Tested:** on a throw-away copy of the database (never on the live one): each dashboard was built empty and with a full scenario, and its result checked to be sendable to the browser. Not yet viewed in a browser.
+- **Install / upgrade notes:** the manifest changed, so **restart the Odoo server first**, then *Upgrade* this module (the server keeps each module's file list in memory until it restarts).

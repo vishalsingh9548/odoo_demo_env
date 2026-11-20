@@ -168,8 +168,8 @@
             <field name="epc_project_id" ref="epc_demo_project"/>
             <field name="state">sale</field>
             <field name="warranty_type">both</field>
-            <field name="delivery_type">scheduled</field>
-            <field name="freight_type">included</field>
+            <field name="epc_delivery_type">scheduled</field>
+            <field name="epc_freight_type">included</field>
             <field name="payment_terms_type">milestone</field>
             <field name="cancellation_policy">deduction</field>
             <field name="certification_type">both</field>

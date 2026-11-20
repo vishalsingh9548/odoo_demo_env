@@ -334,6 +334,36 @@ class EpcBoqLine(models.Model):
             if any(line.boq_id.approval_state == 'approved' for line in self):
                 raise UserError("This BOQ is approved and locked. Use Reopen (Reset to Draft) first.")
 
+    # The product a blank line of each category starts with (see data/boq_product_data.xml)
+    _DEFAULT_PRODUCT_XMLID = {
+        'solar_module': 'csl_epc_boq.boq_product_solar_module_550',
+        'inverter': 'csl_epc_boq.boq_product_inverter_100kw',
+        'mounting_structure': 'csl_epc_boq.boq_product_mounting_structure',
+        'dc_cable': 'csl_epc_boq.boq_product_dc_cable',
+        'ac_cable': 'csl_epc_boq.boq_product_ac_cable',
+        'lt_panel_db': 'csl_epc_boq.boq_product_lt_panel',
+        'earthing_material': 'csl_epc_boq.boq_product_earthing',
+        'civil_work': 'csl_epc_boq.boq_product_civil_work',
+        'manpower': 'csl_epc_boq.boq_product_manpower',
+        'logistics': 'csl_epc_boq.boq_product_logistics',
+        'overheads': 'csl_epc_boq.boq_product_overheads',
+    }
+
+    def _default_product_for_category(self, category):
+        xmlid = self._DEFAULT_PRODUCT_XMLID.get(category)
+        return self.env.ref(xmlid, raise_if_not_found=False) if xmlid else self.env['product.product']
+
+    # Choosing a category on a blank line fills the usual product and its cost
+    @api.onchange('category')
+    def _onchange_category_set_product(self):
+        if self.category and not self.product_id and not self.unit_cost:
+            product = self._default_product_for_category(self.category)
+            if product:
+                self.product_id = product
+                self.unit_cost = product.standard_price
+                if not self.description:
+                    self.description = product.name
+
     # Picking a product fills the unit cost from the product's own cost
     @api.onchange('product_id')
     def _onchange_product_id_set_cost(self):
@@ -344,6 +374,12 @@ class EpcBoqLine(models.Model):
     def create(self, vals_list):
         # A line created with a product but no cost takes the product's cost
         for vals in vals_list:
+            # A line with a category but neither product nor cost (e.g. the lines made from a
+            # System Design) starts with the category's usual product, so its cost is filled
+            if vals.get('category') and not vals.get('product_id') and 'unit_cost' not in vals:
+                default_product = self._default_product_for_category(vals['category'])
+                if default_product:
+                    vals['product_id'] = default_product.id
             if vals.get('product_id') and 'unit_cost' not in vals:
                 vals['unit_cost'] = self.env['product.product'].browse(vals['product_id']).standard_price
         if not self.env.su and self.env['epc.config'].flag('lock_approved'):

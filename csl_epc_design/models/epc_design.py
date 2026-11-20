@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import re
+
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
@@ -34,6 +36,11 @@ class EpcDesign(models.Model):
     )
 
     # --- Panels ---
+    panel_product_id = fields.Many2one(
+        'product.product', string='Panel Make / Model',
+        help="Pick the solar panel from the product list. Its name fills the panel make and, when the "
+             "name contains the rating (e.g. '550 Wp'), the Panel Rating too.",
+    )
     panel_make = fields.Char(string='Panel Make / Model', help="Brand and model of the solar panel.")
     panel_watt = fields.Float(string='Panel Rating (Wp)', help="Rated power of one panel, in watts-peak.")
     panel_count = fields.Integer(string='Number of Panels', help="Total number of panels in the system.")
@@ -41,6 +48,11 @@ class EpcDesign(models.Model):
     panel_voc = fields.Float(string='Panel Voc (V)', help="Open-circuit voltage of one panel (from the datasheet).")
 
     # --- Inverter ---
+    inverter_product_id = fields.Many2one(
+        'product.product', string='Inverter Make / Model',
+        help="Pick the inverter from the product list. Its name fills the inverter make and, when the "
+             "name contains the rating (e.g. '100 kW'), the Inverter Rating too.",
+    )
     inverter_make = fields.Char(string='Inverter Make / Model', help="Brand and model of the inverter.")
     inverter_kw = fields.Float(string='Inverter Rating (kW)', help="AC rating of one inverter, in kilowatts.")
     inverter_count = fields.Integer(string='Number of Inverters', default=1, help="How many inverters of this model are used.")
@@ -114,6 +126,24 @@ class EpcDesign(models.Model):
         string='Design Warnings', compute='_compute_string_check',
         help="Plain-language warnings when the numbers do not fit together.",
     )
+
+    # Choosing the panel product fills the make text and the Wp rating from the product name
+    @api.onchange('panel_product_id')
+    def _onchange_panel_product_id(self):
+        if self.panel_product_id:
+            self.panel_make = self.panel_product_id.name
+            match = re.search(r'(\d+(?:\.\d+)?)\s*Wp', self.panel_product_id.name, re.I)
+            if match:
+                self.panel_watt = float(match.group(1))
+
+    # Choosing the inverter product fills the make text and the kW rating from the product name
+    @api.onchange('inverter_product_id')
+    def _onchange_inverter_product_id(self):
+        if self.inverter_product_id:
+            self.inverter_make = self.inverter_product_id.name
+            match = re.search(r'(\d+(?:\.\d+)?)\s*kW', self.inverter_product_id.name, re.I)
+            if match:
+                self.inverter_kw = float(match.group(1))
 
     # Works out the array size, inverter size and their ratio
     @api.depends('panel_count', 'panel_watt', 'inverter_kw', 'inverter_count')
@@ -191,14 +221,16 @@ class EpcDesign(models.Model):
         if self.panel_count:
             lines.append((0, 0, {
                 'category': 'solar_module', 'quantity': self.panel_count,
+                'product_id': self.panel_product_id.id or False,
                 'description': "Solar module %s %.0f Wp" % (self.panel_make or '', self.panel_watt)}))
         if self.inverter_count:
             lines.append((0, 0, {
                 'category': 'inverter', 'quantity': self.inverter_count,
+                'product_id': self.inverter_product_id.id or False,
                 'description': "Inverter %s %.1f kW" % (self.inverter_make or '', self.inverter_kw)}))
         mounting = dict(self._fields['mounting_type'].selection).get(self.mounting_type)
         lines.append((0, 0, {
-            'category': 'mounting_structure', 'quantity': 1,
+            'category': 'mounting_structure', 'quantity': self.dc_capacity_kw or 1.0,
             'description': "Mounting structure %s (%.2f kWp)" % (mounting or '', self.dc_capacity_kw)}))
         boq = self.env['epc.boq'].create({
             'feasibility_id': self.feasibility_id.id,

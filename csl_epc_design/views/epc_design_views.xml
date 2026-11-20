@@ -74,14 +74,18 @@
                             <page string="Panels &amp; Inverter" name="equipment">
                                 <group>
                                     <group string="Panels">
-                                        <field name="panel_make"/>
+                                        <field name="panel_product_id"
+                                               domain="[('categ_id', 'child_of', %(csl_epc_boq.product_categ_solar_modules)d)]"/>
+                                        <field name="panel_make" invisible="1"/>
                                         <field name="panel_watt"/>
                                         <field name="panel_count"/>
                                         <field name="panel_vmp"/>
                                         <field name="panel_voc"/>
                                     </group>
                                     <group string="Inverter">
-                                        <field name="inverter_make"/>
+                                        <field name="inverter_product_id"
+                                               domain="[('categ_id', 'child_of', %(csl_epc_boq.product_categ_inverters)d)]"/>
+                                        <field name="inverter_make" invisible="1"/>
                                         <field name="inverter_kw"/>
                                         <field name="inverter_count"/>
                                         <field name="mppt_min_voltage"/>
