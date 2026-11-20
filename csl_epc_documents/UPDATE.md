@@ -59,3 +59,8 @@ The *Overdue* filter compares the due date directly. Verified: 8 documents creat
 
 ## Change (2026-11-20) — Screens restricted to Solar EPC Administrator
 - This module's menus, fields, buttons and tabs now use `csl_epc_core.group_epc_admin` (only Administrator sees them). Upgrade the module to apply.
+
+## Fix (2026-11-20) — Dashboard checklist showed ✕ on a site that has the Documents app
+- On a database with Odoo's own Documents app, `project.project` already has fields named `document_ids` / `document_count` (different model). Ours shared those names, so the Paper checklist read the wrong records and always showed ✕ even with every paper Accepted.
+- Our project fields are now `epc_document_ids`, `epc_document_count`, `epc_document_done_count`, `epc_document_pending_mandatory` and `epc_document_progress` (nothing stored, so no data migration). `csl_epc_subsidy` updated to read `epc_document_ids`.
+- Upgrade `csl_epc_documents,csl_epc_subsidy`, then hard-refresh.

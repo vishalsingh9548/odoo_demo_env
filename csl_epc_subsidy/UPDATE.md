@@ -78,3 +78,6 @@ Five more records added to `data/subsidy_scheme_data.xml` so the suggestion on t
 
 ## Change (2026-11-20) — Screens restricted to Solar EPC Administrator
 - This module's menus, fields, buttons and tabs now use `csl_epc_core.group_epc_admin` (only Administrator sees them). Upgrade the module to apply.
+
+## Fix (2026-11-20) — reads `epc_document_ids`
+- The project documents link was renamed in `csl_epc_documents` (see its UPDATE.md); the subsidy application now reads `project.epc_document_ids`.
