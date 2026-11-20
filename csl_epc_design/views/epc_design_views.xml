@@ -30,15 +30,15 @@
                         <button name="action_submit" string="Submit for Approval" type="object"
                                 class="oe_highlight" invisible="approval_state != 'to_submit'"/>
                         <button name="action_approve" string="Approve" type="object"
-                                class="oe_highlight" groups="csl_epc_core.group_epc_manager"
+                                class="oe_highlight" groups="csl_epc_core.group_epc_admin"
                                 invisible="approval_state != 'submitted'"/>
                         <button name="action_open_reject_wizard" string="Reject" type="object"
-                                groups="csl_epc_core.group_epc_manager"
+                                groups="csl_epc_core.group_epc_admin"
                                 invisible="approval_state != 'submitted'"/>
                         <button name="action_reset_to_submit" string="Reset to Draft" type="object"
                                 invisible="approval_state not in ('submitted', 'rejected')"/>
                         <button name="action_reset_to_submit" string="Reopen (Reset to Draft)" type="object"
-                                groups="csl_epc_core.group_epc_manager" invisible="approval_state != 'approved'"/>
+                                groups="csl_epc_core.group_epc_admin" invisible="approval_state != 'approved'"/>
                         <button name="action_create_boq" string="Create BOQ" type="object"
                                 class="oe_highlight" invisible="approval_state != 'approved' or boq_count &gt; 0"/>
                         <field name="approval_state" widget="statusbar"

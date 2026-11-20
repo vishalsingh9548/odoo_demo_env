@@ -3,7 +3,7 @@
     <data>
         <menuitem id="menu_epc_billing_root" name="Milestone Billing"
                   web_icon="csl_epc_billing,static/description/icon.png"
-                  groups="csl_epc_core.group_epc_manager" sequence="52"/>
+                  groups="csl_epc_core.group_epc_admin" sequence="52"/>
         <menuitem id="menu_epc_milestone_billing" name="Milestone Billing"
                   parent="menu_epc_billing_root" action="epc_order_milestone_action"
                   sequence="10"/>

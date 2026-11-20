@@ -28,7 +28,7 @@
                             <group string="Compliance">
                                 <field name="cancellation_policy"/>
                                 <field name="certification_type"/>
-                                <field name="tolerance_type"/>
+                                <field name="epc_tolerance_type"/>
                             </group>
                         </group>
                     </page>

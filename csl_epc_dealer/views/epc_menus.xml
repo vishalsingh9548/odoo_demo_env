@@ -3,7 +3,7 @@
     <data>
         <menuitem id="menu_epc_dealer_root" name="Dealers &amp; DISCOM"
                   web_icon="csl_epc_dealer,static/description/icon.png"
-                  groups="csl_epc_core.group_epc_user" sequence="47"/>
+                  groups="csl_epc_core.group_epc_admin" sequence="47"/>
         <menuitem id="menu_epc_config_dealer" name="Dealers"
                   parent="menu_epc_dealer_root" action="epc_dealer_action"
                   sequence="10"/>

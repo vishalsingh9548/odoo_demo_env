@@ -40,3 +40,6 @@ Install after `csl_epc_documents`. No data migration.
 - **Impact:** adds one menu entry ("Dashboard") and one client action. Nothing existing is changed; uninstalling the module removes it.
 - **Tested:** on a throw-away copy of the database (never on the live one): each dashboard was built empty and with a full scenario, and its result checked to be sendable to the browser. Not yet viewed in a browser.
 - **Install / upgrade notes:** the manifest changed, so **restart the Odoo server first**, then *Upgrade* this module (the server keeps each module's file list in memory until it restarts).
+
+## Change (2026-11-20) — Screens restricted to Solar EPC Administrator
+- This module's menus, fields, buttons and tabs now use `csl_epc_core.group_epc_admin` (only Administrator sees them). Upgrade the module to apply.

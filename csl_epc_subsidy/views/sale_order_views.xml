@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="csl_epc_core.sale_order_view_form_epc"/>
             <field name="arch" type="xml">
                 <xpath expr="//page[@name='epc_terms']" position="inside">
-                    <group string="Subsidy (information only, does not change the total)" name="epc_order_subsidy">
+                    <group string="Subsidy (information only, does not change the total)" name="epc_order_subsidy" groups="csl_epc_core.group_epc_admin">
                         <field name="epc_subsidy_scheme_id"/>
                         <field name="epc_expected_subsidy"/>
                         <field name="epc_customer_pays"/>

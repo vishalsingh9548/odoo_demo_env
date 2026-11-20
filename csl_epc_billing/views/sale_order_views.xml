@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="csl_epc_core.sale_order_view_form_epc"/>
             <field name="arch" type="xml">
                 <xpath expr="//notebook" position="inside">
-                    <page name="epc_milestones" string="Milestone Billing" groups="csl_epc_core.group_epc_user">
+                    <page name="epc_milestones" string="Milestone Billing" groups="csl_epc_core.group_epc_admin">
                         <group>
                             <group>
                                 <field name="payment_plan_id" readonly="state not in ('draft', 'sent')"/>

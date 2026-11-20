@@ -44,7 +44,7 @@ class SaleOrder(models.Model):
         string='Certifications',
         help="Which product certifications apply to the equipment being supplied.",
     )
-    tolerance_type = fields.Selection(
+    epc_tolerance_type = fields.Selection(
         [('positive', 'Positive Tolerance'), ('range', '± Range Tolerance')],
         string='Wattage Tolerance',
         help="The manufacturing tolerance allowed on the rated wattage of the modules supplied.",

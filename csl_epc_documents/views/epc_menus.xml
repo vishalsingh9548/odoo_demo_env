@@ -3,7 +3,7 @@
     <data>
         <menuitem id="menu_epc_documents_root" name="Project Documents"
                   web_icon="csl_epc_documents,static/description/icon.png"
-                  groups="csl_epc_core.group_epc_user" sequence="49"/>
+                  groups="csl_epc_core.group_epc_admin" sequence="49"/>
         <menuitem id="menu_epc_documents" name="Project Documents"
                   parent="menu_epc_documents_root" action="epc_project_document_action"
                   sequence="10"/>

@@ -8,11 +8,11 @@
             <field name="arch" type="xml">
                 <xpath expr="//page[@name='epc_terms']" position="inside">
                     <group>
-                        <group string="Electricity Connection (from the lead)" name="epc_order_discom">
+                        <group string="Electricity Connection (from the lead)" name="epc_order_discom" groups="csl_epc_core.group_epc_admin">
                             <field name="epc_discom_id"/>
                             <field name="epc_consumer_number"/>
                         </group>
-                        <group string="Dealer (from the lead)" name="epc_order_dealer">
+                        <group string="Dealer (from the lead)" name="epc_order_dealer" groups="csl_epc_core.group_epc_admin">
                             <field name="epc_dealer_id"/>
                             <field name="epc_sub_dealer_id"/>
                         </group>

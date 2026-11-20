@@ -8,12 +8,12 @@
             <field name="arch" type="xml">
                 <xpath expr="//page[@name='epc_solar_details']/group" position="after">
                     <group>
-                        <group string="Electricity Connection (DISCOM)" name="epc_discom">
+                        <group string="Electricity Connection (DISCOM)" name="epc_discom" groups="csl_epc_core.group_epc_admin">
                             <field name="discom_id"/>
                             <field name="consumer_number"/>
                             <field name="connection_type"/>
                         </group>
-                        <group string="Dealer" name="epc_dealer">
+                        <group string="Dealer" name="epc_dealer" groups="csl_epc_core.group_epc_admin">
                             <field name="dealer_id"/>
                             <field name="sub_dealer_id" invisible="not dealer_id"/>
                         </group>

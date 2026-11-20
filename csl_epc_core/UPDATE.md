@@ -145,3 +145,10 @@ Charts can carry axis headings: a stage module passes `xlabel` (bottom axis) and
 - **Impact:** any custom report or code that reads `delivery_type` / `freight_type` for EPC orders must read `epc_delivery_type` / `epc_freight_type` (none in this repo). Upgrade `csl_epc_core` and `csl_solar_epc`, then hard-refresh the browser.
 - **Tested:** on S00229 both groups' fields save together and Load Stages from Plan fills the 3 stages of "Residential 50-40-10" (rolled back).
 - **Not ours:** `tolerance_type` has a similar clash between `advance_manufacturing` and `grando_solar` (not installed here); left alone.
+
+## Change (2026-11-20) — Administrator-only screens in six modules
+- `csl_epc_billing`, `csl_epc_dealer`, `csl_epc_design`, `csl_epc_documents`, `csl_epc_net_metering` and `csl_epc_subsidy` now use `csl_epc_core.group_epc_admin` for their menus, fields, buttons and tabs. All other modules (including the Solar Details tab in this module) keep their existing groups. Model access rights and record rules are unchanged.
+
+## Fix (2026-11-20) — Wattage Tolerance no longer clashes with Advance Manufacturing
+- `csl_epc_core` and `advance_manufacturing` both defined `sale.order.tolerance_type` with different options; Odoo kept the EPC list and rejected Advance Manufacturing's "Negative". Solar EPC now uses its own field `epc_tolerance_type` (Positive / ± Range) on the Solar EPC Terms tab; `advance_manufacturing` is untouched and keeps `tolerance_type` with all its options. `csl_solar_epc/demo/epc_demo.xml` uses the new name.
+- Upgrade `csl_epc_core,csl_solar_epc`. No migration script: on an existing database, copy old values once with `UPDATE sale_order SET epc_tolerance_type = tolerance_type WHERE is_epc_order AND tolerance_type IN ('positive','range');`

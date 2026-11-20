@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="csl_epc_boq.epc_boq_view_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='feasibility_id']" position="after">
-                    <field name="design_id" invisible="not design_id"/>
+                    <field name="design_id" groups="csl_epc_core.group_epc_admin" invisible="not design_id"/>
                 </xpath>
             </field>
         </record>

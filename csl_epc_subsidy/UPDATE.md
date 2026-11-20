@@ -75,3 +75,6 @@ Five more records added to `data/subsidy_scheme_data.xml` so the suggestion on t
 - **Why:** the lead and its quotation disagreed (0 against 17,158.58 in a real case).
 - **Impact:** with no quotation yet, a percentage scheme still shows 0 (there is no price to take a percentage of); per-kW and flat schemes are unchanged. The scheme chosen can change once a quotation exists, if another scheme then pays more. No new fields, no data change, no upgrade needed.
 - **Install / upgrade notes:** Python code changed, so **restart the Odoo server**; no module upgrade is required.
+
+## Change (2026-11-20) — Screens restricted to Solar EPC Administrator
+- This module's menus, fields, buttons and tabs now use `csl_epc_core.group_epc_admin` (only Administrator sees them). Upgrade the module to apply.

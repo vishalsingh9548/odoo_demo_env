@@ -173,7 +173,7 @@
             <field name="payment_terms_type">milestone</field>
             <field name="cancellation_policy">deduction</field>
             <field name="certification_type">both</field>
-            <field name="tolerance_type">positive</field>
+            <field name="epc_tolerance_type">positive</field>
         </record>
         <record id="epc_demo_quotation_line_modules" model="sale.order.line">
             <field name="order_id" ref="epc_demo_quotation"/>

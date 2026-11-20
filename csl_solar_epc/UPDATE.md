@@ -190,3 +190,6 @@ DISCOM list (`csl_epc_dealer`), PM Surya Ghar scheme (`csl_epc_subsidy`), two pa
 
 ## Dashboards for five of the new modules (2026-11-19)
 `csl_epc_design`, `csl_epc_subsidy`, `csl_epc_net_metering`, `csl_epc_dealer` and `csl_epc_documents` each got a Dashboard menu entry built on the shared stage-dashboard screen of `csl_epc_core` (design previewed and approved first). Details, reads and tests are in each module's UPDATE.md. `csl_epc_billing` has none (not requested). To get them: restart the server once, then Upgrade the five modules.
+
+## Fix (2026-11-20) — Demo data uses `epc_tolerance_type`
+- Demo orders now set `epc_tolerance_type` (renamed in `csl_epc_core`, see its UPDATE.md).

@@ -42,3 +42,6 @@ Verified: advance invoice on confirm (draft, correct 30%), installation / commis
 - **How it loads:** from the module's `data/` folder when the module is installed. The records are `noupdate`, so anything edited later in the screens is never overwritten by an upgrade.
 - **Impact:** only adds master records. No existing record or behaviour is changed. If a record with the same name was typed by hand before installing, delete or rename it first, because names must be unique for DISCOMs.
 - **Status:** files checked for correct XML only; not yet installed anywhere (install is done by the owner).
+
+## Change (2026-11-20) — Screens restricted to Solar EPC Administrator
+- This module's menus, fields, buttons and tabs now use `csl_epc_core.group_epc_admin` (only Administrator sees them). Upgrade the module to apply.
