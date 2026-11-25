@@ -9,7 +9,7 @@
                     <button name="action_approve" type="object" string="Approve" class="btn-primary"
                             invisible="state != 'requested'" groups="maintenance.group_equipment_manager"/>
                     <button name="action_dispatch" type="object" string="Dispatch" class="btn-primary"
-                            invisible="state not in ('requested', 'approved')" groups="maintenance.group_equipment_manager"/>
+                            invisible="state != 'approved'" groups="maintenance.group_equipment_manager"/>
                     <button name="action_receive" type="object" string="Mark Received" class="btn-primary"
                             invisible="state != 'dispatched'"/>
                     <button name="action_new_flight" type="object" string="New Flight with Replacement"
@@ -28,7 +28,7 @@
                                 class="btn btn-primary btn-lg w-100" invisible="state != 'requested'"
                                 groups="maintenance.group_equipment_manager"/>
                         <button name="action_dispatch" type="object" string="Dispatch" icon="fa-truck"
-                                class="btn btn-primary btn-lg w-100" invisible="state not in ('requested', 'approved')"
+                                class="btn btn-primary btn-lg w-100" invisible="state != 'approved'"
                                 groups="maintenance.group_equipment_manager"/>
                         <button name="action_receive" type="object" string="Mark Received" icon="fa-check-square-o"
                                 class="btn btn-primary btn-lg w-100" invisible="state != 'dispatched'"/>
@@ -100,8 +100,13 @@
                 <field name="replacement_equipment_id"/>
                 <field name="project_id"/>
                 <field name="flight_id"/>
+                <filter string="To Approve" name="to_approve" domain="[('state', '=', 'requested')]"/>
+                <filter string="Overdue" name="overdue"
+                        domain="[('state', 'in', ('requested', 'approved', 'dispatched')), ('required_date', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Not Cancelled" name="not_cancelled" domain="[('state', '!=', 'cancel')]"/>
+                <separator/>
                 <filter string="Open" name="open" domain="[('state', 'in', ('requested', 'approved', 'dispatched'))]"/>
-                <filter string="To Dispatch" name="to_dispatch" domain="[('state', 'in', ('requested', 'approved'))]"/>
+                <filter string="To Dispatch" name="to_dispatch" domain="[('state', '=', 'approved')]"/>
                 <filter string="On the Way" name="dispatched" domain="[('state', '=', 'dispatched')]"/>
                 <group expand="0" string="Group By">
                     <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
@@ -161,6 +166,91 @@
             <p class="o_view_nocontent_smiling_face">No replacement requested</p>
             <p>Use "Report Breakdown" on a flight when a drone or battery breaks: it opens a repair
                request and asks for a working unit to be sent to site.</p>
+        </field>
+    </record>
+    <!-- Approval Board: one column per status, cards cannot be dragged (each move runs its checks) -->
+    <record id="drone_equipment_request_view_kanban_board" model="ir.ui.view">
+        <field name="name">drone.equipment.request.kanban.board</field>
+        <field name="model">drone.equipment.request</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" records_draggable="0" quick_create="0" group_create="0"
+                    group_delete="0" group_edit="0" sample="1" class="o_drone_breakdown_board">
+                <field name="state"/>
+                <field name="equipment_type"/>
+                <field name="replacement_equipment_id"/>
+                <field name="flight_id"/>
+                <progressbar field="equipment_type" colors='{"drone": "info", "battery": "warning"}'/>
+                <templates>
+                    <t t-name="card">
+                        <t t-set="st" t-value="record.state.raw_value"/>
+                        <t t-set="drone" t-value="record.equipment_type.raw_value == 'drone'"/>
+                        <div class="d-flex align-items-start gap-2">
+                            <span t-attf-class="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 #{drone and 'text-bg-info' or 'text-bg-warning'}"
+                                  style="width: 34px; height: 34px;">
+                                <i t-attf-class="fa #{drone and 'fa-paper-plane' or 'fa-battery-three-quarters'}"
+                                   t-att-title="drone and 'Drone' or 'Battery'"/>
+                            </span>
+                            <div class="flex-grow-1 overflow-hidden">
+                                <field name="name" class="fw-bold"/>
+                                <div class="small text-muted text-truncate"><field name="project_id"/></div>
+                            </div>
+                            <field name="required_date" widget="remaining_days" class="small flex-shrink-0"
+                                   invisible="state in ('received', 'cancel')"/>
+                        </div>
+                        <div class="rounded-2 bg-danger-subtle px-2 py-1 mt-2 small">
+                            <div class="text-truncate fw-bold">
+                                <i class="fa fa-wrench me-1" title="Broken"/><field name="broken_equipment_id"/>
+                            </div>
+                            <div class="text-truncate text-muted"><field name="reason"/></div>
+                        </div>
+                        <div class="small mt-1 text-truncate">
+                            <i class="fa fa-arrow-right me-1 text-success" title="Replacement"/>
+                            <field t-if="record.replacement_equipment_id.raw_value" name="replacement_equipment_id" class="fw-bold"/>
+                            <span t-else="" class="text-muted fst-italic">Replacement not chosen yet</span>
+                        </div>
+                        <div class="small text-truncate text-muted">
+                            <i class="fa fa-map-marker me-1" title="Site"/><field name="site_location"/>
+                        </div>
+                        <div class="d-flex gap-1 mt-2" t-if="st == 'requested' or st == 'approved' or st == 'dispatched'">
+                            <button t-if="st == 'requested'" name="action_approve" type="object"
+                                    class="btn btn-sm btn-primary" groups="maintenance.group_equipment_manager">
+                                <i class="fa fa-check me-1" title="Approve"/>Approve
+                            </button>
+                            <button t-if="st == 'approved' and record.replacement_equipment_id.raw_value" name="action_dispatch"
+                                    type="object" class="btn btn-sm btn-primary" groups="maintenance.group_equipment_manager">
+                                <i class="fa fa-truck me-1" title="Dispatch"/>Dispatch
+                            </button>
+                            <span t-if="st == 'approved' and !record.replacement_equipment_id.raw_value"
+                                  class="small text-warning align-self-center">Open the card to choose the replacement</span>
+                            <button t-if="st == 'dispatched'" name="action_receive" type="object" class="btn btn-sm btn-success">
+                                <i class="fa fa-check-square-o me-1" title="Received"/>Mark Received
+                            </button>
+                        </div>
+                        <footer class="small text-muted">
+                            <field name="requested_by_id" widget="many2one_avatar_user"/>
+                            <field name="create_date" widget="date" class="ms-1"/>
+                            <field name="activity_ids" widget="kanban_activity" class="ms-auto"/>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_drone_breakdown_board" model="ir.actions.act_window">
+        <field name="name">Approval Board</field>
+        <field name="res_model">drone.equipment.request</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('drone_equipment_request_view_kanban_board')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('drone_equipment_request_view_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('drone_equipment_request_view_form')})]"/>
+        <field name="context">{'search_default_not_cancelled': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No breakdown reported</p>
+            <p>"Report Breakdown" on a flight puts a replacement request here: approve it, choose the
+               replacement, dispatch it, and mark it received on site.</p>
         </field>
     </record>
 </odoo>
