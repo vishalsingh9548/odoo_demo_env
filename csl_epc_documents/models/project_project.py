@@ -8,17 +8,17 @@ class ProjectProject(models.Model):
 
     epc_document_ids = fields.One2many('epc.project.document', 'project_id', string='Documents',
                                    help="The government / compliance papers of this project.")
-    epc_document_count = fields.Integer(string='Documents', compute='_compute_documents',
+    epc_document_count = fields.Integer(string='Documents', compute='_compute_epc_documents',
                                     help="How many papers this project has.")
-    epc_document_done_count = fields.Integer(string='Documents Done', compute='_compute_documents',
+    epc_document_done_count = fields.Integer(string='Documents Done', compute='_compute_epc_documents',
                                          help="Papers already submitted or accepted.")
-    epc_document_pending_mandatory = fields.Integer(string='Mandatory Pending', compute='_compute_documents',
+    epc_document_pending_mandatory = fields.Integer(string='Mandatory Pending', compute='_compute_epc_documents',
                                                 help="Mandatory papers not yet submitted or accepted.")
-    epc_document_progress = fields.Float(string='Document Progress', compute='_compute_documents',
+    epc_document_progress = fields.Float(string='Document Progress', compute='_compute_epc_documents',
                                      help="Percentage of papers submitted or accepted.")
 
     @api.depends('epc_document_ids.state', 'epc_document_ids.mandatory')
-    def _compute_documents(self):
+    def _compute_epc_documents(self):
         for project in self:
             docs = project.epc_document_ids
             done = docs.filtered(lambda d: d.state in ('submitted', 'accepted'))
