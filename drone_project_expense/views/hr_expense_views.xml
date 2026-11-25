@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_expense_view_form_project" model="ir.ui.view">
+        <field name="name">hr.expense.form.project</field>
+        <field name="model">hr.expense</field>
+        <field name="inherit_id" ref="hr_expense.hr_expense_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet//field[@name='product_id']" position="after">
+                <field name="project_id" groups="drone_sales_crm.group_drone_user" readonly="not is_editable" options="{'no_create': True}"
+                       placeholder="Job the expense is for"/>
+                <field name="task_id" groups="drone_sales_crm.group_drone_user" readonly="not is_editable" options="{'no_create': True}"
+                       domain="[('project_id', '=?', project_id)]"
+                       placeholder="Optional: span or task"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_expense_view_list_project" model="ir.ui.view">
+        <field name="name">hr.expense.list.project</field>
+        <field name="model">hr.expense</field>
+        <field name="inherit_id" ref="hr_expense.hr_expense_view_expenses_analysis_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='employee_id']" position="after">
+                <field name="project_id" groups="drone_sales_crm.group_drone_user" optional="show" readonly="not is_editable"/>
+                <field name="task_id" groups="drone_sales_crm.group_drone_user" optional="hide" readonly="not is_editable"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_expense_view_search_project" model="ir.ui.view">
+        <field name="name">hr.expense.search.project</field>
+        <field name="model">hr.expense</field>
+        <field name="inherit_id" ref="hr_expense.hr_expense_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='employee_id']" position="after">
+                <field name="project_id" groups="drone_sales_crm.group_drone_user"/>
+                <field name="task_id" groups="drone_sales_crm.group_drone_user"/>
+            </xpath>
+            <xpath expr="//group/filter[@name='employee']" position="after">
+                <filter string="Project" name="group_by_project" groups="drone_sales_crm.group_drone_user" context="{'group_by': 'project_id'}"/>
+                <filter string="Task" name="group_by_task" groups="drone_sales_crm.group_drone_user" context="{'group_by': 'task_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_hr_expense_sheet_form_project" model="ir.ui.view">
+        <field name="name">hr.expense.sheet.form.project</field>
+        <field name="model">hr.expense.sheet</field>
+        <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='expense_line_ids']/list/field[@name='name']" position="after">
+                <field name="project_id" groups="drone_sales_crm.group_drone_user" optional="show"/>
+                <field name="task_id" groups="drone_sales_crm.group_drone_user" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
