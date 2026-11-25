@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_saleorder_document_drone" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[@id='informations']" position="after">
+            <div class="mb-4" t-if="doc.line_name or doc.span_count" name="drone_stringing_job">
+                <strong>Stringing job</strong>
+                <table class="table table-sm table-borderless mt-1 mb-0">
+                    <tr t-if="doc.line_name">
+                        <td class="ps-0" style="width: 30%;">Line</td>
+                        <td><span t-field="doc.line_name"/></td>
+                    </tr>
+                    <tr t-if="doc.voltage_kv">
+                        <td class="ps-0">Voltage</td>
+                        <td><span t-field="doc.voltage_kv"/> kV</td>
+                    </tr>
+                    <tr t-if="doc.site_location">
+                        <td class="ps-0">Site / route</td>
+                        <td><span t-field="doc.site_location"/></td>
+                    </tr>
+                    <tr t-if="doc.span_count">
+                        <td class="ps-0">Spans surveyed</td>
+                        <td><span t-field="doc.span_count"/> spans, <span t-field="doc.total_km"/> km</td>
+                    </tr>
+                </table>
+            </div>
+        </xpath>
+        <!-- Per-km lines always show the unit as "km" -->
+        <xpath expr="//span[@t-field='line.product_uom']" position="attributes">
+            <attribute name="t-if">not line.is_stringing_km</attribute>
+        </xpath>
+        <xpath expr="//span[@t-field='line.product_uom']" position="after">
+            <span t-if="line.is_stringing_km">km</span>
+        </xpath>
+        <xpath expr="//span[@name='order_note']/.." position="after">
+            <div t-if="not is_html_empty(doc.company_id.drone_quote_terms)" class="mt-4" name="drone_quote_terms">
+                <strong>Drone terms</strong>
+                <div t-field="doc.company_id.drone_quote_terms"/>
+            </div>
+        </xpath>
+    </template>
+</odoo>

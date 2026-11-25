@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_drone" model="ir.ui.view">
+        <field name="name">sale.order.form.drone</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_certifications" type="object"
+                        class="oe_stat_button" icon="fa-check-square-o" groups="drone_sales_crm.group_drone_user"
+                        invisible="state != 'sale'">
+                    <field name="certification_count" widget="statinfo" string="Certifications"/>
+                </button>
+            </xpath>
+            <xpath expr="//page[@name='other_information']" position="before">
+                <page string="Stringing Job" name="drone_stringing_job" groups="drone_sales_crm.group_drone_user">
+                    <group string="Stringing job">
+                        <group>
+                            <field name="line_name"/>
+                            <field name="voltage_kv"/>
+                            <field name="site_location"/>
+                        </group>
+                        <group>
+                            <field name="span_count"/>
+                            <field name="total_km"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Not group-restricted: certified km must stay read-only for every user -->
+    <record id="view_order_form_drone_km_lock" model="ir.ui.view">
+        <field name="name">sale.order.form.drone.km.lock</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/list/field[@name='qty_delivered_method']" position="after">
+                <field name="is_stringing_km" column_invisible="True"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='qty_delivered']" position="attributes">
+                <attribute name="readonly">qty_delivered_method != 'manual' or is_downpayment or is_stringing_km</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='qty_delivered']" position="before">
+                <field name="is_stringing_km" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='qty_delivered']" position="attributes">
+                <attribute name="readonly">qty_delivered_method != 'manual' or is_stringing_km</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_tree_drone" model="ir.ui.view">
+        <field name="name">sale.order.list.drone</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_tree"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="line_name" optional="show" groups="drone_sales_crm.group_drone_user"/>
+                <field name="voltage_kv" optional="hide" groups="drone_sales_crm.group_drone_user"/>
+                <field name="site_location" optional="hide" groups="drone_sales_crm.group_drone_user"/>
+                <field name="span_count" optional="hide" groups="drone_sales_crm.group_drone_user"/>
+                <field name="total_km" optional="show" groups="drone_sales_crm.group_drone_user"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_sales_order_filter_drone" model="ir.ui.view">
+        <field name="name">sale.order.search.drone</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="line_name" groups="drone_sales_crm.group_drone_user"/>
+                <field name="voltage_kv" groups="drone_sales_crm.group_drone_user"/>
+            </field>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="edit_project_drone" model="ir.ui.view">
+        <field name="name">project.project.form.drone</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_drone_certifications" type="object"
+                        class="oe_stat_button" icon="fa-check-square-o"
+                        groups="drone_sales_crm.group_drone_user"
+                        invisible="not drone_certification_count">
+                    <field name="drone_certification_count" widget="statinfo" string="Certifications"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

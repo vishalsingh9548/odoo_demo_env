@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Task stages of a stringing job -->
+    <record id="task_type_planned" model="project.task.type">
+        <field name="name">Planned</field>
+        <field name="sequence">1</field>
+    </record>
+    <record id="task_type_in_progress" model="project.task.type">
+        <field name="name">In progress</field>
+        <field name="sequence">2</field>
+    </record>
+    <record id="task_type_strung" model="project.task.type">
+        <field name="name">Strung</field>
+        <field name="sequence">3</field>
+    </record>
+    <record id="task_type_certified" model="project.task.type">
+        <field name="name">Certified</field>
+        <field name="sequence">4</field>
+        <field name="fold" eval="True"/>
+    </record>
+
+    <!--
+        Odoo 18 has no "is template" flag on projects: this project is used through the
+        product's project_template_id and copied on every confirmed order. It must stay
+        active; the "[Template]" prefix tells users not to log work on it.
+    -->
+    <record id="project_stringing_job_template" model="project.project">
+        <field name="name">[Template] Stringing job template</field>
+        <field name="type_ids" eval="[(6, 0, [
+            ref('task_type_planned'),
+            ref('task_type_in_progress'),
+            ref('task_type_strung'),
+            ref('task_type_certified'),
+        ])]"/>
+        <field name="allow_billable" eval="True"/>
+        <field name="privacy_visibility">followers</field>
+        <field name="description" type="html">
+            <p>Template for drone stringing jobs. It is copied for every confirmed sales order
+            with the "Drone stringing (per km)" product. Do not log work on this project.</p>
+        </field>
+    </record>
+</odoo>
