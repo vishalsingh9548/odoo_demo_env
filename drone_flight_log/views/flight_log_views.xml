@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="drone_flight_log_view_form" model="ir.ui.view">
+        <field name="name">drone.flight.log.form</field>
+        <field name="model">drone.flight.log</field>
+        <field name="arch" type="xml">
+            <form string="Flight Log">
+                <header>
+                    <button name="action_takeoff_now" type="object" string="Take-off Now"
+                            invisible="state != 'draft'"/>
+                    <button name="action_landed_now" type="object" string="Landed Now"
+                            invisible="state != 'draft' or landing_time"/>
+                    <button name="action_done" type="object" string="Confirm Flight"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_report_breakdown" type="object" string="Report Breakdown"
+                            class="btn-danger" invisible="state == 'cancel'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state == 'cancel'"/>
+                    <button name="action_draft" type="object" string="Reset to Draft"
+                            invisible="state != 'cancel'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_repair_requests" type="object" class="oe_stat_button"
+                                icon="fa-wrench" invisible="not repair_request_count">
+                            <field name="repair_request_count" widget="statinfo" string="Repairs"/>
+                        </button>
+                        <button name="action_view_equipment_requests" type="object" class="oe_stat_button"
+                                icon="fa-truck" invisible="not equipment_request_count">
+                            <field name="equipment_request_count" widget="statinfo" string="Replacements"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                        <div class="text-muted">
+                            <field name="task_id" readonly="state != 'draft'" options="{'no_create': True, 'no_open': True}"
+                                   placeholder="Span" class="fw-bold"/>
+                        </div>
+                    </div>
+
+                    <!-- Phone action bar: big buttons, one tap each -->
+                    <div class="d-flex d-md-none flex-column gap-2 mb-3" name="mobile_actions">
+                        <button name="action_takeoff_now" type="object" string="Take-off Now" icon="fa-plane"
+                                class="btn btn-secondary btn-lg w-100" invisible="state != 'draft' or landing_time"/>
+                        <button name="action_landed_now" type="object" string="Landed Now" icon="fa-flag-checkered"
+                                class="btn btn-secondary btn-lg w-100" invisible="state != 'draft' or landing_time"/>
+                        <button name="action_done" type="object" string="Confirm Flight" icon="fa-check"
+                                class="btn btn-primary btn-lg w-100" invisible="state != 'draft' or not landing_time"/>
+                        <button name="action_report_breakdown" type="object" string="Report Breakdown" icon="fa-exclamation-triangle"
+                                class="btn btn-outline-danger btn-lg w-100" invisible="state == 'cancel'"/>
+                    </div>
+
+                    <group>
+                        <group string="Flight">
+                            <field name="drone_id" readonly="state != 'draft'" options="{'no_create': True}"/>
+                            <field name="drone_serial_no" class="text-muted"/>
+                            <field name="battery_ids" widget="many2many_tags" readonly="state != 'draft'"
+                                   options="{'no_create': True}" class="d-md-none" string="Batteries"/>
+                            <field name="pilot_id" readonly="state != 'draft'"/>
+                            <field name="takeoff_time" readonly="state != 'draft'"/>
+                            <field name="landing_time" readonly="state != 'draft'"/>
+                            <field name="duration_min"/>
+                        </group>
+                        <group string="Result">
+                            <field name="result" readonly="state != 'draft'" widget="radio"/>
+                            <field name="abort_reason" invisible="result == 'success'"
+                                   required="result != 'success'" readonly="state != 'draft'"/>
+                            <field name="weather" readonly="state != 'draft'"/>
+                            <field name="wind_kmh" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <div class="d-none d-md-block">
+                        <separator string="Batteries"/>
+                        <field name="battery_ids" readonly="state != 'draft'" options="{'no_create': True}">
+                            <list decoration-warning="battery_health == 'warning'"
+                                  decoration-danger="battery_health == 'retire'">
+                                <field name="name"/>
+                                <field name="serial_no"/>
+                                <field name="drone_flight_count" string="Cycles"/>
+                                <field name="battery_cycle_limit"/>
+                                <field name="battery_health" widget="badge"
+                                       decoration-success="battery_health == 'ok'"
+                                       decoration-warning="battery_health == 'warning'"
+                                       decoration-danger="battery_health == 'retire'"/>
+                            </list>
+                        </field>
+                    </div>
+                    <group>
+                        <group string="Span">
+                            <field name="project_id"/>
+                            <field name="partner_id"/>
+                            <field name="tower_from"/>
+                            <field name="tower_to"/>
+                            <field name="crossing_type"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                        <group string="Remarks">
+                            <field name="note" nolabel="1" colspan="2" placeholder="Anything the next crew should know..."/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="drone_flight_log_view_kanban" model="ir.ui.view">
+        <field name="name">drone.flight.log.kanban</field>
+        <field name="model">drone.flight.log</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" sample="1" quick_create="0">
+                <field name="state"/>
+                <field name="result"/>
+                <field name="landing_time"/>
+                <templates>
+                    <t t-name="card">
+                        <t t-set="res" t-value="record.result.raw_value"/>
+                        <t t-set="tone" t-value="record.state.raw_value == 'cancel' and 'secondary' or res == 'success' and 'success' or res == 'retry' and 'warning' or 'danger'"/>
+                        <div class="d-flex align-items-start gap-2">
+                            <div class="flex-grow-1 overflow-hidden">
+                                <field name="name" class="fw-bold"/>
+                                <div class="text-truncate"><field name="task_id"/></div>
+                            </div>
+                            <div class="text-end flex-shrink-0">
+                                <span t-if="record.state.raw_value == 'draft'" class="badge rounded-pill text-bg-info">
+                                    <t t-if="record.landing_time.raw_value">Landed</t><t t-else="">In progress</t>
+                                </span>
+                                <span t-elif="record.state.raw_value == 'cancel'" class="badge rounded-pill text-bg-secondary">Cancelled</span>
+                                <span t-else="" t-attf-class="badge rounded-pill text-bg-#{tone}"><field name="result"/></span>
+                            </div>
+                        </div>
+                        <div class="small mt-1 text-truncate">
+                            <i class="fa fa-paper-plane me-1 text-muted" title="Drone"/><field name="drone_id"/>
+                        </div>
+                        <div class="mt-1"><field name="battery_ids" widget="many2many_tags"/></div>
+                        <footer class="small text-muted">
+                            <span><i class="fa fa-user me-1" title="Pilot"/><field name="pilot_id"/></span>
+                            <span class="ms-auto">
+                                <field name="takeoff_time" widget="datetime"/> ·
+                                <field name="duration_min"/> min
+                            </span>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="drone_flight_log_view_list" model="ir.ui.view">
+        <field name="name">drone.flight.log.list</field>
+        <field name="model">drone.flight.log</field>
+        <field name="arch" type="xml">
+            <list string="Flight Logs" decoration-muted="state == 'cancel'"
+                  decoration-info="state == 'draft'" decoration-danger="result == 'aborted' and state == 'done'">
+                <field name="name"/>
+                <field name="takeoff_time"/>
+                <field name="project_id" optional="show"/>
+                <field name="task_id"/>
+                <field name="drone_id"/>
+                <field name="battery_ids" widget="many2many_tags" optional="show"/>
+                <field name="pilot_id" optional="show"/>
+                <field name="duration_min" sum="Total (min)"/>
+                <field name="result"/>
+                <field name="wind_kmh" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'" decoration-success="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="drone_flight_log_view_search" model="ir.ui.view">
+        <field name="name">drone.flight.log.search</field>
+        <field name="model">drone.flight.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="task_id"/>
+                <field name="drone_id"/>
+                <field name="battery_ids" string="Battery"/>
+                <field name="pilot_id"/>
+                <filter string="Done" name="done" domain="[('state', '=', 'done')]"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <separator/>
+                <filter string="Rope passed" name="success" domain="[('result', '=', 'success')]"/>
+                <filter string="Not passed" name="failed" domain="[('result', '!=', 'success')]"/>
+                <separator/>
+                <filter string="Take-off" name="takeoff" date="takeoff_time"/>
+                <group expand="0" string="Group By">
+                    <filter string="Job" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="Span" name="group_task" context="{'group_by': 'task_id'}"/>
+                    <filter string="Drone" name="group_drone" context="{'group_by': 'drone_id'}"/>
+                    <filter string="Pilot" name="group_pilot" context="{'group_by': 'pilot_id'}"/>
+                    <filter string="Result" name="group_result" context="{'group_by': 'result'}"/>
+                    <filter string="Day" name="group_day" context="{'group_by': 'takeoff_time:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="drone_flight_log_view_pivot" model="ir.ui.view">
+        <field name="name">drone.flight.log.pivot</field>
+        <field name="model">drone.flight.log</field>
+        <field name="arch" type="xml">
+            <pivot string="Flight Analysis">
+                <field name="project_id" type="row"/>
+                <field name="result" type="col"/>
+                <field name="duration_min" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="drone_flight_log_view_graph" model="ir.ui.view">
+        <field name="name">drone.flight.log.graph</field>
+        <field name="model">drone.flight.log</field>
+        <field name="arch" type="xml">
+            <graph string="Flight Analysis" type="bar">
+                <field name="drone_id"/>
+                <field name="duration_min" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_drone_flight_log" model="ir.actions.act_window">
+        <field name="name">Flight Logs</field>
+        <field name="res_model">drone.flight.log</field>
+        <field name="view_mode">list,kanban,form,pivot,graph</field>
+        <field name="mobile_view_mode">kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Log a drone flight</p>
+            <p>Record each flight on a span: the drone, pilot, batteries used, flight time and result.</p>
+        </field>
+    </record>
+
+    <record id="action_drone_flight_analysis" model="ir.actions.act_window">
+        <field name="name">Flight Analysis</field>
+        <field name="res_model">drone.flight.log</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="context">{'search_default_done': 1}</field>
+    </record>
+</odoo>

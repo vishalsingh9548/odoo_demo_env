@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_drone_flight_log_user,drone.flight.log.user,model_drone_flight_log,project.group_project_user,1,1,1,0
+access_drone_flight_log_manager,drone.flight.log.manager,model_drone_flight_log,project.group_project_manager,1,1,1,1
+access_drone_equipment_request_user,drone.equipment.request.user,model_drone_equipment_request,project.group_project_user,1,1,1,0
+access_drone_equipment_request_manager,drone.equipment.request.manager,model_drone_equipment_request,maintenance.group_equipment_manager,1,1,1,1
+access_drone_breakdown_wizard_user,drone.breakdown.wizard.user,model_drone_breakdown_wizard,project.group_project_user,1,1,1,1

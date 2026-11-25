@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="equipment_category_drone" model="maintenance.equipment.category">
+        <field name="name">Drones</field>
+        <field name="drone_equipment_type">drone</field>
+    </record>
+    <record id="equipment_category_battery" model="maintenance.equipment.category">
+        <field name="name">Drone Batteries</field>
+        <field name="drone_equipment_type">battery</field>
+    </record>
+</odoo>

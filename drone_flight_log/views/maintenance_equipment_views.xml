@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_equipment_view_form_drone" model="ir.ui.view">
+        <field name="name">maintenance.equipment.form.drone</field>
+        <field name="model">maintenance.equipment</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_drone_flights" type="object" class="oe_stat_button"
+                        icon="fa-paper-plane" groups="drone_sales_crm.group_drone_user" invisible="not drone_equipment_type">
+                    <field name="drone_flight_count" widget="statinfo" string="Flights"/>
+                </button>
+                <button name="action_view_drone_replacement_requests" type="object" class="oe_stat_button"
+                        icon="fa-truck" groups="drone_sales_crm.group_drone_user" invisible="not drone_replacement_request_count">
+                    <field name="drone_replacement_request_count" widget="statinfo" string="Replacements"/>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Drone Ops" name="drone_ops" groups="drone_sales_crm.group_drone_user" invisible="not drone_equipment_type">
+                    <field name="drone_equipment_type" invisible="1"/>
+                    <group>
+                        <group string="Status">
+                            <field name="drone_availability" widget="badge"
+                                   decoration-success="drone_availability == 'free'"
+                                   decoration-info="drone_availability == 'busy'"
+                                   decoration-danger="drone_availability == 'broken'"
+                                   decoration-muted="drone_availability == 'retired'"/>
+                            <label for="drone_project_id"/>
+                            <div class="o_row">
+                                <field name="drone_project_id" options="{'no_create': True}"/>
+                                <button name="action_drone_release" type="object" string="Release to Store"
+                                        class="btn-link" icon="fa-sign-in" invisible="not drone_project_id"/>
+                            </div>
+                            <field name="drone_operational_state" widget="badge"
+                                   decoration-success="drone_operational_state == 'ok'"
+                                   decoration-danger="drone_operational_state == 'broken'"/>
+                            <field name="drone_broken_flight_id" invisible="drone_operational_state != 'broken'"/>
+                        </group>
+                        <group string="Usage">
+                            <field name="drone_flight_count" string="Flights / Cycles"/>
+                            <field name="drone_flight_hours"/>
+                            <field name="drone_last_flight_date"/>
+                        </group>
+                        <group string="Battery" invisible="drone_equipment_type != 'battery'">
+                            <field name="battery_cycle_limit"/>
+                            <field name="battery_health" widget="badge"
+                                   decoration-success="battery_health == 'ok'"
+                                   decoration-warning="battery_health == 'warning'"
+                                   decoration-danger="battery_health == 'retire'"/>
+                        </group>
+                        <group string="Servicing" invisible="drone_equipment_type != 'drone'">
+                            <field name="service_interval_hours"/>
+                            <field name="hours_since_service"/>
+                            <field name="last_service_date"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_equipment_category_view_form_drone" model="ir.ui.view">
+        <field name="name">maintenance.equipment.category.form.drone</field>
+        <field name="model">maintenance.equipment.category</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_category_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='technician_user_id']" position="after">
+                <field name="drone_equipment_type" groups="drone_sales_crm.group_drone_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="maintenance_equipment_view_list_drone" model="ir.ui.view">
+        <field name="name">maintenance.equipment.list.drone</field>
+        <field name="model">maintenance.equipment</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <list string="Drones" decoration-danger="drone_operational_state == 'broken'">
+                <field name="name"/>
+                <field name="serial_no"/>
+                <field name="model" optional="show"/>
+                <field name="drone_availability" widget="badge"
+                       decoration-success="drone_availability == 'free'"
+                       decoration-info="drone_availability == 'busy'"
+                       decoration-danger="drone_availability == 'broken'"
+                       decoration-muted="drone_availability == 'retired'"/>
+                <field name="drone_project_id" optional="show"/>
+                <field name="drone_operational_state" column_invisible="True"/>
+                <field name="drone_flight_count"/>
+                <field name="drone_flight_hours"/>
+                <field name="hours_since_service"/>
+                <field name="service_interval_hours" optional="hide"/>
+                <field name="drone_last_flight_date"/>
+                <field name="location" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="maintenance_equipment_view_list_battery" model="ir.ui.view">
+        <field name="name">maintenance.equipment.list.battery</field>
+        <field name="model">maintenance.equipment</field>
+        <field name="priority">91</field>
+        <field name="arch" type="xml">
+            <list string="Batteries" decoration-warning="battery_health == 'warning'"
+                  decoration-danger="battery_health == 'retire' or drone_operational_state == 'broken'">
+                <field name="name"/>
+                <field name="serial_no"/>
+                <field name="model" optional="hide"/>
+                <field name="drone_availability" widget="badge"
+                       decoration-success="drone_availability == 'free'"
+                       decoration-info="drone_availability == 'busy'"
+                       decoration-danger="drone_availability == 'broken'"
+                       decoration-muted="drone_availability == 'retired'"/>
+                <field name="drone_project_id" optional="show"/>
+                <field name="drone_operational_state" column_invisible="True"/>
+                <field name="drone_flight_count" string="Cycles"/>
+                <field name="battery_cycle_limit"/>
+                <field name="battery_health" widget="badge"
+                       decoration-success="battery_health == 'ok'"
+                       decoration-warning="battery_health == 'warning'"
+                       decoration-danger="battery_health == 'retire'"/>
+                <field name="drone_flight_hours"/>
+                <field name="drone_last_flight_date"/>
+                <field name="location" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+
+    <record id="maintenance_equipment_view_kanban_drone" model="ir.ui.view">
+        <field name="name">maintenance.equipment.kanban.drone</field>
+        <field name="model">maintenance.equipment</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="drone_availability" default_order="drone_equipment_type desc, serial_no"
+                    highlight_color="drone_kanban_color" records_draggable="0" group_create="0"
+                    group_delete="0" group_edit="0" quick_create="0" sample="1">
+                <progressbar field="drone_availability"
+                             colors='{"free": "success", "busy": "info", "broken": "danger", "retired": "muted"}'/>
+                <field name="drone_equipment_type"/>
+                <field name="drone_availability"/>
+                <field name="battery_health"/>
+                <field name="drone_usage_percent"/>
+                <field name="maintenance_open_count"/>
+                <field name="drone_project_id"/>
+                <field name="drone_broken_flight_id"/>
+                <field name="drone_last_flight_day"/>
+                <field name="drone_flight_count"/>
+                <field name="battery_cycle_limit"/>
+                <field name="service_interval_hours"/>
+                <templates>
+                    <t t-name="card">
+                        <t t-set="state" t-value="record.drone_availability.raw_value"/>
+                        <t t-set="tone" t-value="{'free': 'success', 'busy': 'info', 'broken': 'danger', 'retired': 'secondary'}[state] or 'secondary'"/>
+                        <t t-set="is_battery" t-value="record.drone_equipment_type.raw_value == 'battery'"/>
+                        <t t-set="usage" t-value="record.drone_usage_percent.raw_value or 0"/>
+                        <t t-set="battery_icon" t-value="usage &lt; 25 and 'fa-battery-full' or usage &lt; 50 and 'fa-battery-three-quarters' or usage &lt; 75 and 'fa-battery-half' or usage &lt; 100 and 'fa-battery-quarter' or 'fa-battery-empty'"/>
+                        <t t-set="bar" t-value="usage &gt;= 100 and 'danger' or usage &gt;= 80 and 'warning' or 'success'"/>
+
+                        <!-- Header: icon, name, serial, status pill -->
+                        <div class="d-flex align-items-center gap-2">
+                            <div t-attf-class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0 bg-#{tone}-subtle"
+                                 style="width: 40px; height: 40px;">
+                                <i t-attf-class="fa fa-lg text-#{tone} #{is_battery and battery_icon or 'fa-paper-plane'}"
+                                   t-att-title="is_battery and 'Battery' or 'Drone'"/>
+                            </div>
+                            <div class="flex-grow-1 overflow-hidden">
+                                <field name="name" class="fw-bold d-block text-truncate"/>
+                                <div class="small text-muted text-truncate">
+                                    <span class="font-monospace"><field name="serial_no"/></span>
+                                    <t t-if="record.model.raw_value"> · <field name="model"/></t>
+                                </div>
+                            </div>
+                            <span t-attf-class="badge rounded-pill text-bg-#{tone} flex-shrink-0">
+                                <field name="drone_availability"/>
+                            </span>
+                        </div>
+
+                        <!-- Where is it -->
+                        <div t-attf-class="rounded-2 px-2 py-1 mt-2 small bg-#{tone}-subtle">
+                            <t t-if="state == 'busy'">
+                                <div class="fw-bold text-truncate">
+                                    <i class="fa fa-briefcase me-1" title="Assigned job"/><field name="drone_project_id"/>
+                                </div>
+                                <div t-if="record.location.raw_value" class="text-truncate">
+                                    <i class="fa fa-map-marker me-1" title="Location"/><field name="location"/>
+                                </div>
+                            </t>
+                            <t t-elif="state == 'free'">
+                                <div class="fw-bold"><i class="fa fa-check-circle me-1" title="Free"/>Available</div>
+                                <div class="text-truncate">
+                                    <i class="fa fa-map-marker me-1" title="Location"/>
+                                    <t t-if="record.location.raw_value"><field name="location"/></t>
+                                    <t t-else="">Store</t>
+                                </div>
+                            </t>
+                            <t t-elif="state == 'broken'">
+                                <div class="fw-bold"><i class="fa fa-wrench me-1" title="Broken"/>Out of service, under repair</div>
+                                <div t-if="record.drone_broken_flight_id.raw_value" class="text-truncate">
+                                    Broke on <field name="drone_broken_flight_id"/>
+                                </div>
+                                <div t-if="record.drone_project_id.raw_value" class="text-truncate">
+                                    <i class="fa fa-briefcase me-1" title="Assigned job"/><field name="drone_project_id"/>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="fw-bold"><i class="fa fa-ban me-1" title="Retired"/>Retired, do not use</div>
+                                <div t-if="record.location.raw_value" class="text-truncate"><field name="location"/></div>
+                            </t>
+                        </div>
+
+                        <!-- Key figures -->
+                        <div class="row g-0 text-center mt-2">
+                            <t t-if="is_battery">
+                                <div class="col border-end">
+                                    <div class="fw-bold"><field name="drone_flight_count"/></div>
+                                    <div class="small text-muted">cycles</div>
+                                </div>
+                                <div class="col border-end">
+                                    <div class="fw-bold"><field name="drone_flight_hours" widget="float_time"/></div>
+                                    <div class="small text-muted">h flown</div>
+                                </div>
+                                <div class="col">
+                                    <div class="fw-bold">
+                                        <t t-if="record.drone_last_flight_day.raw_value" t-out="record.drone_last_flight_day.value"/>
+                                        <t t-else="">–</t>
+                                    </div>
+                                    <div class="small text-muted">last flight</div>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="col border-end">
+                                    <div class="fw-bold"><field name="drone_flight_count"/></div>
+                                    <div class="small text-muted">flights</div>
+                                </div>
+                                <div class="col border-end">
+                                    <div class="fw-bold"><field name="drone_flight_hours" widget="float_time"/></div>
+                                    <div class="small text-muted">h flown</div>
+                                </div>
+                                <div class="col">
+                                    <div class="fw-bold"><field name="hours_since_service" widget="float_time"/></div>
+                                    <div class="small text-muted">h since service</div>
+                                </div>
+                            </t>
+                        </div>
+
+                        <!-- Life / service bar -->
+                        <div class="mt-2">
+                            <div class="d-flex justify-content-between small text-muted">
+                                <span t-if="is_battery" class="text-truncate">Cycle life · <t t-out="record.drone_flight_count.value"/> / <t t-out="record.battery_cycle_limit.value"/></span>
+                                <span t-else="" class="text-truncate">Service due every <t t-out="record.service_interval_hours.value"/> h</span>
+                                <span><t t-out="usage"/>%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div t-attf-class="progress-bar bg-#{bar}" role="progressbar"
+                                     t-attf-style="width: #{usage}%; min-width: 4px;"
+                                     t-att-aria-valuenow="usage" aria-valuemin="0" aria-valuemax="100"/>
+                            </div>
+                        </div>
+
+                        <footer class="mt-2">
+                            <span t-if="record.maintenance_open_count.raw_value" class="badge text-bg-warning">
+                                <i class="fa fa-wrench me-1" title="Open repairs"/><field name="maintenance_open_count"/> open
+                            </span>
+                            <span t-if="is_battery and record.battery_health.raw_value == 'warning'" class="badge text-bg-warning ms-1">Near limit</span>
+                            <div class="d-flex ms-auto align-items-center">
+                                <field name="activity_ids" widget="kanban_activity"/>
+                            </div>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="maintenance_equipment_view_search_drone" model="ir.ui.view">
+        <field name="name">maintenance.equipment.search.drone</field>
+        <field name="model">maintenance.equipment</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="drone_project_id" groups="drone_sales_crm.group_drone_user"/>
+                <separator groups="drone_sales_crm.group_drone_user"/>
+                <filter string="Drones" name="drone_drones" domain="[('drone_equipment_type', '=', 'drone')]" groups="drone_sales_crm.group_drone_user"/>
+                <filter string="Batteries" name="drone_batteries" domain="[('drone_equipment_type', '=', 'battery')]" groups="drone_sales_crm.group_drone_user"/>
+                <separator groups="drone_sales_crm.group_drone_user"/>
+                <filter string="Free" name="drone_free" domain="[('drone_availability', '=', 'free')]" groups="drone_sales_crm.group_drone_user"/>
+                <filter string="On a Job" name="drone_busy" domain="[('drone_availability', '=', 'busy')]" groups="drone_sales_crm.group_drone_user"/>
+                <filter string="Broken" name="drone_broken" domain="[('drone_availability', '=', 'broken')]" groups="drone_sales_crm.group_drone_user"/>
+                <filter string="Availability" name="group_drone_availability" context="{'group_by': 'drone_availability'}" groups="drone_sales_crm.group_drone_user"/>
+                <filter string="Assigned Job" name="group_drone_project" context="{'group_by': 'drone_project_id'}" groups="drone_sales_crm.group_drone_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_drone_fleet_board" model="ir.actions.act_window">
+        <field name="name">Fleet Board</field>
+        <field name="res_model">maintenance.equipment</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('drone_equipment_type', '!=', False)]</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('maintenance_equipment_view_kanban_drone')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('maintenance_equipment_view_list_drone')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No drones or batteries yet</p>
+            <p>Add them under Drones and Batteries, with their serial numbers.</p>
+        </field>
+    </record>
+
+    <record id="action_drone_equipment_drones" model="ir.actions.act_window">
+        <field name="name">Drones</field>
+        <field name="res_model">maintenance.equipment</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('drone_equipment_type', '=', 'drone')]</field>
+        <field name="context" eval="{'default_category_id': ref('drone_flight_log.equipment_category_drone')}"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('maintenance_equipment_view_kanban_drone')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('maintenance_equipment_view_list_drone')})]"/>
+    </record>
+
+    <record id="action_drone_equipment_batteries" model="ir.actions.act_window">
+        <field name="name">Batteries</field>
+        <field name="res_model">maintenance.equipment</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('drone_equipment_type', '=', 'battery')]</field>
+        <field name="context" eval="{'default_category_id': ref('drone_flight_log.equipment_category_battery')}"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('maintenance_equipment_view_kanban_drone')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('maintenance_equipment_view_list_battery')})]"/>
+    </record>
+    <record id="hr_equipment_request_view_form_drone" model="ir.ui.view">
+        <field name="name">maintenance.request.form.drone</field>
+        <field name="model">maintenance.request</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='maintenance_type']" position="after">
+                <field name="drone_flight_id" groups="drone_sales_crm.group_drone_user" invisible="not drone_flight_id" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

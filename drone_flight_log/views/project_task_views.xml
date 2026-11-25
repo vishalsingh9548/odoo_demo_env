@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_task_form2_drone_flight" model="ir.ui.view">
+        <field name="name">project.task.form.drone.flight</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_log_drone_flight" type="object" string="Log Flight"
+                        class="btn-primary" groups="drone_sales_crm.group_drone_user" invisible="not is_span"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="after">
+                <div class="d-md-none rounded-2 bg-info-subtle p-2 mb-3" name="drone_mobile_panel"
+                     groups="drone_sales_crm.group_drone_user" invisible="not is_span">
+                    <div class="fw-bold">
+                        <i class="fa fa-arrows-h me-1" title="Span"/>
+                        <field name="tower_from" readonly="1" class="d-inline"/> → <field name="tower_to" readonly="1" class="d-inline"/>
+                    </div>
+                    <div class="small">
+                        <field name="span_length_m" readonly="1" class="d-inline"/> m ·
+                        <field name="crossing_type" readonly="1" class="d-inline"/> ·
+                        <field name="drone_flight_count" readonly="1" class="d-inline"/> flights
+                    </div>
+                    <div class="d-flex flex-column gap-2 mt-2" name="drone_mobile_buttons">
+                        <button name="action_log_drone_flight" type="object" string="Log Flight" icon="fa-plane"
+                                class="btn btn-primary btn-lg w-100"/>
+                        <button name="action_view_drone_flights" type="object" string="Flights on this Span" icon="fa-list"
+                                class="btn btn-secondary w-100"/>
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_drone_flights" type="object" class="oe_stat_button"
+                        icon="fa-paper-plane" groups="drone_sales_crm.group_drone_user" invisible="not is_span">
+                    <field name="drone_flight_count" widget="statinfo" string="Flights"/>
+                </button>
+            </xpath>
+            <xpath expr="//page[@name='drone_span_details']//group[field[@name='span_length_m']]" position="inside">
+                <field name="drone_flight_minutes" groups="drone_sales_crm.group_drone_user"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
