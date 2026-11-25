@@ -1,6 +1,6 @@
 {
     'name': 'CSL Solar EPC - AMC',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.0.1',
     'category': 'Industries',
     'summary': 'O&M / AMC contracts with Helpdesk and Field Service integration.',
     'author': 'Cloud Science Labs',
