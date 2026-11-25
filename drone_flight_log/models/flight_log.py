@@ -32,8 +32,15 @@ class DroneFlightLog(models.Model):
         default="draft", required=True, tracking=True, copy=False,
     )
     company_id = fields.Many2one(
-        "res.company", required=True, default=lambda self: self.env.company,
+        "res.company", required=True, compute="_compute_company_id", store=True, readonly=False,
+        precompute=True,
+        help="The span task's company; the current company when the task has none.",
     )
+
+    @api.depends("task_id")
+    def _compute_company_id(self):
+        for flight in self:
+            flight.company_id = flight.task_id.company_id or flight.company_id or self.env.company
 
     # --- Where -------------------------------------------------------------------------------
     task_id = fields.Many2one(

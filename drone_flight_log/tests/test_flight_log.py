@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from psycopg2 import IntegrityError
 
 from odoo.exceptions import UserError, ValidationError
-from odoo.tests import TransactionCase, tagged
+from odoo.tests import Form, TransactionCase, tagged
 from odoo.tools import mute_logger
 
 
@@ -307,3 +307,23 @@ class TestDroneFlightLog(TransactionCase):
         """The same x2many twice on a form breaks loading in Odoo 18: keep a single one."""
         arch = self.env["drone.flight.log"].get_views([(False, "form")])["views"]["form"]["arch"]
         self.assertEqual(arch.count('name="battery_ids"'), 1)
+
+    def test_21_log_flight_from_task_tab(self):
+        """Flights can be added on the span task's Flight Log tab."""
+        with Form(self.span) as task_form:
+            with task_form.drone_flight_ids.new() as line:
+                line.drone_id = self.drone
+                line.battery_ids.add(self.bat1)
+                line.pilot_id = self.pilot
+                line.takeoff_time = self.start
+        flight = self.span.drone_flight_ids
+        self.assertEqual(len(flight), 1)
+        self.assertEqual((flight.task_id, flight.project_id, flight.state), (self.span, self.project, "draft"))
+        self.assertEqual(flight.battery_ids, self.bat1)
+        flight.action_landed_now()
+        flight.action_done()
+        self.assertEqual(flight.state, "done")
+        self.assertEqual(self.span.drone_flight_count, 1)
+        arch = self.env["project.task"].get_views([(False, "form")])["views"]["form"]["arch"]
+        self.assertIn('name="drone_flight_log"', arch)
+        self.assertEqual(arch.count('name="drone_flight_ids"'), 1)

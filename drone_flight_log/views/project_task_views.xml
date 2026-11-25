@@ -38,6 +38,63 @@
             <xpath expr="//page[@name='drone_span_details']//group[field[@name='span_length_m']]" position="inside">
                 <field name="drone_flight_minutes" groups="drone_sales_crm.group_drone_user"/>
             </xpath>
+            <!-- Log flights straight from the span task -->
+            <xpath expr="//page[@name='drone_span_details']" position="after">
+                <page string="Flight Log" name="drone_flight_log" groups="drone_sales_crm.group_drone_user"
+                      invisible="not is_span">
+                    <field name="drone_flight_ids" mode="list,kanban"
+                           context="{'default_task_id': id}">
+                        <list editable="bottom" default_order="takeoff_time desc"
+                              decoration-muted="state == 'cancel'"
+                              decoration-info="state == 'draft'"
+                              decoration-danger="state == 'done' and result == 'aborted'">
+                            <field name="name" readonly="1" optional="show"/>
+                            <field name="drone_id" options="{'no_create': True}" readonly="state != 'draft'"/>
+                            <field name="battery_ids" widget="many2many_tags" options="{'no_create': True}"
+                                   readonly="state != 'draft'"/>
+                            <field name="pilot_id" options="{'no_create': True}" readonly="state != 'draft'"/>
+                            <field name="takeoff_time" readonly="state != 'draft'"/>
+                            <field name="landing_time" readonly="state != 'draft'"/>
+                            <field name="duration_min" sum="Total (min)"/>
+                            <field name="result" readonly="state != 'draft'"/>
+                            <field name="abort_reason" optional="show" readonly="state != 'draft'"
+                                   invisible="result == 'success'"/>
+                            <field name="wind_kmh" optional="hide" readonly="state != 'draft'"/>
+                            <field name="weather" optional="hide" readonly="state != 'draft'"/>
+                            <field name="state" widget="badge" readonly="1"
+                                   decoration-info="state == 'draft'" decoration-success="state == 'done'"/>
+                            <field name="company_id" column_invisible="1"/>
+                            <button name="action_landed_now" type="object" string="Landed" icon="fa-flag-checkered"
+                                    invisible="state != 'draft' or landing_time"/>
+                            <button name="action_done" type="object" string="Confirm" icon="fa-check"
+                                    class="text-success" invisible="state != 'draft' or not landing_time"/>
+                            <button name="action_report_breakdown" type="object" string="Breakdown"
+                                    icon="fa-exclamation-triangle" class="text-danger" invisible="state == 'cancel'"/>
+                        </list>
+                        <kanban class="o_kanban_mobile">
+                            <field name="state"/>
+                            <field name="result"/>
+                            <field name="landing_time"/>
+                            <templates>
+                                <t t-name="card">
+                                    <div class="d-flex justify-content-between">
+                                        <field name="name" class="fw-bold"/>
+                                        <span t-if="record.state.raw_value == 'draft'" class="badge rounded-pill text-bg-info">
+                                            <t t-if="record.landing_time.raw_value">Landed</t><t t-else="">In progress</t>
+                                        </span>
+                                        <span t-elif="record.state.raw_value == 'done'"
+                                              t-attf-class="badge rounded-pill text-bg-#{record.result.raw_value == 'success' and 'success' or record.result.raw_value == 'retry' and 'warning' or 'danger'}"><field name="result"/></span>
+                                        <span t-else="" class="badge rounded-pill text-bg-secondary">Cancelled</span>
+                                    </div>
+                                    <div class="small"><i class="fa fa-paper-plane me-1" title="Drone"/><field name="drone_id"/></div>
+                                    <field name="battery_ids" widget="many2many_tags"/>
+                                    <div class="small text-muted"><field name="takeoff_time"/> · <field name="duration_min"/> min</div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                </page>
+            </xpath>
         </field>
     </record>
 </odoo>
