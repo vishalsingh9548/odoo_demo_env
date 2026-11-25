@@ -154,8 +154,9 @@ class MaintenanceEquipment(models.Model):
             else:
                 equipment.drone_availability = "free"
 
-    # Odoo colour index per availability, used for the card's left edge.
-    _DRONE_KANBAN_COLORS = {"free": 10, "busy": 4, "broken": 1, "retired": 0}
+    # Odoo colour index per equipment type, used for the card's left edge
+    # (availability is already shown by the board column, the status pill and panel).
+    _DRONE_KANBAN_COLORS = {"drone": 5, "battery": 2}  # purple / orange
 
     @api.depends("drone_availability", "drone_equipment_type", "drone_flight_count", "battery_cycle_limit",
                  "hours_since_service", "service_interval_hours", "drone_last_flight_date")
@@ -164,7 +165,7 @@ class MaintenanceEquipment(models.Model):
             equipment.drone_last_flight_day = (
                 fields.Datetime.context_timestamp(equipment, equipment.drone_last_flight_date).date()
                 if equipment.drone_last_flight_date else False)
-            equipment.drone_kanban_color = self._DRONE_KANBAN_COLORS.get(equipment.drone_availability, 0)
+            equipment.drone_kanban_color = self._DRONE_KANBAN_COLORS.get(equipment.drone_equipment_type, 0)
             if equipment.drone_equipment_type == "battery" and equipment.battery_cycle_limit:
                 ratio = equipment.drone_flight_count / equipment.battery_cycle_limit
             elif equipment.drone_equipment_type == "drone" and equipment.service_interval_hours:
