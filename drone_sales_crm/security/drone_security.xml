@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="module_category_drone" model="ir.module.category">
-        <field name="name">Drone</field>
+    <!-- Module category "Drone" comes from the manifests ("category": "Drone"), which Odoo
+         creates as base.module_category_drone. The group uses the same category, so the
+         Apps filter and the user's access rights show one "Drone" section. -->
+    <record id="base.module_category_drone" model="ir.module.category">
         <field name="description">Drone business features: stringing jobs, survey spans, certifications, flight log, drones and batteries, project and task expenses.</field>
         <field name="sequence">60</field>
     </record>
@@ -10,7 +12,7 @@
          drone_project_expense): only its members see their features. -->
     <record id="group_drone_user" model="res.groups">
         <field name="name">Drone User</field>
-        <field name="category_id" ref="module_category_drone"/>
+        <field name="category_id" ref="base.module_category_drone"/>
         <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
     </record>
 </odoo>

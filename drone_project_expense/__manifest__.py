@@ -14,8 +14,8 @@ Record expenses against a job without touching analytic accounts:
 * Existing expenses whose analytic account belongs to a single project are linked to it on install
 * Visible only to members of the Drone User group (drone_sales_crm)
 """,
-    "version": "18.0.1.2.0",
-    "category": "Human Resources/Expenses",
+    "version": "18.0.1.3.0",
+    "category": "Drone",
     "author": "Abas",
     "license": "LGPL-3",
     "depends": [
