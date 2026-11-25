@@ -266,11 +266,12 @@ class TestDroneFlightLog(TransactionCase):
         self.assertIn("drone_project_id", arch)
 
     def test_17_board_helpers(self):
-        self.assertEqual(self.bat1.drone_kanban_color, 10)  # free: green
+        self.assertEqual(self.bat1.drone_kanban_color, 2)  # battery: orange
+        self.assertEqual(self.drone.drone_kanban_color, 5)  # drone: purple
         for i in range(4):
             self._flight(offset_min=i * 20).action_done()
         self.assertEqual(self.bat1.drone_usage_percent, 80)  # 4 of 5 cycles
-        self.assertEqual(self.bat1.drone_kanban_color, 4)  # on a job: blue
+        self.assertEqual(self.bat1.drone_kanban_color, 2, 'Colour follows the type, not the status')
         self.assertGreater(self.drone.drone_usage_percent, 0)
 
     # --- Phone flow -----------------------------------------------------------------------------

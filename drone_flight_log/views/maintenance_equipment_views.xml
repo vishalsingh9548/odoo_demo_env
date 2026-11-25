@@ -153,20 +153,27 @@
                         <t t-set="state" t-value="record.drone_availability.raw_value"/>
                         <t t-set="tone" t-value="{'free': 'success', 'busy': 'info', 'broken': 'danger', 'retired': 'secondary'}[state] or 'secondary'"/>
                         <t t-set="is_battery" t-value="record.drone_equipment_type.raw_value == 'battery'"/>
+                        <!-- Type colour: drones purple, batteries orange -->
+                        <t t-set="type_bg" t-value="is_battery and '#fff1e6' or '#f1e9fb'"/>
+                        <t t-set="type_fg" t-value="is_battery and '#e8590c' or '#7048e8'"/>
                         <t t-set="usage" t-value="record.drone_usage_percent.raw_value or 0"/>
                         <t t-set="battery_icon" t-value="usage &lt; 25 and 'fa-battery-full' or usage &lt; 50 and 'fa-battery-three-quarters' or usage &lt; 75 and 'fa-battery-half' or usage &lt; 100 and 'fa-battery-quarter' or 'fa-battery-empty'"/>
                         <t t-set="bar" t-value="usage &gt;= 100 and 'danger' or usage &gt;= 80 and 'warning' or 'success'"/>
 
                         <!-- Header: icon, name, serial, status pill -->
                         <div class="d-flex align-items-center gap-2">
-                            <div t-attf-class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0 bg-#{tone}-subtle"
-                                 style="width: 40px; height: 40px;">
-                                <i t-attf-class="fa fa-lg text-#{tone} #{is_battery and battery_icon or 'fa-paper-plane'}"
+                            <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                                 t-attf-style="width: 40px; height: 40px; background-color: #{type_bg};">
+                                <i t-attf-class="fa fa-lg #{is_battery and battery_icon or 'fa-paper-plane'}"
+                                   t-attf-style="color: #{type_fg};"
                                    t-att-title="is_battery and 'Battery' or 'Drone'"/>
                             </div>
                             <div class="flex-grow-1 overflow-hidden">
                                 <field name="name" class="fw-bold d-block text-truncate"/>
                                 <div class="small text-muted text-truncate">
+                                    <span class="badge me-1" t-attf-style="background-color: #{type_fg}; color: #fff;">
+                                        <t t-if="is_battery">Battery</t><t t-else="">Drone</t>
+                                    </span>
                                     <span class="font-monospace"><field name="serial_no"/></span>
                                     <t t-if="record.model.raw_value"> · <field name="model"/></t>
                                 </div>

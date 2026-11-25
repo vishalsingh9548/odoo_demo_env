@@ -15,7 +15,7 @@ Flight operations for drone stringing jobs, on top of Drone - CRM & Sales:
   high-priority repair request and a replacement request (requested > approved > dispatched >
   received) to send a working unit to site; a completed repair puts the equipment back in service
 """,
-    "version": "18.0.1.7.0",
+    "version": "18.0.1.7.1",
     "category": "Drone",
     "author": "Abas",
     "license": "LGPL-3",
