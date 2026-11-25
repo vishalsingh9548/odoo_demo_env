@@ -7,15 +7,15 @@
             <form string="Flight Log">
                 <header>
                     <button name="action_takeoff_now" type="object" string="Take-off Now"
-                            invisible="state != 'draft'"/>
+                            invisible="not id or state != 'draft'"/>
                     <button name="action_landed_now" type="object" string="Landed Now"
-                            invisible="state != 'draft' or landing_time"/>
+                            invisible="not id or state != 'draft' or landing_time"/>
                     <button name="action_done" type="object" string="Confirm Flight"
-                            class="btn-primary" invisible="state != 'draft'"/>
+                            class="btn-primary" invisible="not id or state != 'draft'"/>
                     <button name="action_report_breakdown" type="object" string="Report Breakdown"
-                            class="btn-danger" invisible="state == 'cancel'"/>
+                            class="btn-danger" invisible="not id or state == 'cancel'"/>
                     <button name="action_cancel" type="object" string="Cancel"
-                            invisible="state == 'cancel'"/>
+                            invisible="not id or state == 'cancel'"/>
                     <button name="action_draft" type="object" string="Reset to Draft"
                             invisible="state != 'cancel'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
@@ -42,13 +42,13 @@
                     <!-- Phone action bar: big buttons, one tap each -->
                     <div class="d-flex d-md-none flex-column gap-2 mb-3" name="mobile_actions">
                         <button name="action_takeoff_now" type="object" string="Take-off Now" icon="fa-plane"
-                                class="btn btn-secondary btn-lg w-100" invisible="state != 'draft' or landing_time"/>
+                                class="btn btn-secondary btn-lg w-100" invisible="not id or state != 'draft' or landing_time"/>
                         <button name="action_landed_now" type="object" string="Landed Now" icon="fa-flag-checkered"
-                                class="btn btn-secondary btn-lg w-100" invisible="state != 'draft' or landing_time"/>
+                                class="btn btn-secondary btn-lg w-100" invisible="not id or state != 'draft' or landing_time"/>
                         <button name="action_done" type="object" string="Confirm Flight" icon="fa-check"
-                                class="btn btn-primary btn-lg w-100" invisible="state != 'draft' or not landing_time"/>
+                                class="btn btn-primary btn-lg w-100" invisible="not id or state != 'draft' or not landing_time"/>
                         <button name="action_report_breakdown" type="object" string="Report Breakdown" icon="fa-exclamation-triangle"
-                                class="btn btn-outline-danger btn-lg w-100" invisible="state == 'cancel'"/>
+                                class="btn btn-outline-danger btn-lg w-100" invisible="not id or state == 'cancel'"/>
                     </div>
 
                     <group>

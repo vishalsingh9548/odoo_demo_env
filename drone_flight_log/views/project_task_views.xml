@@ -44,7 +44,8 @@
                       invisible="not is_span">
                     <field name="drone_flight_ids" mode="list,kanban"
                            context="{'default_task_id': id}">
-                        <list editable="bottom" default_order="takeoff_time desc"
+                        <!-- Not editable inline: "Add a line" and a click on a row open the flight form in a pop-up -->
+                        <list default_order="takeoff_time desc"
                               decoration-muted="state == 'cancel'"
                               decoration-info="state == 'draft'"
                               decoration-danger="state == 'done' and result == 'aborted'">
@@ -64,6 +65,8 @@
                             <field name="state" widget="badge" readonly="1"
                                    decoration-info="state == 'draft'" decoration-success="state == 'done'"/>
                             <field name="company_id" column_invisible="1"/>
+                            <button name="action_open_flight_popup" type="object" string="Open" icon="fa-external-link"
+                                    title="Open the flight in a pop-up"/>
                             <button name="action_landed_now" type="object" string="Landed" icon="fa-flag-checkered"
                                     invisible="state != 'draft' or landing_time"/>
                             <button name="action_done" type="object" string="Confirm" icon="fa-check"

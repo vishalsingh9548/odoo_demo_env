@@ -328,3 +328,14 @@ class TestDroneFlightLog(TransactionCase):
         arch = self.env["project.task"].get_views([(False, "form")])["views"]["form"]["arch"]
         self.assertIn('name="drone_flight_log"', arch)
         self.assertEqual(arch.count('name="drone_flight_ids"'), 1)
+
+    def test_22_task_tab_opens_flights_in_popup(self):
+        arch = self.env["project.task"].get_views([(False, "form")])["views"]["form"]["arch"]
+        start = arch.index('name="drone_flight_ids"')
+        tab = arch[start:arch.index("</field>", arch.index("</list>", start))]
+        self.assertNotIn("editable=", tab, "Rows open in a pop-up, not inline")
+        for button in ("action_open_flight_popup", "action_landed_now", "action_done", "action_report_breakdown"):
+            self.assertIn(button, tab)
+        flight = self._flight()
+        action = flight.action_open_flight_popup()
+        self.assertEqual((action["res_model"], action["res_id"], action["target"]), ("drone.flight.log", flight.id, "new"))
