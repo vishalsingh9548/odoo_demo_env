@@ -13,7 +13,7 @@ This module adds, on top of standard CRM and Sales:
 * On install: the drone stringing products, the job project template and the
   "Drone stringing job" quotation template
 """,
-    "version": "18.0.1.6.0",
+    "version": "18.0.1.7.0",
     "category": "Drone",
     "author": "Abas",
     "license": "LGPL-3",

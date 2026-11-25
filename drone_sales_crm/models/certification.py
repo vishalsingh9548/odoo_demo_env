@@ -128,6 +128,8 @@ class DroneCertification(models.Model):
             "rate": rate,
             "amount": rate * self.certified_km,
             "currency": order.currency_id,
+            "progress_pct": min(100.0, 100.0 * cumulative_km / ordered_km) if ordered_km else 0.0,
+            "state_label": dict(self._fields["state"]._description_selection(self.env)).get(self.state, ""),
         }
 
     def action_print_certification(self):

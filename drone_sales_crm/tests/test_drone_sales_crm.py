@@ -239,7 +239,7 @@ class TestDroneSalesCrm(TransactionCase):
         html = str(self.env["ir.actions.report"]._render_qweb_html(
             "drone_sales_crm.action_report_drone_certification", second.ids)[0])
         for text in (second.name, "KPIL/PO/TEST", "R. Sharma", "765kV Nimrana-Bareilly",
-                     "Certified by this certificate", "Certified by the client"):
+                     "Certified by this certificate", "Certified by the client", "of ordered km certified"):
             self.assertIn(text, html)
         # Without a document layout, Odoo first asks to configure one (standard behaviour).
         self.env.company.external_report_layout_id = self.env.ref("web.external_layout_standard")

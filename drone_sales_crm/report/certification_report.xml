@@ -25,130 +25,169 @@
                     <t t-else="">Tax ID</t>: <span t-field="doc.partner_id.vat"/>
                 </p>
             </t>
-            <div class="page">
+            <t t-set="accent" t-value="doc.company_id.primary_color or '#5e4766'"/>
+            <t t-set="km" t-value="{'widget': 'float', 'precision': 3}"/>
+            <t t-set="money" t-value="{'widget': 'monetary', 'display_currency': vals['currency']}"/>
+            <t t-set="badge" t-value="{'draft': '#6c757d', 'confirmed': '#0d6efd', 'invoiced': '#198754'}.get(doc.state, '#6c757d')"/>
+            <div class="page" style="font-size: 13px;">
                 <div class="oe_structure"/>
-                <t t-set="layout_document_title">
-                    <span>Client Certification # </span>
-                    <span t-field="doc.name">CERT/2026/0001</span>
-                    <span t-if="doc.state == 'draft'" class="text-muted"> (Draft)</span>
-                </t>
+                <style>
+                    .o_cert_label { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: #6c757d; }
+                    .o_cert_value { font-size: 13px; font-weight: 600; color: #212529; }
+                    .o_cert_card td { padding: 6px 12px; vertical-align: top; }
+                    .o_cert_tile td { padding: 8px 12px; }
+                    .o_cert_km th { color: #fff; padding: 6px 10px; font-weight: 600; }
+                    .o_cert_km td { padding: 5px 10px; border-bottom: 1px solid #e9ecef; }
+                </style>
 
-                <div class="row mb-4" id="informations">
-                    <div class="col" name="info_date">
-                        <strong>Certification Date</strong>
-                        <div t-field="doc.date"/>
-                    </div>
-                    <div t-if="order.client_order_ref" class="col" name="info_client_po">
-                        <strong>Client PO</strong>
-                        <div t-field="order.client_order_ref"/>
-                    </div>
-                    <div class="col" name="info_order">
-                        <strong>Our Order</strong>
-                        <div t-field="order.name"/>
-                    </div>
-                    <div t-if="doc.client_engineer" class="col" name="info_engineer">
-                        <strong>Client Engineer</strong>
-                        <div t-field="doc.client_engineer"/>
+                <!-- Title band (in the page, not the layout header: some layouts print the header
+                     title on one line over the company address) -->
+                <div class="mt-1 mb-3" name="certification_title"
+                     t-attf-style="border-left: 6px solid #{accent}; background-color: #f8f9fa; padding: 8px 14px;">
+                    <span style="float: right; margin-top: 12px;">
+                        <span t-attf-style="background-color: #{badge}; color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600;"
+                              t-out="vals['state_label']"/>
+                    </span>
+                    <div class="o_cert_label">Client Certification</div>
+                    <div t-attf-style="font-size: 22px; font-weight: 700; color: #{accent}; line-height: 1.2;">
+                        <span t-field="doc.name">CERT/2026/0001</span>
                     </div>
                 </div>
 
-                <div class="row mb-4" name="stringing_job">
-                    <div t-if="order.line_name" class="col" name="job_line">
-                        <strong>Line</strong>
-                        <div t-field="order.line_name"/>
+                <!-- Details card -->
+                <table class="w-100 mb-3 o_cert_card" id="informations" style="border: 1px solid #dee2e6;">
+                    <tr>
+                        <td name="info_date">
+                            <div class="o_cert_label">Certification date</div>
+                            <div class="o_cert_value" t-field="doc.date"/>
+                        </td>
+                        <td name="info_client_po">
+                            <div class="o_cert_label">Client PO</div>
+                            <div class="o_cert_value"><span t-if="order.client_order_ref" t-field="order.client_order_ref"/><span t-else="">–</span></div>
+                        </td>
+                        <td name="info_order">
+                            <div class="o_cert_label">Our order</div>
+                            <div class="o_cert_value" t-field="order.name"/>
+                        </td>
+                        <td name="info_engineer">
+                            <div class="o_cert_label">Client engineer</div>
+                            <div class="o_cert_value"><span t-if="doc.client_engineer" t-field="doc.client_engineer"/><span t-else="">–</span></div>
+                        </td>
+                    </tr>
+                    <tr name="stringing_job" style="border-top: 1px solid #dee2e6;">
+                        <td colspan="2" name="job_line">
+                            <div class="o_cert_label">Transmission line</div>
+                            <div class="o_cert_value"><span t-if="order.line_name" t-field="order.line_name"/><span t-else="">–</span></div>
+                        </td>
+                        <td name="job_voltage">
+                            <div class="o_cert_label">Voltage</div>
+                            <div class="o_cert_value"><t t-if="order.voltage_kv"><span t-field="order.voltage_kv"/> kV</t><span t-else="">–</span></div>
+                        </td>
+                        <td name="job_site">
+                            <div class="o_cert_label">Site / route</div>
+                            <div class="o_cert_value"><span t-if="order.site_location" t-field="order.site_location"/><span t-else="">–</span></div>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Highlight tiles -->
+                <table class="w-100 mb-2 o_cert_tile" name="highlights" style="border-collapse: collapse;">
+                    <tr>
+                        <td t-attf-style="background-color: #{accent}; color: #fff; width: 33%; border: none; border-right: 8px solid #fff;">
+                            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: .06em; opacity: .85;">This certificate</div>
+                            <div style="font-size: 20px; font-weight: 700;"><span t-out="doc.certified_km" t-options="km"/> km</div>
+                        </td>
+                        <td style="background-color: #f1f3f5; width: 34%; border: none; border-right: 8px solid #fff;">
+                            <div class="o_cert_label">Cumulative / ordered</div>
+                            <div style="font-size: 20px; font-weight: 700;">
+                                <span t-out="vals['cumulative_km']" t-options="km"/>
+                                <span style="font-size: 13px; color: #6c757d;"> / <span t-out="vals['ordered_km']" t-options="km"/> km</span>
+                            </div>
+                        </td>
+                        <td style="background-color: #e8f5e9; width: 33%; border: none;" t-if="vals['rate']">
+                            <div class="o_cert_label">Value of work certified</div>
+                            <div style="font-size: 20px; font-weight: 700; color: #1b5e20;"><span t-out="vals['amount']" t-options="money"/></div>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Progress -->
+                <div class="mb-3" name="progress">
+                    <div style="font-size: 11px; color: #6c757d; margin-bottom: 3px;">
+                        <strong t-out="round(vals['progress_pct'], 1)"/>% of ordered km certified
                     </div>
-                    <div t-if="order.voltage_kv" class="col-2" name="job_voltage">
-                        <strong>Voltage</strong>
-                        <div><span t-field="order.voltage_kv"/> kV</div>
-                    </div>
-                    <div t-if="order.site_location" class="col" name="job_site">
-                        <strong>Site / route</strong>
-                        <div t-field="order.site_location"/>
+                    <div style="height: 8px; background-color: #e9ecef; border-radius: 4px;">
+                        <div t-attf-style="height: 8px; width: #{vals['progress_pct']}%; background-color: #{accent}; border-radius: 4px;"/>
                     </div>
                 </div>
 
-                <table class="table table-sm o_main_table mt-2" name="km_summary">
+                <!-- Km summary -->
+                <table class="w-100 mb-3 o_cert_km" name="km_summary">
                     <thead>
-                        <tr>
+                        <tr t-attf-style="background-color: #{accent};">
                             <th class="text-start">Description</th>
-                            <th class="text-end">Length (km)</th>
+                            <th class="text-end" style="width: 30%;">Length (km)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Ordered</td>
-                            <td class="text-end" t-out="vals['ordered_km']" t-options='{"widget": "float", "precision": 3}'/>
+                        <tr><td>Ordered</td><td class="text-end" t-out="vals['ordered_km']" t-options="km"/></tr>
+                        <tr style="background-color: #f8f9fa;"><td>Certified before this certificate</td><td class="text-end" t-out="vals['previous_km']" t-options="km"/></tr>
+                        <tr t-attf-style="font-weight: 700; background-color: #fff8e1; border-left: 4px solid #{accent};">
+                            <td>Certified by this certificate</td><td class="text-end" t-out="doc.certified_km" t-options="km"/>
                         </tr>
-                        <tr>
-                            <td>Certified before this certificate</td>
-                            <td class="text-end" t-out="vals['previous_km']" t-options='{"widget": "float", "precision": 3}'/>
-                        </tr>
-                        <tr class="fw-bold">
-                            <td>Certified by this certificate</td>
-                            <td class="text-end" t-out="doc.certified_km" t-options='{"widget": "float", "precision": 3}'/>
-                        </tr>
-                        <tr>
-                            <td>Cumulative certified to date</td>
-                            <td class="text-end" t-out="vals['cumulative_km']" t-options='{"widget": "float", "precision": 3}'/>
-                        </tr>
-                        <tr>
-                            <td>Balance to certify</td>
-                            <td class="text-end" t-out="vals['balance_km']" t-options='{"widget": "float", "precision": 3}'/>
-                        </tr>
+                        <tr><td>Cumulative certified to date</td><td class="text-end" t-out="vals['cumulative_km']" t-options="km"/></tr>
+                        <tr style="background-color: #f8f9fa;"><td>Balance to certify</td><td class="text-end" t-out="vals['balance_km']" t-options="km"/></tr>
                     </tbody>
                 </table>
 
-                <div class="row justify-content-end mb-4" name="value_of_work" t-if="vals['rate']">
-                    <div class="col-6">
-                        <table class="table table-sm table-borderless">
-                            <tr>
-                                <td>Rate per km (as per order)</td>
-                                <td class="text-end">
-                                    <span t-out="vals['rate']" t-options='{"widget": "monetary", "display_currency": vals["currency"]}'/>
-                                </td>
-                            </tr>
-                            <tr class="border-top fw-bold">
-                                <td>Value of work certified (before tax)</td>
-                                <td class="text-end">
-                                    <span t-out="vals['amount']" t-options='{"widget": "monetary", "display_currency": vals["currency"]}'/>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
+                <!-- Value -->
+                <table class="mb-3" name="value_of_work" t-if="vals['rate']" style="width: 55%; margin-left: 45%;">
+                    <tr>
+                        <td style="padding: 5px 10px; color: #6c757d;">Rate per km (as per order)</td>
+                        <td class="text-end" style="padding: 5px 10px;"><span t-out="vals['rate']" t-options="money"/></td>
+                    </tr>
+                    <tr t-attf-style="border-top: 2px solid #{accent};">
+                        <td style="padding: 7px 10px; font-weight: 700;">Value of work certified (before tax)</td>
+                        <td class="text-end" style="padding: 7px 10px; font-weight: 700; font-size: 15px;"><span t-out="vals['amount']" t-options="money"/></td>
+                    </tr>
+                </table>
 
-                <div t-if="doc.note" class="mb-4" name="remarks">
-                    <strong>Remarks</strong>
+                <div t-if="doc.note" class="mb-2" name="remarks">
+                    <div class="o_cert_label">Remarks</div>
                     <div t-field="doc.note"/>
                 </div>
-                <p t-if="doc.invoice_id" class="text-muted" name="invoice_ref">
-                    Invoiced on <span t-field="doc.invoice_id.name"/>.
-                </p>
+                <div t-if="doc.invoice_id" class="mb-2" name="invoice_ref" style="color: #198754; font-size: 12px;">
+                    ✔ Invoiced on <strong t-field="doc.invoice_id.name"/>
+                </div>
 
-                <p class="mt-3 mb-0" name="declaration">
+                <!-- Declaration -->
+                <div name="declaration" class="mb-3"
+                     t-attf-style="background-color: #f8f9fa; border-left: 4px solid #{accent}; padding: 8px 14px; font-style: italic;">
                     We certify that the length shown above as "Certified by this certificate" has been
                     strung with pilot rope by drone and accepted on site.
-                </p>
-
-                <div class="row mt-4" name="signatures" style="page-break-inside: avoid;">
-                    <div class="col-6">
-                        <div style="height: 1.6cm;"/>
-                        <div class="border-top pt-1">
-                            <strong>Certified by the client</strong><br/>
-                            <span t-if="doc.client_engineer" t-field="doc.client_engineer"/>
-                            <span t-else="">Name and designation</span><br/>
-                            <span t-field="doc.partner_id.name"/> · Signature, date and stamp
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div style="height: 1.6cm;"/>
-                        <div class="border-top pt-1">
-                            <strong>For <span t-field="doc.company_id.name"/></strong><br/>
-                            Site Supervisor / Project Manager<br/>
-                            Signature and date
-                        </div>
-                    </div>
                 </div>
+
+                <!-- Signatures -->
+                <table class="w-100" name="signatures" style="page-break-inside: avoid; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 50%; border: 1px solid #dee2e6; border-right: 10px solid #fff; padding: 8px 12px; vertical-align: top;">
+                            <div class="o_cert_label">Certified by the client</div>
+                            <div style="height: 1.1cm;"/>
+                            <div style="border-top: 1px dashed #adb5bd; padding-top: 4px;">
+                                <strong><span t-if="doc.client_engineer" t-field="doc.client_engineer"/><span t-else="">Name and designation</span></strong><br/>
+                                <span t-field="doc.partner_id.name"/> · Signature, date and stamp
+                            </div>
+                        </td>
+                        <td style="width: 50%; border: 1px solid #dee2e6; padding: 8px 12px; vertical-align: top;">
+                            <div class="o_cert_label">For <span t-field="doc.company_id.name"/></div>
+                            <div style="height: 1.1cm;"/>
+                            <div style="border-top: 1px dashed #adb5bd; padding-top: 4px;">
+                                <strong>Site Supervisor / Project Manager</strong><br/>
+                                Signature and date
+                            </div>
+                        </td>
+                    </tr>
+                </table>
                 <div class="oe_structure"/>
             </div>
         </t>
