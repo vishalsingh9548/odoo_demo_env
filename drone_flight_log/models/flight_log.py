@@ -213,6 +213,19 @@ class DroneFlightLog(models.Model):
             flight.landing_time = now
         return True
 
+    def action_open_flight_popup(self):
+        """Open this flight's form in a pop-up (used from the span task's Flight Log tab)."""
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "name": self.name,
+            "res_model": "drone.flight.log",
+            "res_id": self.id,
+            "view_mode": "form",
+            "views": [(False, "form")],
+            "target": "new",
+        }
+
     def action_report_breakdown(self):
         self.ensure_one()
         return {
