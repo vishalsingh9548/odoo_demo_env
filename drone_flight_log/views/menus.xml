@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_drone_ops_root" name="Drone Ops" sequence="45"
+              web_icon="maintenance,static/description/icon.png"
+              groups="drone_sales_crm.group_drone_user"/>
+    <menuitem id="menu_drone_flight_logs" name="Flight Logs" parent="menu_drone_ops_root"
+              action="action_drone_flight_log" sequence="10" groups="drone_sales_crm.group_drone_user"/>
+    <menuitem id="menu_drone_equipment" name="Equipment" parent="menu_drone_ops_root" sequence="20" groups="drone_sales_crm.group_drone_user"/>
+    <menuitem id="menu_drone_fleet_board" name="Fleet Board" parent="menu_drone_equipment"
+              action="action_drone_fleet_board" sequence="5" groups="drone_sales_crm.group_drone_user"/>
+    <menuitem id="menu_drone_drones" name="Drones" parent="menu_drone_equipment"
+              action="action_drone_equipment_drones" sequence="10" groups="drone_sales_crm.group_drone_user"/>
+    <menuitem id="menu_drone_batteries" name="Batteries" parent="menu_drone_equipment"
+              action="action_drone_equipment_batteries" sequence="20" groups="drone_sales_crm.group_drone_user"/>
+    <menuitem id="menu_drone_equipment_requests" name="Replacement Requests" parent="menu_drone_equipment"
+              action="action_drone_equipment_request" sequence="25" groups="drone_sales_crm.group_drone_user"/>
+    <menuitem id="menu_drone_maintenance_requests" name="Maintenance Requests" parent="menu_drone_equipment"
+              action="maintenance.hr_equipment_request_action" sequence="30" groups="drone_sales_crm.group_drone_user"/>
+    <menuitem id="menu_drone_reporting" name="Reporting" parent="menu_drone_ops_root" sequence="90" groups="drone_sales_crm.group_drone_user"/>
+    <menuitem id="menu_drone_flight_analysis" name="Flight Analysis" parent="menu_drone_reporting"
+              action="action_drone_flight_analysis" sequence="10" groups="drone_sales_crm.group_drone_user"/>
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="edit_project_drone_flight" model="ir.ui.view">
+        <field name="name">project.project.form.drone.flight</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_drone_flights" type="object" class="oe_stat_button"
+                        icon="fa-paper-plane" groups="drone_sales_crm.group_drone_user" invisible="not drone_flight_count">
+                    <field name="drone_flight_count" widget="statinfo" string="Flights"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>
