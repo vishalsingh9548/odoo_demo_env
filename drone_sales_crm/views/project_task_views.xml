@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_task_form2_drone" model="ir.ui.view">
+        <field name="name">project.task.form.drone</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='description_page']" position="after">
+                <page string="Span Details" name="drone_span_details" groups="drone_sales_crm.group_drone_user">
+                    <group>
+                        <group>
+                            <field name="is_span"/>
+                            <field name="tower_from" invisible="not is_span"/>
+                            <field name="tower_to" invisible="not is_span"/>
+                        </group>
+                        <group invisible="not is_span">
+                            <field name="span_length_m"/>
+                            <field name="crossing_type"/>
+                            <field name="survey_span_id" readonly="1"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_task_search_form_drone" model="ir.ui.view">
+        <field name="name">project.task.search.drone</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_search_form_base"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter string="Spans" name="drone_spans" groups="drone_sales_crm.group_drone_user" domain="[('is_span', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

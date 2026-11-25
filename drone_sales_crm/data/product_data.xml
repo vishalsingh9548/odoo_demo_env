@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="product_category_drone_stringing" model="product.category">
+        <field name="name">Drone Stringing Services</field>
+        <field name="parent_id" ref="product.product_category_all"/>
+    </record>
+
+    <!-- The rate per km is set on each quotation line, so the list price stays 0. -->
+    <record id="product_drone_stringing_km" model="product.product">
+        <field name="name">Drone stringing (per km)</field>
+        <field name="default_code">DS-KM</field>
+        <field name="type">service</field>
+        <field name="categ_id" ref="product_category_drone_stringing"/>
+        <field name="uom_id" ref="uom.product_uom_km"/>
+        <field name="uom_po_id" ref="uom.product_uom_km"/>
+        <field name="invoice_policy">delivery</field>
+        <field name="service_type">manual</field>
+        <field name="service_tracking">project_only</field>
+        <field name="project_template_id" ref="project_stringing_job_template"/>
+        <field name="is_stringing_km" eval="True"/>
+        <field name="list_price">0.0</field>
+        <field name="description_sale">Drone-based pilot rope stringing, billed on km certified by the client's engineer.</field>
+        <field name="sale_ok" eval="True"/>
+        <field name="purchase_ok" eval="False"/>
+    </record>
+
+    <record id="product_drone_mobilisation" model="product.product">
+        <field name="name">Mobilisation charge</field>
+        <field name="default_code">DS-MOB</field>
+        <field name="type">service</field>
+        <field name="categ_id" ref="product_category_drone_stringing"/>
+        <field name="uom_id" ref="uom.product_uom_unit"/>
+        <field name="uom_po_id" ref="uom.product_uom_unit"/>
+        <field name="invoice_policy">order</field>
+        <field name="service_type">manual</field>
+        <field name="service_tracking">no</field>
+        <field name="description_sale">Mobilisation of crew, drone and equipment to site.</field>
+        <field name="sale_ok" eval="True"/>
+        <field name="purchase_ok" eval="False"/>
+    </record>
+
+    <record id="product_drone_demobilisation" model="product.product">
+        <field name="name">Demobilisation charge</field>
+        <field name="default_code">DS-DEMOB</field>
+        <field name="type">service</field>
+        <field name="categ_id" ref="product_category_drone_stringing"/>
+        <field name="uom_id" ref="uom.product_uom_unit"/>
+        <field name="uom_po_id" ref="uom.product_uom_unit"/>
+        <field name="invoice_policy">order</field>
+        <field name="service_type">manual</field>
+        <field name="service_tracking">no</field>
+        <field name="description_sale">Demobilisation of crew, drone and equipment from site.</field>
+        <field name="sale_ok" eval="True"/>
+        <field name="purchase_ok" eval="False"/>
+    </record>
+</odoo>

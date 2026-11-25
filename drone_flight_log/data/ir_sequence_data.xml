@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="seq_drone_flight_log" model="ir.sequence">
+        <field name="name">Drone Flight Log</field>
+        <field name="code">drone.flight.log</field>
+        <field name="prefix">FL/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+    <record id="seq_drone_equipment_request" model="ir.sequence">
+        <field name="name">Equipment Replacement Request</field>
+        <field name="code">drone.equipment.request</field>
+        <field name="prefix">ER/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_drone" model="ir.module.category">
+        <field name="name">Drone</field>
+        <field name="description">Drone business features: stringing jobs, survey spans, certifications, flight log, drones and batteries, project and task expenses.</field>
+        <field name="sequence">60</field>
+    </record>
+
+    <!-- The one group for all drone modules (drone_sales_crm, drone_flight_log,
+         drone_project_expense): only its members see their features. -->
+    <record id="group_drone_user" model="res.groups">
+        <field name="name">Drone User</field>
+        <field name="category_id" ref="module_category_drone"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>

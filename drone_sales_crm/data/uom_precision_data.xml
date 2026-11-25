@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Client certifications record km to 3 decimals (1 m). Quantities on order and invoice
+        lines must keep the same precision, otherwise 2.255 km would be invoiced as 2.26 km.
+        Both records are "noupdate" in their own modules, so they are written explicitly
+        (runs on every install and upgrade of this module).
+    -->
+    <function model="decimal.precision" name="write"
+              eval="[[ref('product.decimal_product_uom')], {'digits': 3}]"/>
+    <function model="uom.uom" name="write"
+              eval="[[ref('uom.product_uom_km')], {'rounding': 0.001}]"/>
+</odoo>

@@ -10,7 +10,7 @@
             <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='partner_id']" position="after">
-                    <field name="amc_contract_id"/>
+                    <field name="amc_contract_id" groups="csl_epc_core.group_epc_user"/>
                 </xpath>
             </field>
         </record>

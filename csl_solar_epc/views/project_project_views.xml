@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="csl_epc_core.project_view_form_epc"/>
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='action_open_share_project_wizard']" position="after">
-                    <button name="action_print_today_dpr" string="Download Today's Report" type="object"/>
+                    <button name="action_print_today_dpr" string="Download Today's Report" type="object" groups="csl_epc_core.group_epc_user"/>
                 </xpath>
             </field>
         </record>

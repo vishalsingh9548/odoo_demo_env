@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="edit_project_drone_expense" model="ir.ui.view">
+        <field name="name">project.project.form.drone.expense</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_new_drone_expense" type="object" string="New Expense" class="btn-primary"
+                        groups="drone_sales_crm.group_drone_user"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="after">
+                <div class="d-md-none mb-3" name="drone_expense_mobile" groups="drone_sales_crm.group_drone_user">
+                    <button name="action_new_drone_expense" type="object" string="New Expense" icon="fa-money"
+                            class="btn btn-outline-primary btn-lg w-100"/>
+                </div>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_drone_expenses" type="object" class="oe_stat_button"
+                        icon="fa-money" groups="drone_sales_crm.group_drone_user">
+                    <field name="drone_expense_count" widget="statinfo" string="Expenses"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_task_form2_drone_expense" model="ir.ui.view">
+        <field name="name">project.task.form.drone.expense</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_new_drone_expense" type="object" string="New Expense" class="btn-primary"
+                        groups="drone_sales_crm.group_drone_user"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="after">
+                <div class="d-md-none mb-3" name="drone_expense_mobile" groups="drone_sales_crm.group_drone_user">
+                    <button name="action_new_drone_expense" type="object" string="New Expense" icon="fa-money"
+                            class="btn btn-outline-primary btn-lg w-100"/>
+                </div>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_drone_expenses" type="object" class="oe_stat_button"
+                        icon="fa-money" groups="drone_sales_crm.group_drone_user">
+                    <field name="drone_expense_count" widget="statinfo" string="Expenses"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>
