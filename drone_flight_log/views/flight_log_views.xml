@@ -56,7 +56,8 @@
                             <field name="drone_id" readonly="state != 'draft'" options="{'no_create': True}"/>
                             <field name="drone_serial_no" class="text-muted"/>
                             <field name="battery_ids" widget="many2many_tags" readonly="state != 'draft'"
-                                   options="{'no_create': True}" class="d-md-none" string="Batteries"/>
+                                   options="{'no_create': True}" string="Batteries"
+                                   placeholder="Batteries used on this flight"/>
                             <field name="pilot_id" readonly="state != 'draft'"/>
                             <field name="takeoff_time" readonly="state != 'draft'"/>
                             <field name="landing_time" readonly="state != 'draft'"/>
@@ -70,22 +71,6 @@
                             <field name="wind_kmh" readonly="state != 'draft'"/>
                         </group>
                     </group>
-                    <div class="d-none d-md-block">
-                        <separator string="Batteries"/>
-                        <field name="battery_ids" readonly="state != 'draft'" options="{'no_create': True}">
-                            <list decoration-warning="battery_health == 'warning'"
-                                  decoration-danger="battery_health == 'retire'">
-                                <field name="name"/>
-                                <field name="serial_no"/>
-                                <field name="drone_flight_count" string="Cycles"/>
-                                <field name="battery_cycle_limit"/>
-                                <field name="battery_health" widget="badge"
-                                       decoration-success="battery_health == 'ok'"
-                                       decoration-warning="battery_health == 'warning'"
-                                       decoration-danger="battery_health == 'retire'"/>
-                            </list>
-                        </field>
-                    </div>
                     <group>
                         <group string="Span">
                             <field name="project_id"/>
