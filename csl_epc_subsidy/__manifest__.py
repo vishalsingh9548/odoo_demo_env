@@ -1,6 +1,6 @@
 {
     'name': 'CSL Solar EPC - Subsidy',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.0.1',
     'category': 'Industries',
     'summary': 'Subsidy scheme master and subsidy applications (claimed / approved / disbursed) linked to the project and its documents.',
     'author': 'Cloud Science Labs',
