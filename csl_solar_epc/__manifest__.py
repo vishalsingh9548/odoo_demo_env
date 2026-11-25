@@ -1,7 +1,7 @@
 {
     # Basic identity of the app, shown in Apps list
     'name': 'Solar Dashboard',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.0.1',
     'category': 'Industries',
     'summary': 'End-to-end Solar EPC project management: Lead to O&M',
     'description': """
