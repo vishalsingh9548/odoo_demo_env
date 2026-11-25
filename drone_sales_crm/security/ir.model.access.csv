@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_drone_survey_span_user,drone.survey.span.user,model_drone_survey_span,sales_team.group_sale_salesman,1,1,1,1
+access_drone_certification_user,drone.certification.user,model_drone_certification,sales_team.group_sale_salesman,1,1,1,0
+access_drone_certification_manager,drone.certification.manager,model_drone_certification,sales_team.group_sale_manager,1,1,1,1
+access_drone_certification_project,drone.certification.project,model_drone_certification,project.group_project_user,1,0,0,0
+access_drone_certification_invoice,drone.certification.invoice,model_drone_certification,account.group_account_invoice,1,1,0,0
+access_drone_survey_span_manager,drone.survey.span.manager,model_drone_survey_span,sales_team.group_sale_manager,1,1,1,1

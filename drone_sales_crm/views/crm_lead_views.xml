@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crm_lead_view_form_drone" model="ir.ui.view">
+        <field name="name">crm.lead.form.drone</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Stringing Job" name="drone_stringing_job" groups="drone_sales_crm.group_drone_user">
+                    <group string="Stringing job">
+                        <group>
+                            <field name="line_name" placeholder="e.g. 765kV Nimrana-Bareilly"/>
+                            <field name="voltage_kv"/>
+                            <field name="site_location"/>
+                        </group>
+                        <group>
+                            <field name="span_count"/>
+                            <field name="total_km"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Survey" name="drone_survey" groups="drone_sales_crm.group_drone_user">
+                    <field name="survey_span_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                            <field name="tower_from"/>
+                            <field name="tower_to"/>
+                            <field name="length_m" sum="Total (m)"/>
+                            <field name="crossing_type"/>
+                            <field name="remarks" optional="show"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="crm_case_tree_view_oppor_drone" model="ir.ui.view">
+        <field name="name">crm.lead.list.opportunity.drone</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_tree_view_oppor"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="line_name" optional="show" groups="drone_sales_crm.group_drone_user"/>
+                <field name="voltage_kv" optional="hide" groups="drone_sales_crm.group_drone_user"/>
+                <field name="span_count" optional="hide" groups="drone_sales_crm.group_drone_user"/>
+                <field name="total_km" optional="show" groups="drone_sales_crm.group_drone_user"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_crm_case_opportunities_filter_drone" model="ir.ui.view">
+        <field name="name">crm.lead.search.opportunity.drone</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="line_name" groups="drone_sales_crm.group_drone_user"/>
+                <field name="voltage_kv" groups="drone_sales_crm.group_drone_user"/>
+            </field>
+        </field>
+    </record>
+</odoo>

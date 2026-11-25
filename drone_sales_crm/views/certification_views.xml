@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="drone_certification_view_form" model="ir.ui.view">
+        <field name="name">drone.certification.form</field>
+        <field name="model">drone.certification</field>
+        <field name="arch" type="xml">
+            <form string="Client Certification">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_print_certification" type="object" string="Print"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,invoiced"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="sale_order_id" readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
+                            <field name="partner_id"/>
+                            <field name="project_id"/>
+                        </group>
+                        <group>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="certified_km" readonly="state != 'draft'"/>
+                            <field name="client_engineer" readonly="state != 'draft'"/>
+                            <field name="invoice_id" invisible="not invoice_id"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="attachment_ids" widget="many2many_binary"/>
+                        <field name="note" placeholder="Remarks from the client's engineer..."/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="drone_certification_view_list" model="ir.ui.view">
+        <field name="name">drone.certification.list</field>
+        <field name="model">drone.certification</field>
+        <field name="arch" type="xml">
+            <list string="Client Certifications" decoration-muted="state == 'invoiced'"
+                  decoration-info="state == 'draft'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="partner_id"/>
+                <field name="sale_order_id"/>
+                <field name="project_id" optional="show"/>
+                <field name="client_engineer" optional="hide"/>
+                <field name="certified_km" sum="Total km"/>
+                <field name="invoice_id" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'invoiced'"
+                       decoration-warning="state == 'confirmed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="drone_certification_view_search" model="ir.ui.view">
+        <field name="name">drone.certification.search</field>
+        <field name="model">drone.certification</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="sale_order_id"/>
+                <field name="partner_id"/>
+                <field name="project_id"/>
+                <filter string="To Invoice" name="to_invoice" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Customer" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Sales Order" name="group_order" context="{'group_by': 'sale_order_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_drone_certification" model="ir.actions.act_window">
+        <field name="name">Client Certifications</field>
+        <field name="res_model">drone.certification</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record the km certified by the client</p>
+            <p>Confirmed certifications set the delivered km on the sales order, ready to invoice.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_drone_certification"
+              name="Certifications"
+              parent="sale.sale_order_menu"
+              action="action_drone_certification"
+              sequence="40"
+              groups="drone_sales_crm.group_drone_user"/>
+</odoo>

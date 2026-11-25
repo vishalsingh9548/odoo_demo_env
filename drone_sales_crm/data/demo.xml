@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Demo only: loaded in databases created with demo data. Products, project template and
+         quotation template come from data/ and are reused here. -->
+    <record id="demo_partner_kpil" model="res.partner">
+        <field name="name">KPIL</field>
+        <field name="is_company" eval="True"/>
+        <field name="city">Gurugram</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+
+    <record id="demo_lead_kpil_nimrana_bareilly" model="crm.lead">
+        <field name="name">KPIL – 765kV Nimrana–Bareilly</field>
+        <field name="type">opportunity</field>
+        <field name="partner_id" ref="demo_partner_kpil"/>
+        <field name="line_name">765kV Nimrana–Bareilly</field>
+        <field name="voltage_kv">765</field>
+        <field name="site_location">Nimrana (Rajasthan) to Bareilly (Uttar Pradesh)</field>
+        <field name="survey_span_ids" eval="[
+            Command.create({'sequence': 10, 'name': '1', 'tower_from': 'T-101', 'tower_to': 'T-102', 'length_m': 620, 'crossing_type': 'farmland'}),
+            Command.create({'sequence': 20, 'name': '2', 'tower_from': 'T-102', 'tower_to': 'T-103', 'length_m': 845, 'crossing_type': 'river'}),
+            Command.create({'sequence': 30, 'name': '3', 'tower_from': 'T-103', 'tower_to': 'T-104', 'length_m': 410, 'crossing_type': 'farmland'}),
+            Command.create({'sequence': 40, 'name': '4', 'tower_from': 'T-104', 'tower_to': 'T-105', 'length_m': 380, 'crossing_type': 'farmland'}),
+            Command.create({'sequence': 50, 'name': '5', 'tower_from': 'T-105', 'tower_to': 'T-106', 'length_m': 900, 'crossing_type': 'river'}),
+            Command.create({'sequence': 60, 'name': '6', 'tower_from': 'T-106', 'tower_to': 'T-107', 'length_m': 515, 'crossing_type': 'farmland'}),
+            Command.create({'sequence': 70, 'name': '7', 'tower_from': 'T-107', 'tower_to': 'T-108', 'length_m': 300, 'crossing_type': 'farmland'}),
+            Command.create({'sequence': 80, 'name': '8', 'tower_from': 'T-108', 'tower_to': 'T-109', 'length_m': 760, 'crossing_type': 'river'}),
+            Command.create({'sequence': 90, 'name': '9', 'tower_from': 'T-109', 'tower_to': 'T-110', 'length_m': 450, 'crossing_type': 'farmland'}),
+            Command.create({'sequence': 100, 'name': '10', 'tower_from': 'T-110', 'tower_to': 'T-111', 'length_m': 690, 'crossing_type': 'farmland'}),
+            Command.create({'sequence': 110, 'name': '11', 'tower_from': 'T-111', 'tower_to': 'T-112', 'length_m': 880, 'crossing_type': 'river'}),
+            Command.create({'sequence': 120, 'name': '12', 'tower_from': 'T-112', 'tower_to': 'T-113', 'length_m': 335, 'crossing_type': 'farmland'}),
+        ]"/>
+    </record>
+</odoo>
