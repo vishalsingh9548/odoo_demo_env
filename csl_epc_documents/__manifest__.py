@@ -1,6 +1,6 @@
 {
     'name': 'CSL Solar EPC - Government Document Pack',
-    'version': '18.0.1.0.1',
+    'version': '18.0.1.0.2',
     'category': 'Industries',
     'summary': 'Checklist of government / compliance papers created when an order is confirmed, with status, signed scans and auto-filled print forms.',
     'author': 'Cloud Science Labs',
