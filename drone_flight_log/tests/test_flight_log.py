@@ -195,11 +195,16 @@ class TestDroneFlightLog(TransactionCase):
         flight = self._flight(batteries=self.bat1 | self.bat2)
         self._report_breakdown(flight, self.bat1)
         request = flight.equipment_request_ids
+        request.replacement_equipment_id = spare
+        with self.assertRaises(UserError, msg="Must be approved before dispatch"):
+            request.action_dispatch()
+        self.assertEqual(request.state, "requested")
+        request.replacement_equipment_id = False
+        request.action_approve()
         with self.assertRaises(UserError, msg="A replacement must be chosen before dispatch"):
             request.action_dispatch()
         with self.assertRaises(ValidationError, msg="Must be the same type"):
             request.replacement_equipment_id = self.drone
-        request.action_approve()
         request.replacement_equipment_id = spare
         request.action_dispatch()
         self.assertEqual(request.state, "dispatched")
@@ -222,6 +227,7 @@ class TestDroneFlightLog(TransactionCase):
         request = flight.equipment_request_ids
         self.assertEqual(request.equipment_type, "drone")
         request.replacement_equipment_id = spare_drone
+        request.action_approve()
         request.action_dispatch()
         request.action_receive()
         new_flight = self.env["drone.flight.log"].browse(request.action_new_flight()["res_id"])
@@ -252,6 +258,7 @@ class TestDroneFlightLog(TransactionCase):
         self._report_breakdown(flight, self.bat1)
         request = flight.equipment_request_ids
         request.replacement_equipment_id = spare
+        request.action_approve()
         request.action_dispatch()
         self.assertEqual(spare.drone_project_id, self.project)
         self.assertEqual(spare.drone_availability, "busy")
@@ -339,3 +346,41 @@ class TestDroneFlightLog(TransactionCase):
         flight = self._flight()
         action = flight.action_open_flight_popup()
         self.assertEqual((action["res_model"], action["res_id"], action["target"]), ("drone.flight.log", flight.id, "new"))
+
+    def test_23_breakdown_approval_board(self):
+        flight = self._flight(batteries=self.bat1 | self.bat2)
+        self._report_breakdown(flight, self.bat1)
+        request = flight.equipment_request_ids
+        # Every active status is a column, even the empty ones; Cancelled only when it has cards.
+        Request = self.env["drone.equipment.request"]
+        groups = Request.read_group([("id", "=", request.id)], ["state"], ["state"])
+        self.assertEqual({g["state"] for g in groups}, {"requested", "approved", "dispatched", "received"})
+        request.action_cancel()
+        groups = Request.read_group([("id", "=", request.id)], ["state"], ["state"])
+        self.assertIn("cancel", {g["state"] for g in groups})
+        request.action_reset()
+        # The board opens as a kanban grouped by status, with the approval buttons on the cards.
+        action = self.env["ir.actions.act_window"]._for_xml_id("drone_flight_log.action_drone_breakdown_board")
+        self.assertTrue(action["view_mode"].startswith("kanban"))
+        kanban_id = self.env.ref("drone_flight_log.drone_equipment_request_view_kanban_board").id
+        arch = Request.get_views([(kanban_id, "kanban")])["views"]["kanban"]["arch"]
+        self.assertIn('default_group_by="state"', arch)
+        for button in ("action_approve", "action_dispatch", "action_receive"):
+            self.assertIn(button, arch)
+        menu = self.env.ref("drone_flight_log.menu_drone_breakdown_board")
+        self.assertEqual(menu.parent_id, self.env.ref("drone_flight_log.menu_drone_breakdowns"))
+        self.assertEqual(self.env.ref("drone_flight_log.menu_drone_equipment_requests").parent_id,
+                         self.env.ref("drone_flight_log.menu_drone_breakdowns"))
+
+    def test_24_only_equipment_managers_approve(self):
+        flight = self._flight()
+        self._report_breakdown(flight, self.bat1)
+        request = flight.equipment_request_ids
+        pilot = self.env["res.users"].create({
+            "name": "Pilot user", "login": "pilot_no_manager",
+            "groups_id": [(6, 0, [self.env.ref("base.group_user").id,
+                                  self.env.ref("drone_sales_crm.group_drone_user").id])],
+        })
+        with self.assertRaises(UserError):
+            request.with_user(pilot).action_approve()
+        self.assertEqual(request.state, "requested")

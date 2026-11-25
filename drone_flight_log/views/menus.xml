@@ -12,10 +12,15 @@
               action="action_drone_equipment_drones" sequence="10" groups="drone_sales_crm.group_drone_user"/>
     <menuitem id="menu_drone_batteries" name="Batteries" parent="menu_drone_equipment"
               action="action_drone_equipment_batteries" sequence="20" groups="drone_sales_crm.group_drone_user"/>
-    <menuitem id="menu_drone_equipment_requests" name="Replacement Requests" parent="menu_drone_equipment"
-              action="action_drone_equipment_request" sequence="25" groups="drone_sales_crm.group_drone_user"/>
-    <menuitem id="menu_drone_maintenance_requests" name="Maintenance Requests" parent="menu_drone_equipment"
-              action="maintenance.hr_equipment_request_action" sequence="30" groups="drone_sales_crm.group_drone_user"/>
+    <!-- Breakdowns: what was reported from the flights, and where each request stands -->
+    <menuitem id="menu_drone_breakdowns" name="Breakdowns" parent="menu_drone_ops_root" sequence="15"
+              groups="drone_sales_crm.group_drone_user"/>
+    <menuitem id="menu_drone_breakdown_board" name="Approval Board" parent="menu_drone_breakdowns"
+              action="action_drone_breakdown_board" sequence="5" groups="drone_sales_crm.group_drone_user"/>
+    <menuitem id="menu_drone_equipment_requests" name="Replacement Requests" parent="menu_drone_breakdowns"
+              action="action_drone_equipment_request" sequence="10" groups="drone_sales_crm.group_drone_user"/>
+    <menuitem id="menu_drone_maintenance_requests" name="Repair Requests" parent="menu_drone_breakdowns"
+              action="maintenance.hr_equipment_request_action" sequence="20" groups="drone_sales_crm.group_drone_user"/>
     <menuitem id="menu_drone_reporting" name="Reporting" parent="menu_drone_ops_root" sequence="90" groups="drone_sales_crm.group_drone_user"/>
     <menuitem id="menu_drone_flight_analysis" name="Flight Analysis" parent="menu_drone_reporting"
               action="action_drone_flight_analysis" sequence="10" groups="drone_sales_crm.group_drone_user"/>

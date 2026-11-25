@@ -26,6 +26,7 @@ class DroneEquipmentRequest(models.Model):
             ("cancel", "Cancelled"),
         ],
         default="requested", required=True, tracking=True, copy=False,
+        group_expand="_expand_states",
     )
     company_id = fields.Many2one("res.company", required=True, default=lambda self: self.env.company)
 
@@ -62,6 +63,11 @@ class DroneEquipmentRequest(models.Model):
     receive_date = fields.Datetime(readonly=True, copy=False)
     note = fields.Text(string="Dispatch Notes")
 
+    def _expand_states(self, states, domain):
+        """Approval Board: every active status is a column, even when empty; Cancelled only
+        when it has cards."""
+        return [key for key, _label in self._fields["state"].selection if key != "cancel" or key in states]
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -97,13 +103,23 @@ class DroneEquipmentRequest(models.Model):
 
     # --- Workflow --------------------------------------------------------------------------------------
 
+    def _check_equipment_manager(self):
+        if not self.env.su and not self.env.user.has_group("maintenance.group_equipment_manager"):
+            raise UserError(_("Only an equipment manager can approve or dispatch a replacement."))
+
     def action_approve(self):
+        self._check_equipment_manager()
         self.filtered(lambda r: r.state == "requested").write({"state": "approved"})
         return True
 
     def action_dispatch(self):
+        """Send the replacement to site. The request must be approved first."""
+        self._check_equipment_manager()
+        not_approved = self.filtered(lambda r: r.state == "requested")
+        if not_approved:
+            raise UserError(_("Approve %s before dispatching it.", ", ".join(not_approved.mapped("name"))))
         for request in self:
-            if request.state not in ("requested", "approved"):
+            if request.state != "approved":
                 continue
             replacement = request.replacement_equipment_id
             if not replacement:
