@@ -302,3 +302,8 @@ class TestDroneFlightLog(TransactionCase):
             self.assertIn("kanban", action.view_mode)
         for model in ("drone.flight.log", "drone.equipment.request"):
             self.assertTrue(self.env[model].get_views([(False, "kanban")])["views"]["kanban"]["arch"])
+
+    def test_20_form_has_one_battery_field(self):
+        """The same x2many twice on a form breaks loading in Odoo 18: keep a single one."""
+        arch = self.env["drone.flight.log"].get_views([(False, "form")])["views"]["form"]["arch"]
+        self.assertEqual(arch.count('name="battery_ids"'), 1)
